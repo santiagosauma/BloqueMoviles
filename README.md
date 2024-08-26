@@ -22,9 +22,9 @@ Docentes:
 
 ## Contexto del Proyecto
 
-En el mundo actual, el uso de aplicaciones móviles ha revolucionado la forma en que interactuamos con servicios esenciales. BufeTec App nace de la necesidad de ofrecer una plataforma digital que facilite el acceso a servicios legales, tanto para clientes como para los colaboradores internos de la Clínica Penal. La aplicación está diseñada para funcionar en dispositivos Android, garantizando compatibilidad con las versiones más recientes.
+En el mundo actual, el uso de aplicaciones móviles ha revolucionado la forma en que interactuamos con servicios esenciales. Legal Solutions App nace de la necesidad de ofrecer una plataforma digital que facilite el acceso a servicios legales, tanto para clientes como para los colaboradores internos de la Clínica Penal. La aplicación está diseñada para funcionar en dispositivos Android, garantizando compatibilidad con las versiones más recientes.
 
-Esta herramienta no solo mejorará la interacción con los clientes, sino que también permitirá a la Clínica Penal organizarse mejor y proporcionar un servicio más eficiente y accesible. BufeTec App incluye funcionalidades avanzadas como la gestión de citas, acceso a información jurídica, y comunicación fluida entre clientes y abogados, todo en un entorno seguro y fácil de usar.
+Esta herramienta no solo mejorará la interacción con los clientes, sino que también permitirá a la Clínica Penal organizarse mejor y proporcionar un servicio más eficiente y accesible. Legal Solutions App incluye funcionalidades avanzadas como la gestión de citas, acceso a información jurídica, y comunicación fluida entre clientes y abogados, todo en un entorno seguro y fácil de usar.
 
 ## Tipos de Usuario
 
@@ -35,11 +35,11 @@ Esta herramienta no solo mejorará la interacción con los clientes, sino que ta
 ## Herramientas de Trabajo
 
 - **MockUp Digital - Figma**: [Clínica Penal App](https://www.figma.com/design/zh6VobRc6wSZPaGuifHL6s/Cl%C3%ADnica-Penal-App---Equipo-5?node-id=1-1501&t=yKHhERyovNj70uUR-1)
-- **Presentación Inicial - Canva**: [BufeTec Presentación Inicial](https://www.canva.com/design/DAGN4p9d1Y0/C_7YrhZfzL6iPidXGJ2dAA/view?utm_content=DAGN4p9d1Y0&utm_campaign=designshare&utm_medium=link&utm_source=editor)
+- **Presentación Inicial - Canva**: [Clínica Penal Presentación Inicial](https://www.canva.com/design/DAGN4p9d1Y0/C_7YrhZfzL6iPidXGJ2dAA/view?utm_content=DAGN4p9d1Y0&utm_campaign=designshare&utm_medium=link&utm_source=editor)
 
 ## Instalación y Uso
 
-1. **Clona el repositorio**: `git clone https://github.com/santiagosauma/SoftBlitz-BufeTec_Project.git`
-2. **Navega al directorio del proyecto**: `cd SoftBlitz-BufeTec_Project`
+1. **Clona el repositorio**: `git clone https://github.com/santiagosauma/SoftBlitz-ClinicaPenal_Project.git`
+2. **Navega al directorio del proyecto**: `cd SoftBlitz-ClinicaPenal_Project`
 3. **Instala dependencias**: `npm install` (o el gestor de paquetes que utilices)
 4. **Ejecuta la aplicación**: `npm start`
