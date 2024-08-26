@@ -1,6 +1,6 @@
-# BufeTec App
+# Legal Solutions App
 
-BufeTec App es una aplicación móvil desarrollada para optimizar la gestión y el acceso a servicios legales ofrecidos por el bufete de abogados de la Clínica Penal (OSF). La aplicación permite a los usuarios, tanto clientes como colaboradores y administradores, gestionar citas, acceder a información legal y comunicarse de manera eficiente y segura.
+Legal Solutions App es una aplicación móvil desarrollada para optimizar la gestión y el acceso a servicios legales ofrecidos por el bufete de abogados de la Clínica Penal (OSF). La aplicación permite a los usuarios, tanto clientes como colaboradores y administradores, gestionar citas, acceder a información legal y comunicarse de manera eficiente y segura.
 
 ## Consultoría
 
