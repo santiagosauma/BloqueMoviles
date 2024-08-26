@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.leotesta017.bufetecapp.ui.theme.BufeTecAppTheme
 
+
 @Composable
 fun BarraNav(modifier: Modifier = Modifier) {
     Row(
