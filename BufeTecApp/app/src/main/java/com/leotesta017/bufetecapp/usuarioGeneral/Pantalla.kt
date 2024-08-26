@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -17,12 +18,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.leotesta017.bufetecapp.R
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavController
+import com.leotesta017.bufetecapp.R
 import com.leotesta017.bufetecapp.usuarioGeneral.BarraNav
 
 @Composable
-fun Pantalla() {
+fun Pantalla(navController: NavController?) {
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -50,6 +52,7 @@ fun Pantalla() {
         }
 
         BarraNav(
+            navController = navController,
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()
@@ -238,7 +241,7 @@ fun RedesSociales() {
                         .clickable { }
                 )
                 Image(
-                    painter = painterResource(id = R.drawable.logoyoutube),
+                    painter = painterResource(id = R.drawable.youtube),
                     contentDescription = "YouTube",
                     modifier = Modifier
                         .size(30.dp)
@@ -291,6 +294,6 @@ fun Calendarios() {
 
 @Preview(showBackground = true)
 @Composable
-fun PreviewPantalla() {
-    Pantalla()
+fun PantallaPreview() {
+    Pantalla(navController = null)
 }

@@ -14,6 +14,7 @@ import com.leotesta017.bufetecapp.loginRegister.*
 import com.leotesta017.bufetecapp.usuarioColaborador.Pantalla13
 import com.leotesta017.bufetecapp.usuarioEstudiante.Pantalla12
 import com.leotesta017.bufetecapp.usuarioGeneral.Pantalla11
+import com.leotesta017.bufetecapp.usuarioGeneral.PantallaInfo
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,8 +39,8 @@ fun MyApp() {
         composable("pantalla8") { Pantalla8(navController) }
         composable("pantalla9") { Pantalla9(navController) }
         composable("pantalla10") { Pantalla10(navController) }
-        composable("pantalla11") { Pantalla() }  // Nueva pantalla de usuario general
-        composable("pantalla12") { Pantalla12() }  // Nueva pantalla de estudiante
-        composable("pantalla13") { Pantalla13() }  // Nueva pantalla de colaborador
+        composable("pantalla11") { Pantalla(navController) }  // Usando navController
+        composable("pantalla12") { PantallaInfo(navController) }  // Usando navController
+        composable("pantalla13") { Pantalla13() }  // Usando navController
     }
 }

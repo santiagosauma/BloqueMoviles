@@ -1,7 +1,7 @@
-// BarraNav.kt
 package com.leotesta017.bufetecapp.usuarioGeneral
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Folder
@@ -16,28 +16,46 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.leotesta017.bufetecapp.ui.theme.BufeTecAppTheme
 
-
 @Composable
-fun BarraNav(modifier: Modifier = Modifier) {
+fun BarraNav(navController: NavController?, modifier: Modifier = Modifier) {
     Row(
         modifier = modifier
-            .background(Color(0xffffff))
-            .padding(top=15.dp, bottom = 10.dp),
+            .background(Color.White)
+            .padding(top = 15.dp, bottom = 10.dp),
         horizontalArrangement = Arrangement.SpaceAround,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        BottomBarItem(icon = Icons.Default.Menu, text = "Inicio")
-        BottomBarItem(icon = Icons.Default.Folder, text = "Solicitudes")
-        BottomBarItem(icon = Icons.Default.Info, text = "Información")
+        BottomBarItem(
+            icon = Icons.Default.Menu,
+            text = "Inicio",
+            onClick = { navController?.navigate("pantalla12") }
+        )
+        BottomBarItem(
+            icon = Icons.Default.Folder,
+            text = "Solicitudes",
+            onClick = { navController?.navigate("pantalla12") }
+        )
+        BottomBarItem(
+            icon = Icons.Default.Info,
+            text = "Información",
+            onClick = { navController?.navigate("pantalla11") }
+        )
     }
 }
 
 @Composable
-fun BottomBarItem(icon: androidx.compose.ui.graphics.vector.ImageVector, text: String, backgroundColor: Color = Color.Transparent) {
+fun BottomBarItem(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    text: String,
+    onClick: () -> Unit,
+    backgroundColor: Color = Color.Transparent
+) {
     Column(
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.clickable(onClick = onClick)
     ) {
         Box(
             modifier = Modifier
@@ -54,8 +72,8 @@ fun BottomBarItem(icon: androidx.compose.ui.graphics.vector.ImageVector, text: S
 
 @Preview(showBackground = true)
 @Composable
-fun Preview() {
+fun PreviewBarraNav() {
     BufeTecAppTheme {
-        BarraNav()
+        BarraNav(navController = null)
     }
 }
