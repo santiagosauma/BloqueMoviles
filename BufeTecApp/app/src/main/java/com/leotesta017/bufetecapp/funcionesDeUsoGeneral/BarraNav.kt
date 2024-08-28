@@ -1,4 +1,4 @@
-package com.leotesta017.bufetecapp.usuarioGeneral
+package com.leotesta017.bufetecapp.funcionesDeUsoGeneral
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable

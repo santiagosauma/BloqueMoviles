@@ -14,9 +14,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.leotesta017.bufetecapp.funcionesDeUsoGeneral.BarraNav
+import com.leotesta017.bufetecapp.funcionesDeUsoGeneral.TopBar
 
 @Composable
 fun PantallaInfo(navController: NavController?) {
@@ -49,22 +52,7 @@ fun PantallaInfo(navController: NavController?) {
     }
 }
 
-@Composable
-fun TopBar() {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = "Clínica Penal",
-            fontSize = 38.sp,
-            fontWeight = FontWeight.ExtraBold,
-            color = Color.Blue
-        )
-    }
-}
+
 
 @Composable
 fun SearchBar(searchText: String) {
@@ -129,4 +117,10 @@ fun CategoryItem(title: String, description: String) {
             Text(text = "Ver más", fontSize = 14.sp, color = Color.Blue, modifier = Modifier.padding(start = 8.dp))
         }
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PantallaInfoPreview() {
+    PantallaInfo(navController = null)
 }
