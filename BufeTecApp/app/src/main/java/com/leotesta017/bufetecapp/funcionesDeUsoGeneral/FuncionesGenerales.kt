@@ -95,45 +95,52 @@ fun DropdownTextField(
 }
 
 
-
-
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TimePickerTextField(
+fun TimeDropdownTextField(
     label: String,
+    options: List<String>,
     selectedTime: String,
     onTimeSelected: (String) -> Unit
 ) {
-    val context = LocalContext.current
+    var expanded by remember { mutableStateOf(false) }
 
-    TextField(
-        value = selectedTime,
-        onValueChange = { },
-        readOnly = true,
-        label = {
-            Text(label)
-        },
-        trailingIcon = {
-            Icon(Icons.Default.AccessTime, contentDescription = "Seleccionar Hora")
-        },
-        modifier = Modifier
-            .width(350.dp)
-            .background(Color(0xFFF2F2F2))
-            .clickable {
-                val calendar = Calendar.getInstance()
-                TimePickerDialog(
-                    context,
-                    { _, hourOfDay, minute ->
-                        val formattedTime = String.format("%02d:%02d", hourOfDay, minute)
-                        onTimeSelected(formattedTime)
-                    },
-                    calendar.get(Calendar.HOUR_OF_DAY),
-                    calendar.get(Calendar.MINUTE),
-                    true // 24 horas
-                ).show()
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { expanded = !expanded }
+    ) {
+        TextField(
+            value = selectedTime,
+            onValueChange = { },
+            readOnly = true,
+            label = {
+                Text(label)
+            },
+            trailingIcon = {
+                ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+            },
+            modifier = Modifier
+                .menuAnchor()
+                .width(350.dp)
+                .background(Color(0xFFF2F2F2))
+        )
+
+        ExposedDropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            options.forEach { option ->
+                DropdownMenuItem(
+                    text = { Text(option) },
+                    onClick = {
+                        onTimeSelected(option)
+                        expanded = false
+                    }
+                )
             }
-    )
+        }
+    }
 }
-
 
 
 

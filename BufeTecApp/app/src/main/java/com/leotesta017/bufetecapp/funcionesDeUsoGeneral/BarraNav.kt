@@ -36,7 +36,7 @@ fun BarraNav(navController: NavController?, modifier: Modifier = Modifier) {
         BottomBarItem(
             icon = Icons.Default.Folder,
             text = "Solicitudes",
-            onClick = { navController?.navigate("pantalla12") }
+            onClick = { navController?.navigate("solicitud") }
         )
         BottomBarItem(
             icon = Icons.Default.Info,

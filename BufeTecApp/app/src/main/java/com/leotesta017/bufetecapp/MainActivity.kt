@@ -15,6 +15,7 @@ import com.leotesta017.bufetecapp.usuarioColaborador.Pantalla13
 import com.leotesta017.bufetecapp.usuarioEstudiante.Pantalla12
 import com.leotesta017.bufetecapp.usuarioGeneral.Pantalla11
 import com.leotesta017.bufetecapp.usuarioGeneral.PantallaInfo
+import com.leotesta017.bufetecapp.usuarioGeneral.Solicitud
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,5 +43,6 @@ fun MyApp() {
         composable("pantalla11") { Pantalla(navController) }  // Usando navController
         composable("pantalla12") { PantallaInfo(navController) }  // Usando navController
         composable("pantalla13") { Pantalla13() }  // Usando navController
+        composable("solicitud"){ Solicitud(navController)}
     }
 }

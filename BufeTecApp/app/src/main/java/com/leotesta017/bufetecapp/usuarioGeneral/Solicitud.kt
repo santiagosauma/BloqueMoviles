@@ -1,27 +1,29 @@
 package com.leotesta017.bufetecapp.usuarioGeneral
 
-import android.app.DatePickerDialog
+
+import android.widget.CalendarView
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavController
 import com.leotesta017.bufetecapp.funcionesDeUsoGeneral.TopBar
 import com.leotesta017.bufetecapp.funcionesDeUsoGeneral.BarraNav
 import com.leotesta017.bufetecapp.funcionesDeUsoGeneral.DropdownTextField
-import com.leotesta017.bufetecapp.funcionesDeUsoGeneral.TimePickerTextField
-import java.util.Calendar
+import com.leotesta017.bufetecapp.funcionesDeUsoGeneral.TimeDropdownTextField
 
 
 @Composable
@@ -39,7 +41,6 @@ fun Solicitud(navController: NavController?) {
                 TopBar()
                 Spacer(modifier = Modifier.height(20.dp))
 
-                // Llamada a las subfunciones
                 SeleccionarProblema()
                 Spacer(modifier = Modifier.height(20.dp))
                 SeleccionarLugar()
@@ -51,6 +52,7 @@ fun Solicitud(navController: NavController?) {
                 CheckboxConInformacion()
                 Spacer(modifier = Modifier.height(20.dp))
                 BotonConfirmarCita()
+                Spacer(modifier = Modifier.height(50.dp))
             }
         }
 
@@ -93,39 +95,31 @@ fun SeleccionarProblema() {
 
 @Composable
 fun SeleccionarFecha() {
-    val context = LocalContext.current
     var selectedDate by remember { mutableStateOf("") }
-    var showDatePicker by remember { mutableStateOf(false) }
 
-    Column(modifier = Modifier.width(350.dp)) {
-        Text("Fecha", style = MaterialTheme.typography.h6)
+    Column(
+        modifier = Modifier
+            .width(350.dp)
+            .padding(16.dp)
+    ) {
+        Text(
+            text = if (selectedDate.isEmpty()) "Seleccionar Fecha" else "Fecha seleccionada: $selectedDate",
+            style = MaterialTheme.typography.h6,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
 
-        OutlinedButton(
-            onClick = { showDatePicker = true },
+        AndroidView(
+            factory = { context ->
+                CalendarView(context).apply {
+                    setOnDateChangeListener { _, year, month, dayOfMonth ->
+                        selectedDate = "$dayOfMonth/${month + 1}/$year"
+                    }
+                }
+            },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 8.dp, bottom = 8.dp)
-        ) {
-            Text(
-                text = if (selectedDate.isEmpty()) "Seleccionar Fecha" else selectedDate,
-                style = MaterialTheme.typography.body1
-            )
-        }
-
-        if (showDatePicker) {
-            DatePickerDialog(
-                context,
-                { _, year, month, dayOfMonth ->
-                    selectedDate = "$dayOfMonth/${month + 1}/$year"
-                    showDatePicker = false
-                },
-                Calendar.getInstance().get(Calendar.YEAR),
-                Calendar.getInstance().get(Calendar.MONTH),
-                Calendar.getInstance().get(Calendar.DAY_OF_MONTH)
-            ).apply {
-                show()
-            }
-        }
+                .height(350.dp)
+        )
     }
 }
 
@@ -133,14 +127,20 @@ fun SeleccionarFecha() {
 
 @Composable
 fun SeleccionarHora() {
+    val horas = listOf(
+        "08:00", "09:00", "10:00", "11:00", "12:00",
+        "13:00", "14:00", "15:00", "16:00", "17:00"
+    )
     var selectedTime by remember { mutableStateOf("") }
 
-    TimePickerTextField(
+    TimeDropdownTextField(
         label = "Hora",
+        options = horas,
         selectedTime = selectedTime,
         onTimeSelected = { selectedTime = it }
     )
 }
+
 
 @Composable
 fun CheckboxConInformacion() {
@@ -163,13 +163,24 @@ fun CheckboxConInformacion() {
 fun BotonConfirmarCita() {
     val context = LocalContext.current
 
-    Button(onClick = {
-        Toast.makeText(context, "Cita confirmada",
-            Toast.LENGTH_SHORT).show()
-    }) {
-        Text("Confirmar Cita")
+    Button(
+        onClick = {
+            Toast.makeText(context, "Cita confirmada", Toast.LENGTH_SHORT).show()
+        },
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
+            .height(56.dp),
+        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0B1F8C)) // Cambia el color de fondo del botón
+    ) {
+        Text(
+            text = "Confirmar Cita",
+            color = Color.White,
+            style = MaterialTheme.typography.button.copy(fontSize = 18.sp)
+        )
     }
 }
+
 
 @Preview(showBackground = true)
 @Composable
