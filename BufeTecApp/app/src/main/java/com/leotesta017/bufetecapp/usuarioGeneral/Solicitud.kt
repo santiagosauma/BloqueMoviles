@@ -1,15 +1,12 @@
 package com.leotesta017.bufetecapp.usuarioGeneral
 
-
 import android.widget.CalendarView
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -20,49 +17,66 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavController
-import com.leotesta017.bufetecapp.funcionesDeUsoGeneral.TopBar
+import androidx.navigation.compose.rememberNavController
 import com.leotesta017.bufetecapp.funcionesDeUsoGeneral.BarraNav
 import com.leotesta017.bufetecapp.funcionesDeUsoGeneral.DropdownTextField
 import com.leotesta017.bufetecapp.funcionesDeUsoGeneral.TimeDropdownTextField
+import com.leotesta017.bufetecapp.funcionesDeUsoGeneral.TopBar
+import com.leotesta017.bufetecapp.ui.theme.BufeTecAppTheme
 
-
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Solicitud(navController: NavController?) {
-    Box(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(bottom = 56.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            item {
+    Scaffold(
+        topBar = {
+            Column {
                 TopBar()
-                Spacer(modifier = Modifier.height(20.dp))
-
-                SeleccionarProblema()
-                Spacer(modifier = Modifier.height(20.dp))
-                SeleccionarLugar()
-                Spacer(modifier = Modifier.height(20.dp))
-                SeleccionarFecha()
-                Spacer(modifier = Modifier.height(20.dp))
-                SeleccionarHora()
-                Spacer(modifier = Modifier.height(20.dp))
-                CheckboxConInformacion()
-                Spacer(modifier = Modifier.height(20.dp))
-                BotonConfirmarCita()
-                Spacer(modifier = Modifier.height(50.dp))
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp, vertical = 3.dp)
+                        .fillMaxWidth()
+                ) {
+                    IconButton(onClick = { navController?.popBackStack() }) {
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Volver")
+                    }
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = "Crear solicitud",
+                        style = MaterialTheme.typography.headlineSmall.copy(color = Color.Black),
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+            }
+        },
+        bottomBar = {
+            BarraNav(navController = navController, modifier = Modifier.fillMaxWidth())
+        },
+        content = { paddingValues ->
+            LazyColumn(
+                modifier = Modifier
+                    .padding(paddingValues)
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp)
+            ) {
+                item {
+                    Spacer(modifier = Modifier.height(20.dp))
+                    SeleccionarProblema()
+                    Spacer(modifier = Modifier.height(20.dp))
+                    SeleccionarLugar()
+                    Spacer(modifier = Modifier.height(20.dp))
+                    SeleccionarFecha()
+                    Spacer(modifier = Modifier.height(20.dp))
+                    SeleccionarHora()
+                    Spacer(modifier = Modifier.height(20.dp))
+                    CheckboxConInformacion()
+                    Spacer(modifier = Modifier.height(20.dp))
+                    BotonConfirmarCita()
+                    Spacer(modifier = Modifier.height(50.dp))
+                }
             }
         }
-
-        BarraNav(
-            navController = navController,
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .fillMaxWidth()
-        )
-    }
+    )
 }
 
 @Composable
@@ -70,27 +84,29 @@ fun SeleccionarLugar() {
     var selectedPlace by remember { mutableStateOf("") }
     val places = listOf("Lugar 1", "Lugar 2", "Lugar 3")
 
-    DropdownTextField(
-        label = "Lugar",
-        options = places,
-        selectedOption = selectedPlace,
-        onOptionSelected = { selectedPlace = it }
-    )
+    Box(modifier = Modifier.fillMaxWidth()) {
+        DropdownTextField(
+            label = "Lugar",
+            options = places,
+            selectedOption = selectedPlace,
+            onOptionSelected = { selectedPlace = it }
+        )
+    }
 }
-
-
 
 @Composable
 fun SeleccionarProblema() {
     var selectedProblem by remember { mutableStateOf("") }
     val problems = listOf("Problema 1", "Problema 2", "Problema 3")
 
-    DropdownTextField(
-        label = "Problema",
-        options = problems,
-        selectedOption = selectedProblem,
-        onOptionSelected = { selectedProblem = it }
-    )
+    Box(modifier = Modifier.fillMaxWidth()) {
+        DropdownTextField(
+            label = "Problema",
+            options = problems,
+            selectedOption = selectedProblem,
+            onOptionSelected = { selectedProblem = it }
+        )
+    }
 }
 
 @Composable
@@ -99,12 +115,12 @@ fun SeleccionarFecha() {
 
     Column(
         modifier = Modifier
-            .width(350.dp)
+            .fillMaxWidth()
             .padding(16.dp)
     ) {
         Text(
             text = if (selectedDate.isEmpty()) "Seleccionar Fecha" else "Fecha seleccionada: $selectedDate",
-            style = MaterialTheme.typography.h6,
+            style = MaterialTheme.typography.bodyLarge.copy(color = Color(0xFF0B1F8C)),
             modifier = Modifier.padding(bottom = 8.dp)
         )
 
@@ -123,8 +139,6 @@ fun SeleccionarFecha() {
     }
 }
 
-
-
 @Composable
 fun SeleccionarHora() {
     val horas = listOf(
@@ -133,31 +147,38 @@ fun SeleccionarHora() {
     )
     var selectedTime by remember { mutableStateOf("") }
 
-    TimeDropdownTextField(
-        label = "Hora",
-        options = horas,
-        selectedTime = selectedTime,
-        onTimeSelected = { selectedTime = it }
-    )
+    Box(modifier = Modifier.fillMaxWidth()) {
+        TimeDropdownTextField(
+            label = "Hora",
+            options = horas,
+            selectedTime = selectedTime,
+            onTimeSelected = { selectedTime = it }
+        )
+    }
 }
-
 
 @Composable
 fun CheckboxConInformacion() {
     var isChecked by remember { mutableStateOf(false) }
 
-    Box(modifier = Modifier.width(350.dp)) {
+    Box(modifier = Modifier.fillMaxWidth()) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Checkbox(
                 checked = isChecked,
-                onCheckedChange = { isChecked = it }
+                onCheckedChange = { isChecked = it },
+                colors = CheckboxDefaults.colors(
+                    checkedColor = Color(0xFF0B1F8C),
+                    uncheckedColor = Color.Gray
+                )
             )
-            Text("Estoy enterado que en esta solicitud de servicio " +
-                    "legal contará con participación de estudiantes")
+            Text(
+                text = "Estoy enterado que en esta solicitud de servicio legal contará con participación de estudiantes",
+                color = Color.Black,
+                style = MaterialTheme.typography.bodyMedium
+            )
         }
     }
 }
-
 
 @Composable
 fun BotonConfirmarCita() {
@@ -169,21 +190,22 @@ fun BotonConfirmarCita() {
         },
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp)
+            .padding(vertical = 8.dp)
             .height(56.dp),
-        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0B1F8C)) // Cambia el color de fondo del botón
+        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0B1F8C))
     ) {
         Text(
             text = "Confirmar Cita",
             color = Color.White,
-            style = MaterialTheme.typography.button.copy(fontSize = 18.sp)
+            style = MaterialTheme.typography.labelLarge.copy(fontSize = 18.sp)
         )
     }
 }
 
-
 @Preview(showBackground = true)
 @Composable
 fun SolicitudPreview() {
-    Solicitud(navController = null)
+    BufeTecAppTheme {
+        Solicitud(navController = rememberNavController())
+    }
 }
