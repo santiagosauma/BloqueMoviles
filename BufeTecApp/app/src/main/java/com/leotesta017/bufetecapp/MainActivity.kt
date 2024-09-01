@@ -3,8 +3,6 @@ package com.leotesta017.bufetecapp
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -15,7 +13,8 @@ import com.leotesta017.bufetecapp.usuarioColaborador.Pantalla13
 import com.leotesta017.bufetecapp.usuarioEstudiante.Pantalla12
 import com.leotesta017.bufetecapp.usuarioGeneral.Pantalla11
 import com.leotesta017.bufetecapp.usuarioGeneral.PantallaInfo
-import com.leotesta017.bufetecapp.usuarioGeneral.Solicitud
+import com.leotesta017.bufetecapp.solicitud.GeneralSolicitud
+import com.leotesta017.bufetecapp.usuarioGeneral.ReviewComentarios
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,9 +39,10 @@ fun MyApp() {
         composable("pantalla8") { Pantalla8(navController) }
         composable("pantalla9") { Pantalla9(navController) }
         composable("pantalla10") { Pantalla10(navController) }
-        composable("pantalla11") { Pantalla(navController) }  // Usando navController
-        composable("pantalla12") { PantallaInfo(navController) }  // Usando navController
-        composable("pantalla13") { Pantalla13() }  // Usando navController
-        composable("solicitud"){ Solicitud(navController)}
+        composable("pantalla11") { Pantalla(navController) }
+        composable("pantalla12") { PantallaInfo(navController) }
+        composable("pantalla13") { Pantalla13() }
+        composable("solicitud") { GeneralSolicitud(navController) }
+        composable("ReviewComentarios") { ReviewComentarios(navController) }
     }
 }
