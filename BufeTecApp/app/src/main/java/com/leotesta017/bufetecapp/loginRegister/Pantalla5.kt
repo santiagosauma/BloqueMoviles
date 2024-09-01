@@ -114,7 +114,7 @@ fun Pantalla5(navController: NavController) {
                                             if (document != null && document.exists()) {
                                                 val tipoUsuario = document.getString("tipo")
                                                 when (tipoUsuario) {
-                                                    "general" -> navController.navigate("pantalla11")
+                                                    "general" -> navController.navigate("pantalla12")
                                                     "estudiante" -> navController.navigate("pantalla12")
                                                     "colaborador" -> navController.navigate("pantalla13")
                                                     else -> {

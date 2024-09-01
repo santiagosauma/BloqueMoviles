@@ -14,7 +14,9 @@ import com.leotesta017.bufetecapp.usuarioEstudiante.Pantalla12
 import com.leotesta017.bufetecapp.usuarioGeneral.Pantalla11
 import com.leotesta017.bufetecapp.usuarioGeneral.PantallaInfo
 import com.leotesta017.bufetecapp.solicitud.GeneralSolicitud
+import com.leotesta017.bufetecapp.usuarioGeneral.DetalleInfo
 import com.leotesta017.bufetecapp.usuarioGeneral.ReviewComentarios
+import com.leotesta017.bufetecapp.usuarioGeneral.Solicitud
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -44,5 +46,7 @@ fun MyApp() {
         composable("pantalla13") { Pantalla13() }
         composable("solicitud") { GeneralSolicitud(navController) }
         composable("ReviewComentarios") { ReviewComentarios(navController) }
+        composable("detalle_info") { DetalleInfo(navController) }
+        composable("crearsolicitud") { Solicitud(navController) }
     }
 }

@@ -71,13 +71,15 @@ fun GeneralSolicitud(navController: NavController?) {
     }
 
     Box(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.White)  // Fondo blanco para evitar problemas de renderizado
     ) {
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(bottom = 56.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.Start // Alineación a la izquierda
         ) {
             item {
                 TopBar()
@@ -125,7 +127,7 @@ fun SolicitudItem(solicitud: Solicitud, navController: NavController?) {
                 verticalAlignment = Alignment.Top
             ) {
                 Column(modifier = Modifier.weight(1f)) {
-                    Text(text = solicitud.id + " - " + solicitud.titulo, fontWeight = FontWeight.Bold)
+                    Text(text = "${solicitud.id} - ${solicitud.titulo}", fontWeight = FontWeight.Bold)
                     Text(text = solicitud.fechaRealizada)
                     if (solicitud.proximaCita.isNotEmpty()) {
                         Text(
@@ -151,7 +153,7 @@ fun SolicitudItem(solicitud: Solicitud, navController: NavController?) {
                         )
                     }
                     if (solicitud.estado == "Finalizado") {
-                        IconButton(onClick = { expanded = true }) {
+                        IconButton(onClick = { expanded = !expanded }) { // Cambiado a toggle para menor recomposición
                             Icon(
                                 imageVector = Icons.Default.MoreVert,
                                 contentDescription = "Más opciones",

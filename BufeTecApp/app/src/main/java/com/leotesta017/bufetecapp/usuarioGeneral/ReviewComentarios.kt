@@ -7,9 +7,6 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.FormatBold
-import androidx.compose.material.icons.filled.FormatItalic
-import androidx.compose.material.icons.filled.FormatUnderlined
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarOutline
 import androidx.compose.material3.*
@@ -20,7 +17,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -32,11 +28,9 @@ import com.leotesta017.bufetecapp.funcionesDeUsoGeneral.TopBar
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReviewComentarios(navController: NavController?) {
-    var comentario by remember { mutableStateOf(TextFieldValue("")) }
-    var isBold by remember { mutableStateOf(false) }
-    var isItalic by remember { mutableStateOf(false) }
-    var isUnderline by remember { mutableStateOf(false) }
+    var comentario by remember { mutableStateOf(TextFieldValue("Inserte comentario...")) }
     var rating by remember { mutableStateOf(0) }
+    var hasClicked by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -84,7 +78,7 @@ fun ReviewComentarios(navController: NavController?) {
                         Icon(
                             imageVector = if (index < rating) Icons.Default.Star else Icons.Default.StarOutline,
                             contentDescription = "Estrella ${index + 1}",
-                            tint = if (index < rating) Color.Yellow else Color.Black,
+                            tint = if(index < rating) Color(0xFF0B1F8C) else Color.Black,
                             modifier = Modifier
                                 .size(40.dp)
                                 .clickable {
@@ -104,34 +98,25 @@ fun ReviewComentarios(navController: NavController?) {
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start) {
-                    IconButton(onClick = { isBold = !isBold }) {
-                        Icon(imageVector = Icons.Default.FormatBold, contentDescription = "Bold")
-                    }
-                    IconButton(onClick = { isItalic = !isItalic }) {
-                        Icon(imageVector = Icons.Default.FormatItalic, contentDescription = "Italic")
-                    }
-                    IconButton(onClick = { isUnderline = !isUnderline }) {
-                        Icon(imageVector = Icons.Default.FormatUnderlined, contentDescription = "Underline")
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(8.dp))
-
                 BasicTextField(
                     value = comentario,
-                    onValueChange = { comentario = it },
+                    onValueChange = {
+                        comentario = it
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(150.dp)
                         .background(Color.LightGray, shape = MaterialTheme.shapes.small)
-                        .padding(16.dp),
+                        .padding(16.dp)
+                        .clickable {
+                            if (!hasClicked) {
+                                comentario = TextFieldValue("")
+                                hasClicked = true
+                            }
+                        },
                     textStyle = MaterialTheme.typography.bodyLarge.copy(
-                        color = Color.Black,
-                        fontWeight = if (isBold) FontWeight.Bold else FontWeight.Normal,
-                        fontStyle = if (isItalic) androidx.compose.ui.text.font.FontStyle.Italic else androidx.compose.ui.text.font.FontStyle.Normal,
-                        textAlign = TextAlign.Start,
-                        textDecoration = if (isUnderline) TextDecoration.Underline else TextDecoration.None
+                        color = if (comentario.text.isEmpty() && !hasClicked) Color.Gray else Color.Black,
+                        textAlign = TextAlign.Start
                     ),
                     keyboardActions = KeyboardActions.Default
                 )
