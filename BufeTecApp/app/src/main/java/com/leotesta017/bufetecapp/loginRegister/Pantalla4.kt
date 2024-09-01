@@ -39,10 +39,7 @@ fun Pantalla4(navController: NavController) {
     var contrasenaVisible by remember { mutableStateOf(false) }
     var mensajeError by remember { mutableStateOf("") }
 
-    // Validación del correo
     val correoValido = correo.endsWith("@gmail.com") || correo.endsWith("@outlook.com") || correo.endsWith("@tec.mx")
-
-    // Nueva validación de la contraseña
     val contrasenaValida = contrasena.isNotBlank() &&
             contrasena == repetirContrasena &&
             !contrasena.contains(' ') && !contrasena.contains('.')
@@ -50,20 +47,30 @@ fun Pantalla4(navController: NavController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .padding(16.dp)
     ) {
-        IconButton(onClick = { navController.popBackStack() }) {
+        IconButton(
+            onClick = { navController.popBackStack() },
+            modifier = Modifier.align(Alignment.Start)
+        ) {
             Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Volver")
         }
+
+        Spacer(modifier = Modifier.height(16.dp))
 
         Image(
             painter = painterResource(id = R.drawable.logoapp),
             contentDescription = null,
-            modifier = Modifier.size(150.dp)
+            modifier = Modifier
+                .size(150.dp)
+                .align(Alignment.CenterHorizontally)
         )
 
-        Text(text = "Registro", style = MaterialTheme.typography.headlineSmall)
+        Text(
+            text = "Registro",
+            style = MaterialTheme.typography.headlineSmall,
+            modifier = Modifier.align(Alignment.CenterHorizontally)
+        )
 
         OutlinedTextField(
             value = nombre,
@@ -115,9 +122,7 @@ fun Pantalla4(navController: NavController) {
             Checkbox(
                 checked = terminosAceptados,
                 onCheckedChange = { terminosAceptados = it },
-                colors = CheckboxDefaults.colors(
-                    checkedColor = Color.Blue // Color de la palomita cuando está marcada
-                )
+                colors = CheckboxDefaults.colors(checkedColor = Color.Blue)
             )
             Text(
                 text = "Acepto los ",
@@ -127,7 +132,7 @@ fun Pantalla4(navController: NavController) {
                 text = "términos y condiciones",
                 style = MaterialTheme.typography.bodyLarge.copy(
                     color = Color.Blue,
-                    textDecoration = TextDecoration.Underline // Subraya el texto
+                    textDecoration = TextDecoration.Underline
                 ),
                 modifier = Modifier.clickable {
                     val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.minecraft.net/es-es/terms/r2"))
@@ -147,18 +152,16 @@ fun Pantalla4(navController: NavController) {
         Button(
             onClick = {
                 if (nombre.isNotEmpty() && apellidos.isNotEmpty() && correoValido && contrasenaValida && terminosAceptados) {
-                    // Crear el usuario en Firebase Authentication
                     Firebase.auth.createUserWithEmailAndPassword(correo, contrasena)
                         .addOnCompleteListener { task ->
                             if (task.isSuccessful) {
-                                // Guardar el tipo de usuario en Firestore
                                 val userId = task.result?.user?.uid
                                 val db = Firebase.firestore
                                 val user = hashMapOf(
                                     "nombre" to nombre,
                                     "apellidos" to apellidos,
                                     "correo" to correo,
-                                    "tipo" to "general" // Especificar que es un usuario general
+                                    "tipo" to "general"
                                 )
                                 userId?.let {
                                     db.collection("usuarios").document(it)
@@ -180,19 +183,18 @@ fun Pantalla4(navController: NavController) {
             },
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color.Blue, // Color personalizado
-                contentColor = Color.White // Texto negro
+                containerColor = Color.Blue,
+                contentColor = Color.White
             )
         ) {
             Text(text = "Crear Cuenta")
         }
 
-        Spacer(modifier = Modifier.height(36.dp)) // Espacio entre el botón y el texto
+        Spacer(modifier = Modifier.height(36.dp))
 
         Box(
-            modifier = Modifier
-                .fillMaxWidth(),
-            contentAlignment = Alignment.CenterEnd // Alinea el texto a la derecha
+            modifier = Modifier.fillMaxWidth(),
+            contentAlignment = Alignment.CenterEnd
         ) {
             Text(
                 text = "Soy Clínica Penal",

@@ -45,20 +45,30 @@ fun Pantalla5(navController: NavController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .padding(16.dp)
     ) {
-        IconButton(onClick = { navController.popBackStack() }) {
+        IconButton(
+            onClick = { navController.popBackStack() },
+            modifier = Modifier.align(Alignment.Start)
+        ) {
             Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Volver")
         }
+
+        Spacer(modifier = Modifier.height(16.dp))
 
         Image(
             painter = painterResource(id = R.drawable.logoapp),
             contentDescription = null,
-            modifier = Modifier.size(150.dp)
+            modifier = Modifier
+                .size(150.dp)
+                .align(Alignment.CenterHorizontally)
         )
 
-        Text(text = "Iniciar Sesión", style = MaterialTheme.typography.headlineSmall)
+        Text(
+            text = "Iniciar Sesión",
+            style = MaterialTheme.typography.headlineSmall,
+            modifier = Modifier.align(Alignment.CenterHorizontally)
+        )
 
         OutlinedTextField(
             value = correo,
@@ -97,10 +107,8 @@ fun Pantalla5(navController: NavController) {
                     auth.signInWithEmailAndPassword(correo, contrasena)
                         .addOnCompleteListener { task ->
                             if (task.isSuccessful) {
-                                // Obtener el UID del usuario
                                 val uid = auth.currentUser?.uid
                                 if (uid != null) {
-                                    // Buscar el tipo de usuario en Firestore
                                     db.collection("usuarios").document(uid).get()
                                         .addOnSuccessListener { document ->
                                             if (document != null && document.exists()) {
@@ -122,7 +130,6 @@ fun Pantalla5(navController: NavController) {
                                         }
                                 }
                             } else {
-                                // Manejo de errores de Firebase
                                 when (task.exception?.message) {
                                     "The email address is badly formatted." -> {
                                         mensajeError = "Error: Por favor sea serio."
@@ -148,8 +155,8 @@ fun Pantalla5(navController: NavController) {
             },
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color.Blue, // Color personalizado
-                contentColor = Color.White // Texto negro
+                containerColor = Color.Blue,
+                contentColor = Color.White
             )
         ) {
             Text(text = "Iniciar Sesión")
