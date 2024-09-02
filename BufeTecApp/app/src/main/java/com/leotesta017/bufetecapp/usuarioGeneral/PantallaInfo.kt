@@ -45,6 +45,11 @@ fun PantallaInfo(navController: NavController?) {
                 InfoLegalSection()
                 Spacer(modifier = Modifier.height(16.dp))
                 CategoriesSection(navController)
+                Spacer(modifier = Modifier.height(16.dp))
+                ServiciosSection()
+                Spacer(modifier = Modifier.height(16.dp))
+                ServicesSection(navController)
+                Spacer(modifier = Modifier.height(16.dp))
             }
         }
 
@@ -134,8 +139,29 @@ fun InfoLegalSection() {
 }
 
 @Composable
+fun ServiciosSection() {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Color.LightGray)
+            .padding(16.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = "Servicios",
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color.Black
+        )
+
+    }
+}
+
+@Composable
 fun CategoriesSection(navController: NavController?) {
-    Column(modifier = Modifier.padding(16.dp).padding(top = 0.dp)) {
+    Column(modifier = Modifier
+        .padding(16.dp)
+        .padding(top = 0.dp)) {
         CategoryItem("Robo y hurto", "La toma de propiedad ajena sin el consentimiento del propietario, con la intención de no devolverla.", navController)
         Spacer(modifier = Modifier.height(8.dp))
         CategoryItem("Extorsión y amenaza", "Amenazas o coerción para obtener dinero, bienes o servicios de una persona mediante la intimidación.", navController)
@@ -155,6 +181,59 @@ fun CategoryItem(title: String, description: String, navController: NavControlle
             .padding(16.dp)
             .clickable {
                 navController?.navigate("detalle_info")
+            },
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column(
+            modifier = Modifier.weight(1f)
+        ) {
+            Text(text = title, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(text = description, fontSize = 14.sp, color = Color.Black)
+        }
+        Spacer(modifier = Modifier.width(16.dp))
+        Icon(
+            imageVector = Icons.Default.ArrowForward,
+            contentDescription = "Flecha para Detalles",
+            tint = Color.Blue,
+            modifier = Modifier.size(24.dp)
+        )
+    }
+}
+
+@Composable
+fun ServicesSection(navController: NavController?) {
+    Column(modifier = Modifier
+        .padding(16.dp)
+        .padding(top = 0.dp)) {
+        ServiceItem("Asesoria Legal", "Consulta profesional donde se " +
+                "ofrece orientación y consejo sobre cómo proceder en una situación legal " +
+                "específica", navController)
+        Spacer(modifier = Modifier.height(8.dp))
+
+
+        ServiceItem("Representacion Legal", "Actuación en nombre del cliente en" +
+                " procesos judiciales o negociaciones, defendiendo sus derechos e " +
+                "intereses legales", navController)
+        Spacer(modifier = Modifier.height(8.dp))
+
+
+        ServiceItem("Revision de Documentos Legales", "Análisis detallado de " +
+                "contratos, acuerdos y otros documentos legales para garantizar " +
+                "su validez", navController)
+        Spacer(modifier = Modifier.height(8.dp))
+    }
+}
+
+@Composable
+fun ServiceItem(title: String, description: String, navController: NavController?) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Color.White)
+            .padding(16.dp)
+            .clickable {
+                navController?.navigate("servicios_info")
             },
         verticalAlignment = Alignment.CenterVertically
     ) {

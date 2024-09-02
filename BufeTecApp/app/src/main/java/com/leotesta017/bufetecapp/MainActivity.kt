@@ -16,6 +16,7 @@ import com.leotesta017.bufetecapp.usuarioGeneral.PantallaInfo
 import com.leotesta017.bufetecapp.solicitud.GeneralSolicitud
 import com.leotesta017.bufetecapp.usuarioGeneral.DetalleInfo
 import com.leotesta017.bufetecapp.usuarioGeneral.ReviewComentarios
+import com.leotesta017.bufetecapp.usuarioGeneral.ServiciosInfo
 import com.leotesta017.bufetecapp.usuarioGeneral.Solicitud
 
 class MainActivity : ComponentActivity() {
@@ -48,5 +49,6 @@ fun MyApp() {
         composable("ReviewComentarios") { ReviewComentarios(navController) }
         composable("detalle_info") { DetalleInfo(navController) }
         composable("crearsolicitud") { Solicitud(navController) }
+        composable("servicios_info") { ServiciosInfo(navController)}
     }
 }
