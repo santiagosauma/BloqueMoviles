@@ -180,7 +180,7 @@ fun CategoryItem(title: String, description: String, navController: NavControlle
             .background(Color.White)
             .padding(16.dp)
             .clickable {
-                navController?.navigate("modificar_info")
+                navController?.navigate("modificar-info")
             },
         verticalAlignment = Alignment.CenterVertically
     ) {
