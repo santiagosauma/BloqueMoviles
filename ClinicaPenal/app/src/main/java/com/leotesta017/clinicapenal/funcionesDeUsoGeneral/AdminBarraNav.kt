@@ -41,7 +41,7 @@ fun AdminBarraNav(navController: NavController?, modifier: Modifier = Modifier) 
         AdminBottomBarItem(
             icon = Icons.Default.Folder,
             text = "Solicitudes",
-            onClick = { navController?.navigate("solicitudesAdmin") }
+            onClick = { navController?.navigate("generalsolicitudadmin") }
         )
         AdminBottomBarItem(
             icon = Icons.Default.Info,

@@ -16,7 +16,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.leotesta017.clinicapenal.funcionesDeUsoGeneral.BarraNav
+import com.leotesta017.clinicapenal.funcionesDeUsoGeneral.AdminBarraNav
 import com.leotesta017.clinicapenal.funcionesDeUsoGeneral.TopBar
 import com.leotesta017.clinicapenal.ui.theme.ClinicaPenalTheme
 import com.leotesta017.clinicapenal.funcionesDeUsoGeneral.SearchBar
@@ -32,39 +32,41 @@ data class Solicitud(
 
 @Composable
 fun GeneralSolicitudAdmin(navController: NavController?) {
-    val solicitudes = remember {
-        listOf(
-            Solicitud(
-                id = "ID123",
-                titulo = "Asalto",
-                nombreUsuario = "Fernando Balleza",
-                fechaRealizada = "19/07/2024",
-                estado = "Finalizado",
-                estadoColor = Color.Green
-            ),
-            Solicitud(
-                id = "ID125",
-                titulo = "Violencia Familiar",
-                nombreUsuario = "Edsel Espidio",
-                fechaRealizada = "26/07/2024",
-                estado = "Suspendido",
-                estadoColor = Color.Red
-            ),
-            Solicitud(
-                id = "ID124",
-                titulo = "Vandalismo",
-                nombreUsuario = "Edsel Espidio",
-                fechaRealizada = "22/07/2024",
-                estado = "Activo",
-                estadoColor = Color.Yellow
-            ),
-            Solicitud(
-                id = "ID126",
-                titulo = "Conflicto Herencia",
-                nombreUsuario = "Abdiel Vaquera",
-                fechaRealizada = "01/08/2024",
-                estado = "Activo",
-                estadoColor = Color.Yellow
+    var solicitudes by remember {
+        mutableStateOf(
+            listOf(
+                Solicitud(
+                    id = "ID123",
+                    titulo = "Asalto",
+                    nombreUsuario = "Fernando Balleza",
+                    fechaRealizada = "19/07/2024",
+                    estado = "Finalizado",
+                    estadoColor = Color.Green
+                ),
+                Solicitud(
+                    id = "ID125",
+                    titulo = "Violencia Familiar",
+                    nombreUsuario = "Edsel Espidio",
+                    fechaRealizada = "26/07/2024",
+                    estado = "Suspendido",
+                    estadoColor = Color.Red
+                ),
+                Solicitud(
+                    id = "ID124",
+                    titulo = "Vandalismo",
+                    nombreUsuario = "Edsel Espidio",
+                    fechaRealizada = "22/07/2024",
+                    estado = "Activo",
+                    estadoColor = Color.Yellow
+                ),
+                Solicitud(
+                    id = "ID126",
+                    titulo = "Conflicto Herencia",
+                    nombreUsuario = "Abdiel Vaquera",
+                    fechaRealizada = "01/08/2024",
+                    estado = "Activo",
+                    estadoColor = Color.Yellow
+                )
             )
         )
     }
@@ -72,34 +74,41 @@ fun GeneralSolicitudAdmin(navController: NavController?) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White)
+            .background(Color.White)  // Fondo blanco para evitar problemas de renderizado
     ) {
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(bottom = 56.dp)
+                .padding(bottom = 56.dp),
+            horizontalAlignment = Alignment.Start // Alineación a la izquierda
         ) {
             item {
                 TopBar()
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(16.dp))
                 Text(
                     text = "Histórico de Solicitudes",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(horizontal = 16.dp)
                 )
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(16.dp))
                 SearchBar(searchText = "")
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(16.dp))
             }
 
             items(solicitudes) { solicitud ->
-                SolicitudItem(solicitud = solicitud, navController = navController)
+                SolicitudItem(
+                    solicitud = solicitud,
+                    navController = navController,
+                    onDelete = { id ->
+                        solicitudes = solicitudes.filterNot { it.id == id }
+                    }
+                )
                 HorizontalDivider(color = Color.Gray)
             }
         }
 
-        BarraNav(
+        AdminBarraNav(
             navController = navController,
             modifier = Modifier
                 .align(Alignment.BottomCenter)
@@ -109,13 +118,14 @@ fun GeneralSolicitudAdmin(navController: NavController?) {
 }
 
 @Composable
-fun SolicitudItem(solicitud: Solicitud, navController: NavController?) {
+fun SolicitudItem(solicitud: Solicitud, navController: NavController?, onDelete: (String) -> Unit) {
     var expanded by remember { mutableStateOf(false) }
+    var showDialog by remember { mutableStateOf(false) }
 
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color.White)
+            .background(Color(0xFFF5F5F5))  // Gris más claro
             .padding(8.dp)
     ) {
         Column {
@@ -126,8 +136,8 @@ fun SolicitudItem(solicitud: Solicitud, navController: NavController?) {
             ) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text(text = "${solicitud.id} - ${solicitud.titulo}", fontWeight = FontWeight.Bold)
-                    Text(text = solicitud.nombreUsuario)
                     Text(text = solicitud.fechaRealizada)
+                    Text(text = solicitud.nombreUsuario)  // Mostrar nombre de usuario
                 }
                 Column(
                     horizontalAlignment = Alignment.End,
@@ -145,7 +155,7 @@ fun SolicitudItem(solicitud: Solicitud, navController: NavController?) {
                                 .background(solicitud.estadoColor, shape = MaterialTheme.shapes.small)
                         )
                     }
-                    IconButton(onClick = { expanded = !expanded }) {
+                    IconButton(onClick = { expanded = !expanded }) { // Cambiado a toggle para menor recomposición
                         Icon(
                             imageVector = Icons.Default.MoreVert,
                             contentDescription = "Más opciones",
@@ -159,14 +169,35 @@ fun SolicitudItem(solicitud: Solicitud, navController: NavController?) {
                         DropdownMenuItem(
                             onClick = {
                                 expanded = false
-                                navController?.navigate("ReviewComentarios")
+                                showDialog = true
                             },
-                            text = { Text("Valorar") }
+                            text = { Text("Eliminar") }
                         )
                     }
                 }
             }
         }
+    }
+
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    onDelete(solicitud.id)
+                    showDialog = false
+                }) {
+                    Text("Eliminar")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDialog = false }) {
+                    Text("Cancelar")
+                }
+            },
+            title = { Text("Confirmar Eliminación") },
+            text = { Text("¿Está seguro de que desea eliminar esta solicitud?") }
+        )
     }
 }
 
