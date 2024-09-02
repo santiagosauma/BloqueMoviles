@@ -41,7 +41,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.leotesta017.clinicapenal.funcionesDeUsoGeneral.BarraNav
+import com.leotesta017.clinicapenal.funcionesDeUsoGeneral.AdminBarraNav
 import com.leotesta017.clinicapenal.funcionesDeUsoGeneral.RoundedButton
 import com.leotesta017.clinicapenal.funcionesDeUsoGeneral.TopBar
 
@@ -91,7 +91,7 @@ fun ModificarServiciosAdmin(navController: NavController?) {
                         onClick = {  }
                     )
                 }
-                BarraNav(navController = navController, modifier = Modifier.fillMaxWidth())
+                AdminBarraNav(navController = navController, modifier = Modifier.fillMaxWidth())
             }
         },
         content = { paddingValues ->
