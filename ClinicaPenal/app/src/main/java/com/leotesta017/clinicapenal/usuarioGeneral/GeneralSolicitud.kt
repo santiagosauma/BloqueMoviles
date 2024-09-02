@@ -19,7 +19,7 @@ import androidx.navigation.compose.rememberNavController
 import com.leotesta017.clinicapenal.funcionesDeUsoGeneral.BarraNav
 import com.leotesta017.clinicapenal.funcionesDeUsoGeneral.TopBar
 import com.leotesta017.clinicapenal.ui.theme.ClinicaPenalTheme
-import com.leotesta017.clinicapenal.usuarioGeneral.SearchBar
+import com.leotesta017.clinicapenal.funcionesDeUsoGeneral.SearchBar
 
 data class Solicitud(
     val id: String,
@@ -96,7 +96,7 @@ fun GeneralSolicitud(navController: NavController?) {
 
             items(solicitudes) { solicitud ->
                 SolicitudItem(solicitud = solicitud, navController = navController)
-                Divider(color = Color.Gray)
+                HorizontalDivider(color = Color.Gray)
             }
         }
 

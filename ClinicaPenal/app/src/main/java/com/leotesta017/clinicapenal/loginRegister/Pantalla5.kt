@@ -115,7 +115,7 @@ fun Pantalla5(navController: NavController) {
                                                 when (tipoUsuario) {
                                                     "general" -> navController.navigate("pantalla12")
                                                     "estudiante" -> navController.navigate("pantalla12")
-                                                    "colaborador" -> navController.navigate("pantalla13")
+                                                    "colaborador" -> navController.navigate("pantallainfoadmin")
                                                     else -> {
                                                         mensajeError = "Error al obtener el tipo de usuario."
                                                     }
