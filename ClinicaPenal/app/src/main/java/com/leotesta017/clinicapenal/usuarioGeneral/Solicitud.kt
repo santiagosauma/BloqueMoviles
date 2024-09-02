@@ -5,7 +5,7 @@ import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -18,13 +18,12 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.leotesta017.clinicapenal.funcionesDeUsoGeneral.BarraNav
+import com.leotesta017.clinicapenal.funcionesDeUsoGeneral.AdminBarraNav
 import com.leotesta017.clinicapenal.funcionesDeUsoGeneral.DropdownTextField
 import com.leotesta017.clinicapenal.funcionesDeUsoGeneral.TimeDropdownTextField
 import com.leotesta017.clinicapenal.funcionesDeUsoGeneral.TopBar
 import com.leotesta017.clinicapenal.ui.theme.ClinicaPenalTheme
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Solicitud(navController: NavController?) {
     Scaffold(
@@ -38,7 +37,7 @@ fun Solicitud(navController: NavController?) {
                         .fillMaxWidth()
                 ) {
                     IconButton(onClick = { navController?.popBackStack() }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Volver")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
                     }
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
@@ -50,7 +49,7 @@ fun Solicitud(navController: NavController?) {
             }
         },
         bottomBar = {
-            BarraNav(navController = navController, modifier = Modifier.fillMaxWidth())
+            AdminBarraNav(navController = navController, modifier = Modifier.fillMaxWidth())
         },
         content = { paddingValues ->
             LazyColumn(
