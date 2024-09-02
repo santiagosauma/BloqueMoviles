@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "93925419152",
+    "project_id": "bufetecapp",
+    "storage_bucket": "bufetecapp.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:93925419152:android:7054b76910910cbf699015",
+        "android_client_info": {
+          "package_name": "com.leotesta017.bufetecapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyByuA0fbKevotMi_XhgFNn-mhbqqMZs1gA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:93925419152:android:9ed85c2bb738181d699015",
+        "android_client_info": {
+          "package_name": "com.leotesta017.clinicapenal"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyByuA0fbKevotMi_XhgFNn-mhbqqMZs1gA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
