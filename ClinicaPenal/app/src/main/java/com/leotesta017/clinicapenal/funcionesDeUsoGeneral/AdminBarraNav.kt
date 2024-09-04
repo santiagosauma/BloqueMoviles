@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.Info
@@ -22,10 +23,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import com.leotesta017.clinicapenal.ui.theme.ClinicaPenalTheme
 
 @Composable
 fun AdminBarraNav(navController: NavController?, modifier: Modifier = Modifier) {
+    val currentBackStackEntry = navController?.currentBackStackEntryAsState()?.value
+    val currentDestination = currentBackStackEntry?.destination?.route
+
     Row(
         modifier = modifier
             .background(Color.White)
@@ -36,45 +41,59 @@ fun AdminBarraNav(navController: NavController?, modifier: Modifier = Modifier) 
         AdminBottomBarItem(
             icon = Icons.Default.Menu,
             text = "Inicio",
+            isSelected = currentDestination == "pantallainfoadmin",
             onClick = { navController?.navigate("pantallainfoadmin") }
         )
         AdminBottomBarItem(
             icon = Icons.Default.Folder,
             text = "Solicitudes",
+            isSelected = currentDestination == "generalsolicitudadmin",
             onClick = { navController?.navigate("generalsolicitudadmin") }
         )
         AdminBottomBarItem(
             icon = Icons.Default.Info,
             text = "Información",
+            isSelected = currentDestination == "informacionAdmin",
             onClick = { navController?.navigate("informacionAdmin") }
         )
     }
 }
 
-
 @Composable
 fun AdminBottomBarItem(
     icon: androidx.compose.ui.graphics.vector.ImageVector,
     text: String,
-    onClick: () -> Unit,
-    backgroundColor: Color = Color.Transparent
+    isSelected: Boolean,
+    onClick: () -> Unit
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.clickable(onClick = onClick)
     ) {
+
         Box(
             modifier = Modifier
                 .size(50.dp)
-                .background(backgroundColor)
-                .padding(8.dp),
+                .background(
+                    color = if (isSelected) Color(0xFF0B1F8C) else Color.Transparent,
+                    shape = CircleShape
+                ),
             contentAlignment = Alignment.Center
         ) {
-            Icon(imageVector = icon, contentDescription = text, tint = Color.Black)
+            Icon(
+                imageVector = icon,
+                contentDescription = text,
+                tint = if (isSelected) Color(0xFFFFFFFF) else Color.Black,
+            )
         }
-        Text(text = text, fontSize = 12.sp)
+        Text(
+            text = text,
+            fontSize = 12.sp,
+            color = Color.Black
+        )
     }
 }
+
 
 @Preview(showBackground = true)
 @Composable
