@@ -87,7 +87,7 @@ fun HeaderSection(title: String, navController: NavController?) {
             }
             Text(
                 text = title,
-                fontSize = 20.sp,
+                fontSize = 25.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.Black,
                 modifier = Modifier
@@ -95,21 +95,7 @@ fun HeaderSection(title: String, navController: NavController?) {
                     .weight(1f) 
             )
         }
-        Spacer(modifier = Modifier.height(16.dp))
-        Button(
-            onClick = { navController?.navigate("crearsolicitud") },
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1A237E)),
-            shape = RoundedCornerShape(50),
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Icon(
-                imageVector = Icons.Default.Edit,
-                contentDescription = "Solicitud de Cita",
-                tint = Color.White
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(text = "Solicitud de Cita", color = Color.White)
-        }
+
     }
 }
 
