@@ -26,6 +26,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.leotesta017.clinicapenal.R
 import com.leotesta017.clinicapenal.funcionesDeUsoGeneral.AdminBarraNav
+import com.leotesta017.clinicapenal.funcionesDeUsoGeneral.BarraNav
 import com.leotesta017.clinicapenal.funcionesDeUsoGeneral.TopBar
 import com.leotesta017.clinicapenal.ui.theme.ClinicaPenalTheme
 
@@ -54,7 +55,7 @@ fun Solicitud(navController: NavController?) {
             }
         },
         bottomBar = {
-            AdminBarraNav(navController = navController, modifier = Modifier.fillMaxWidth())
+            BarraNav(navController = navController, modifier = Modifier.fillMaxWidth())
         },
         content = { paddingValues ->
             LazyColumn(

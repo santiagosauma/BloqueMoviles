@@ -113,8 +113,8 @@ fun Pantalla5(navController: NavController) {
                                             if (document != null && document.exists()) {
                                                 val tipoUsuario = document.getString("tipo")
                                                 when (tipoUsuario) {
-                                                    "general" -> navController.navigate("pantalla12")
-                                                    "estudiante" -> navController.navigate("pantalla12")
+                                                    "general" -> navController.navigate("pantallainfocategoriasgeneral")
+                                                    "estudiante" -> navController.navigate("pantallainfoestudiante")
                                                     "colaborador" -> navController.navigate("pantallainfoadmin")
                                                     else -> {
                                                         mensajeError = "Error al obtener el tipo de usuario."
