@@ -7,16 +7,19 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.pantallainformacion.Pantalla
+import com.example.pantallainformacion.PantallaInfoClinica
 import com.leotesta017.clinicapenal.loginRegister.*
 import com.leotesta017.clinicapenal.usuarioColaborador.Pantalla13
-import com.leotesta017.clinicapenal.usuarioGeneral.PantallaInfo
 import com.leotesta017.clinicapenal.solicitud.GeneralSolicitud
 import com.leotesta017.clinicapenal.usuarioColaborador.GeneralSolicitudAdmin
 import com.leotesta017.clinicapenal.usuarioColaborador.ModificarInfoAdmin
 import com.leotesta017.clinicapenal.usuarioColaborador.ModificarServiciosAdmin
 import com.leotesta017.clinicapenal.usuarioColaborador.PantallaInfoAdmin
+import com.leotesta017.clinicapenal.usuarioEstudiante.GenerarSolicitudEstudiante
+import com.leotesta017.clinicapenal.usuarioEstudiante.InformacionClinicaEstudiante
+import com.leotesta017.clinicapenal.usuarioEstudiante.PantallaInfoEstudiante
 import com.leotesta017.clinicapenal.usuarioGeneral.DetalleInfo
+import com.leotesta017.clinicapenal.usuarioGeneral.PantallaInfoCategorias
 import com.leotesta017.clinicapenal.usuarioGeneral.ReviewComentarios
 import com.leotesta017.clinicapenal.usuarioGeneral.ServiciosInfo
 import com.leotesta017.clinicapenal.usuarioGeneral.Solicitud
@@ -44,17 +47,29 @@ fun MyApp() {
         composable("pantalla8") { Pantalla8(navController) }
         composable("pantalla9") { Pantalla9(navController) }
         composable("pantalla10") { Pantalla10(navController) }
-        composable("pantalla11") { Pantalla(navController) }
-        composable("pantalla12") { PantallaInfo(navController) }
-        composable("pantalla13") { Pantalla13() }
+
+
+        //Pantallas Usuario General
+        composable("pantallainfocategoriasgeneral") { PantallaInfoCategorias (navController) }
+        composable("pantallainformacionclinica") { PantallaInfoClinica(navController) }
         composable("solicitud") { GeneralSolicitud(navController) }
         composable("ReviewComentarios") { ReviewComentarios(navController) }
         composable("detalle_info") { DetalleInfo(navController) }
         composable("crearsolicitud") { Solicitud(navController) }
         composable("servicios_info") { ServiciosInfo(navController)}
+
+        //Pantallas Usuario Admin
+        composable("pantalla13") { Pantalla13() }
         composable("pantallainfoadmin") { PantallaInfoAdmin(navController)}
         composable("modificar-info") { ModificarInfoAdmin(navController)}
         composable("modificar_servicios_info") { ModificarServiciosAdmin(navController)}
         composable("generalsolicitudadmin") { GeneralSolicitudAdmin(navController)}
+
+        //Pantalla Usuario Estudiante
+
+        composable("pantallainfoestudiante"){ PantallaInfoEstudiante(navController)}
+        composable("generasolicitudestudiante"){ GenerarSolicitudEstudiante(navController) }
+        composable("informacionestudiate"){ InformacionClinicaEstudiante(navController) }
+
     }
 }

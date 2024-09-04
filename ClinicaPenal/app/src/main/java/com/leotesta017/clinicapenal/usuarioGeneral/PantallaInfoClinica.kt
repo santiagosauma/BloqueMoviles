@@ -24,7 +24,7 @@ import com.leotesta017.clinicapenal.funcionesDeUsoGeneral.TopBar
 import com.leotesta017.clinicapenal.funcionesDeUsoGeneral.BarraNav
 
 @Composable
-fun Pantalla(navController: NavController?) {
+fun PantallaInfoClinica(navController: NavController?) {
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -278,6 +278,6 @@ fun Calendarios() {
 
 @Preview(showBackground = true)
 @Composable
-fun PantallaPreview() {
-    Pantalla(navController = null)
+fun PantallaInfoClinicaPreview() {
+    PantallaInfoClinica(navController = null)
 }

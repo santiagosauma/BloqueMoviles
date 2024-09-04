@@ -26,7 +26,7 @@ import com.leotesta017.clinicapenal.funcionesDeUsoGeneral.SearchBar
 
 
 @Composable
-fun PantallaInfo(navController: NavController?) {
+fun PantallaInfoCategorias(navController: NavController?) {
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -199,6 +199,6 @@ fun ServiceItem(title: String, description: String, navController: NavController
 
 @Preview(showBackground = true)
 @Composable
-fun PantallaInfoPreview() {
-    PantallaInfo(navController = null)
+fun PantallaInfoCategoriasPreview() {
+    PantallaInfoCategorias(navController = null)
 }

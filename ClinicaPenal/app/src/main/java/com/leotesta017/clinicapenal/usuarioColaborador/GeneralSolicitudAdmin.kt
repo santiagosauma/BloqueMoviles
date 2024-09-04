@@ -137,7 +137,7 @@ fun SolicitudItem(solicitud: Solicitud, navController: NavController?, onDelete:
                 Column(modifier = Modifier.weight(1f)) {
                     Text(text = "${solicitud.id} - ${solicitud.titulo}", fontWeight = FontWeight.Bold)
                     Text(text = solicitud.fechaRealizada)
-                    Text(text = solicitud.nombreUsuario)  // Mostrar nombre de usuario
+                    Text(text = solicitud.nombreUsuario)
                 }
                 Column(
                     horizontalAlignment = Alignment.End,
@@ -155,7 +155,7 @@ fun SolicitudItem(solicitud: Solicitud, navController: NavController?, onDelete:
                                 .background(solicitud.estadoColor, shape = MaterialTheme.shapes.small)
                         )
                     }
-                    IconButton(onClick = { expanded = !expanded }) { // Cambiado a toggle para menor recomposición
+                    IconButton(onClick = { expanded = !expanded }) {
                         Icon(
                             imageVector = Icons.Default.MoreVert,
                             contentDescription = "Más opciones",

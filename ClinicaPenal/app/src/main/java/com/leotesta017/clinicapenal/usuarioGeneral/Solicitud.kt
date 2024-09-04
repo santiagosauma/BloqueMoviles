@@ -1,11 +1,17 @@
+@file:Suppress("DEPRECATION")
+
 package com.leotesta017.clinicapenal.usuarioGeneral
 
+import android.view.ContextThemeWrapper
 import android.widget.CalendarView
 import android.widget.Toast
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -18,9 +24,8 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.leotesta017.clinicapenal.R
 import com.leotesta017.clinicapenal.funcionesDeUsoGeneral.AdminBarraNav
-import com.leotesta017.clinicapenal.funcionesDeUsoGeneral.DropdownTextField
-import com.leotesta017.clinicapenal.funcionesDeUsoGeneral.TimeDropdownTextField
 import com.leotesta017.clinicapenal.funcionesDeUsoGeneral.TopBar
 import com.leotesta017.clinicapenal.ui.theme.ClinicaPenalTheme
 
@@ -78,33 +83,111 @@ fun Solicitud(navController: NavController?) {
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SeleccionarLugar() {
     var selectedPlace by remember { mutableStateOf("") }
+    var expanded by remember { mutableStateOf(false) }
     val places = listOf("Lugar 1", "Lugar 2", "Lugar 3")
 
     Box(modifier = Modifier.fillMaxWidth()) {
-        DropdownTextField(
-            label = "Lugar",
-            options = places,
-            selectedOption = selectedPlace,
-            onOptionSelected = { selectedPlace = it }
+        TextField(
+            value = selectedPlace,
+            onValueChange = { selectedPlace = it },
+            label = { Text("Lugar") },
+            trailingIcon = {
+                Icon(
+                    imageVector = Icons.Default.ArrowDropDown,
+                    contentDescription = "Dropdown arrow"
+                )
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { expanded = !expanded },
+            colors = TextFieldDefaults.textFieldColors(
+                containerColor = Color(0xFFF2F2F2),
+                focusedIndicatorColor = Color.Blue,
+                unfocusedIndicatorColor = Color.Gray,
+                cursorColor = Color.Blue
+            )
         )
+
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color.White)
+        ) {
+            places.forEach { place ->
+                DropdownMenuItem(
+                    onClick = {
+                        selectedPlace = place
+                        expanded = false
+                    },
+                    text = {
+                        Text(
+                            text = place,
+                            color = Color.Black
+                        )
+                    }
+                )
+            }
+        }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SeleccionarProblema() {
     var selectedProblem by remember { mutableStateOf("") }
+    var expanded by remember { mutableStateOf(false) }
     val problems = listOf("Problema 1", "Problema 2", "Problema 3")
 
     Box(modifier = Modifier.fillMaxWidth()) {
-        DropdownTextField(
-            label = "Problema",
-            options = problems,
-            selectedOption = selectedProblem,
-            onOptionSelected = { selectedProblem = it }
+        TextField(
+            value = selectedProblem,
+            onValueChange = { selectedProblem = it },
+            label = { Text("Problema") },
+            trailingIcon = {
+                Icon(
+                    imageVector = Icons.Default.ArrowDropDown,
+                    contentDescription = "Dropdown arrow"
+                )
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { expanded = !expanded },
+            colors = TextFieldDefaults.textFieldColors(
+                containerColor = Color(0xFFF2F2F2),
+                focusedIndicatorColor = Color.Blue,
+                unfocusedIndicatorColor = Color.Gray,
+                cursorColor = Color.Blue
+            )
         )
+
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color.White)
+        ) {
+            problems.forEach { problem ->
+                DropdownMenuItem(
+                    onClick = {
+                        selectedProblem = problem
+                        expanded = false
+                    },
+                    text = {
+                        Text(
+                            text = problem,
+                            color = Color.Black
+                        )
+                    }
+                )
+            }
+        }
     }
 }
 
@@ -125,7 +208,7 @@ fun SeleccionarFecha() {
 
         AndroidView(
             factory = { context ->
-                CalendarView(context).apply {
+                CalendarView(ContextThemeWrapper(context, R.style.CustomCalendarView)).apply {
                     setOnDateChangeListener { _, year, month, dayOfMonth ->
                         selectedDate = "$dayOfMonth/${month + 1}/$year"
                     }
@@ -138,24 +221,63 @@ fun SeleccionarFecha() {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SeleccionarHora() {
+    // Horas limitadas hasta las 15:00
     val horas = listOf(
         "08:00", "09:00", "10:00", "11:00", "12:00",
-        "13:00", "14:00", "15:00", "16:00", "17:00"
+        "13:00", "14:00", "15:00"
     )
     var selectedTime by remember { mutableStateOf("") }
+    var expanded by remember { mutableStateOf(false) }
 
     Box(modifier = Modifier.fillMaxWidth()) {
-        TimeDropdownTextField(
-            label = "Hora",
-            options = horas,
-            selectedTime = selectedTime,
-            onTimeSelected = { selectedTime = it }
+        TextField(
+            value = selectedTime,
+            onValueChange = { selectedTime = it },
+            label = { Text("Hora") },
+            trailingIcon = {
+                Icon(
+                    imageVector = Icons.Default.ArrowDropDown,
+                    contentDescription = "Dropdown arrow"
+                )
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { expanded = !expanded },
+            colors = TextFieldDefaults.textFieldColors(
+                containerColor = Color(0xFFF2F2F2),
+                focusedIndicatorColor = Color.Blue,
+                unfocusedIndicatorColor = Color.Gray,
+                cursorColor = Color.Blue
+            )
         )
+
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color.White)
+        ) {
+            horas.forEach { hora ->
+                DropdownMenuItem(
+                    onClick = {
+                        selectedTime = hora
+                        expanded = false
+                    },
+                    text = {
+                        Text(
+                            text = hora,
+                            color = Color.Black
+                        )
+                    }
+                )
+            }
+        }
     }
 }
-
 @Composable
 fun CheckboxConInformacion() {
     var isChecked by remember { mutableStateOf(false) }
