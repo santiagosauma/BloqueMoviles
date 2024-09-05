@@ -1,5 +1,3 @@
-@file:Suppress("DEPRECATION")
-
 package com.leotesta017.clinicapenal.usuarioGeneral
 
 import android.view.ContextThemeWrapper
@@ -9,6 +7,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
@@ -18,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -25,7 +25,6 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.leotesta017.clinicapenal.R
-import com.leotesta017.clinicapenal.funcionesDeUsoGeneral.AdminBarraNav
 import com.leotesta017.clinicapenal.funcionesDeUsoGeneral.BarraNav
 import com.leotesta017.clinicapenal.funcionesDeUsoGeneral.TopBar
 import com.leotesta017.clinicapenal.ui.theme.ClinicaPenalTheme
@@ -47,7 +46,7 @@ fun Solicitud(navController: NavController?) {
                     }
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "Crear solicitud",
+                        text = "Nueva solicitud de cita",
                         style = MaterialTheme.typography.headlineSmall.copy(color = Color.Black),
                         modifier = Modifier.weight(1f)
                     )
@@ -66,13 +65,13 @@ fun Solicitud(navController: NavController?) {
             ) {
                 item {
                     Spacer(modifier = Modifier.height(20.dp))
-                    SeleccionarProblema()
+                    SeleccionCasoLegal() // Botón de Víctima e Investigado
                     Spacer(modifier = Modifier.height(20.dp))
-                    SeleccionarLugar()
+                    SeleccionarLugarInput() // Input de Lugar de Procedencia
                     Spacer(modifier = Modifier.height(20.dp))
                     SeleccionarFecha()
                     Spacer(modifier = Modifier.height(20.dp))
-                    SeleccionarHora()
+                    SeleccionarHora() // Ajuste en la selección de hora
                     Spacer(modifier = Modifier.height(20.dp))
                     CheckboxConInformacion()
                     Spacer(modifier = Modifier.height(20.dp))
@@ -86,22 +85,24 @@ fun Solicitud(navController: NavController?) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SeleccionarLugar() {
-    var selectedPlace by remember { mutableStateOf("") }
+fun SeleccionarHora() {
+    val horas = listOf("08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00")
+    var selectedTime by remember { mutableStateOf("") }
     var expanded by remember { mutableStateOf(false) }
-    val places = listOf("Lugar 1", "Lugar 2", "Lugar 3")
 
     Box(modifier = Modifier.fillMaxWidth()) {
-        TextField(
-            value = selectedPlace,
-            onValueChange = { selectedPlace = it },
-            label = { Text("Lugar") },
+        OutlinedTextField(
+            value = selectedTime,
+            onValueChange = { },
+            label = { Text("Hora") },
             trailingIcon = {
                 Icon(
                     imageVector = Icons.Default.ArrowDropDown,
-                    contentDescription = "Dropdown arrow"
+                    contentDescription = "Dropdown arrow",
+                    modifier = Modifier.clickable { expanded = !expanded }
                 )
             },
+            readOnly = true, // Hace que no se pueda escribir en el campo
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable { expanded = !expanded },
@@ -109,7 +110,7 @@ fun SeleccionarLugar() {
                 containerColor = Color(0xFFF2F2F2),
                 focusedIndicatorColor = Color.Blue,
                 unfocusedIndicatorColor = Color.Gray,
-                cursorColor = Color.Blue
+                cursorColor = Color.Transparent // Quita el cursor
             )
         )
 
@@ -120,17 +121,14 @@ fun SeleccionarLugar() {
                 .fillMaxWidth()
                 .background(Color.White)
         ) {
-            places.forEach { place ->
+            horas.forEach { hora ->
                 DropdownMenuItem(
                     onClick = {
-                        selectedPlace = place
+                        selectedTime = hora
                         expanded = false
                     },
                     text = {
-                        Text(
-                            text = place,
-                            color = Color.Black
-                        )
+                        Text(text = hora, color = Color.Black)
                     }
                 )
             }
@@ -138,27 +136,74 @@ fun SeleccionarLugar() {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun SeleccionarProblema() {
-    var selectedProblem by remember { mutableStateOf("") }
-    var expanded by remember { mutableStateOf(false) }
-    val problems = listOf("Problema 1", "Problema 2", "Problema 3")
 
-    Box(modifier = Modifier.fillMaxWidth()) {
-        TextField(
-            value = selectedProblem,
-            onValueChange = { selectedProblem = it },
-            label = { Text("Problema") },
-            trailingIcon = {
-                Icon(
-                    imageVector = Icons.Default.ArrowDropDown,
-                    contentDescription = "Dropdown arrow"
-                )
-            },
+@Composable
+fun SeleccionCasoLegal() {
+    var selectedOption by remember { mutableStateOf("Víctima") }
+
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Text(
+            text = "Estado de Caso legal",
+            style = MaterialTheme.typography.bodyLarge,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+        Row(
+            horizontalArrangement = Arrangement.Center,
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable { expanded = !expanded },
+                .height(48.dp)
+        ) {
+            OutlinedButton(
+                onClick = { selectedOption = "Víctima" },
+                colors = ButtonDefaults.outlinedButtonColors(
+                    containerColor = if (selectedOption == "Víctima") Color(0xFF0B1F8C) else Color.White,
+                    contentColor = if (selectedOption == "Víctima") Color.White else Color.Black
+                ),
+                shape = RoundedCornerShape(
+                    topStart = 24.dp, bottomStart = 24.dp,
+                    topEnd = 0.dp, bottomEnd = 0.dp
+                ),
+                border = ButtonDefaults.outlinedButtonBorder,
+                modifier = Modifier
+                    .weight(1f)
+                    .height(48.dp)
+            ) {
+                Text("Víctima", fontWeight = FontWeight.Bold)
+            }
+
+            OutlinedButton(
+                onClick = { selectedOption = "Investigado" },
+                colors = ButtonDefaults.outlinedButtonColors(
+                    containerColor = if (selectedOption == "Investigado") Color(0xFF0B1F8C) else Color.White,
+                    contentColor = if (selectedOption == "Investigado") Color.White else Color.Black
+                ),
+                shape = RoundedCornerShape(
+                    topStart = 0.dp, bottomStart = 0.dp,
+                    topEnd = 24.dp, bottomEnd = 24.dp
+                ),
+                border = ButtonDefaults.outlinedButtonBorder,
+                modifier = Modifier
+                    .weight(1f)
+                    .height(48.dp)
+            ) {
+                Text("Investigado", fontWeight = FontWeight.Bold)
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SeleccionarLugarInput() {
+    var selectedPlace by remember { mutableStateOf("") }
+
+    Column(modifier = Modifier.fillMaxWidth()) {
+        TextField(
+            value = selectedPlace,
+            onValueChange = { selectedPlace = it },
+            label = { Text("Lugar de Procedencia") },
+            modifier = Modifier
+                .fillMaxWidth(),
             colors = TextFieldDefaults.textFieldColors(
                 containerColor = Color(0xFFF2F2F2),
                 focusedIndicatorColor = Color.Blue,
@@ -166,29 +211,6 @@ fun SeleccionarProblema() {
                 cursorColor = Color.Blue
             )
         )
-
-        DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false },
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color.White)
-        ) {
-            problems.forEach { problem ->
-                DropdownMenuItem(
-                    onClick = {
-                        selectedProblem = problem
-                        expanded = false
-                    },
-                    text = {
-                        Text(
-                            text = problem,
-                            color = Color.Black
-                        )
-                    }
-                )
-            }
-        }
     }
 }
 
@@ -222,63 +244,6 @@ fun SeleccionarFecha() {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun SeleccionarHora() {
-    // Horas limitadas hasta las 15:00
-    val horas = listOf(
-        "08:00", "09:00", "10:00", "11:00", "12:00",
-        "13:00", "14:00", "15:00"
-    )
-    var selectedTime by remember { mutableStateOf("") }
-    var expanded by remember { mutableStateOf(false) }
-
-    Box(modifier = Modifier.fillMaxWidth()) {
-        TextField(
-            value = selectedTime,
-            onValueChange = { selectedTime = it },
-            label = { Text("Hora") },
-            trailingIcon = {
-                Icon(
-                    imageVector = Icons.Default.ArrowDropDown,
-                    contentDescription = "Dropdown arrow"
-                )
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable { expanded = !expanded },
-            colors = TextFieldDefaults.textFieldColors(
-                containerColor = Color(0xFFF2F2F2),
-                focusedIndicatorColor = Color.Blue,
-                unfocusedIndicatorColor = Color.Gray,
-                cursorColor = Color.Blue
-            )
-        )
-
-        DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false },
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color.White)
-        ) {
-            horas.forEach { hora ->
-                DropdownMenuItem(
-                    onClick = {
-                        selectedTime = hora
-                        expanded = false
-                    },
-                    text = {
-                        Text(
-                            text = hora,
-                            color = Color.Black
-                        )
-                    }
-                )
-            }
-        }
-    }
-}
 @Composable
 fun CheckboxConInformacion() {
     var isChecked by remember { mutableStateOf(false) }
@@ -317,7 +282,7 @@ fun BotonConfirmarCita() {
         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0B1F8C))
     ) {
         Text(
-            text = "Confirmar Cita",
+            text = "Generar Solicitud de Cita",
             color = Color.White,
             style = MaterialTheme.typography.labelLarge.copy(fontSize = 18.sp)
         )
