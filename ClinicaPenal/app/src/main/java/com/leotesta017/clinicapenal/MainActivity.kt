@@ -66,7 +66,6 @@ fun MyApp() {
         composable("generalsolicitudadmin") { GeneralSolicitudAdmin(navController)}
 
         //Pantalla Usuario Estudiante
-
         composable("pantallainfoestudiante"){ PantallaInfoEstudiante(navController)}
         composable("generasolicitudestudiante"){ GenerarSolicitudEstudiante(navController) }
         composable("informacionestudiate"){ InformacionClinicaEstudiante(navController) }

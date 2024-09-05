@@ -1,9 +1,12 @@
 package com.leotesta017.clinicapenal.usuarioGeneral
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.automirrored.filled.Chat
@@ -13,17 +16,23 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.font.FontWeight
 import androidx.navigation.NavController
 import com.leotesta017.clinicapenal.funcionesDeUsoGeneral.BarraNav
 import com.leotesta017.clinicapenal.funcionesDeUsoGeneral.LabelCategoria
 import com.leotesta017.clinicapenal.funcionesDeUsoGeneral.RoundedButton
-import com.leotesta017.clinicapenal.funcionesDeUsoGeneral.TopBar
 import com.leotesta017.clinicapenal.funcionesDeUsoGeneral.SearchBar
-
+import com.leotesta017.clinicapenal.funcionesDeUsoGeneral.TopBar
 
 @Composable
 fun PantallaInfoCategorias(navController: NavController?) {
@@ -34,20 +43,19 @@ fun PantallaInfoCategorias(navController: NavController?) {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(bottom = 140.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.Start
         ) {
             item {
                 TopBar()
                 Spacer(modifier = Modifier.height(16.dp))
-                InfoLegalSection()
-                Spacer(modifier = Modifier.height(16.dp))
                 SearchBar("")
                 Spacer(modifier = Modifier.height(16.dp))
-                LabelCategoria("Categoria")
+                CarruselDeNoticias()
+                Spacer(modifier = Modifier.height(16.dp))
+                LabelCategoria("Información Legal")
                 CategoriesSection(navController)
                 Spacer(modifier = Modifier.height(16.dp))
                 LabelCategoria("Servicios")
-                Spacer(modifier = Modifier.height(16.dp))
                 ServicesSection(navController)
                 Spacer(modifier = Modifier.height(16.dp))
             }
@@ -72,7 +80,6 @@ fun PantallaInfoCategorias(navController: NavController?) {
             )
         }
 
-        // Barra de navegación
         BarraNav(
             navController = navController,
             modifier = Modifier
@@ -82,36 +89,81 @@ fun PantallaInfoCategorias(navController: NavController?) {
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun InfoLegalSection() {
-    Box(
+fun CarruselDeNoticias() {
+    val totalPages = 5
+    val pagerState = rememberPagerState { totalPages }
+    val coroutineScope = rememberCoroutineScope()
+
+    Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color.LightGray)
-            .padding(16.dp),
-        contentAlignment = Alignment.Center
+            .padding(horizontal = 16.dp, vertical = 8.dp)
     ) {
         Text(
-            text = "Información Legal",
+            text = "Noticias",
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
-            color = Color.Black
+            color = Color(0xFF1A73E8),
+            modifier = Modifier.padding(bottom = 8.dp)
         )
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(180.dp)
+        ) {
+            HorizontalPager(
+                state = pagerState,
+                modifier = Modifier.fillMaxSize()
+            ) { page ->
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(Color.Gray),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(text = "Imagen ${page + 1}", color = Color.White)
+                }
+            }
+        }
     }
 }
 
 @Composable
 fun CategoriesSection(navController: NavController?) {
-    Column(modifier = Modifier
-        .padding(16.dp)
-        .padding(top = 0.dp)) {
-        CategoryItem("Robo y hurto", "La toma de propiedad ajena sin el consentimiento del propietario, con la intención de no devolverla.", navController)
+    Column(modifier = Modifier.padding(16.dp)) {
+        CategoryItem(
+            title = "Violencia Doméstica",
+            description = "Maltrato físico o emocional dentro del ámbito familiar",
+            navController = navController
+        )
         Spacer(modifier = Modifier.height(8.dp))
-        CategoryItem("Extorsión y amenaza", "Amenazas o coerción para obtener dinero, bienes o servicios de una persona mediante la intimidación.", navController)
+        CategoryItem(
+            title = "Adeudo",
+            description = "Falta de pago de una deuda o compromiso financiero.",
+            navController = navController
+        )
         Spacer(modifier = Modifier.height(8.dp))
-        CategoryItem("Violencia Doméstica", "Abuso físico, emocional o psicológico dentro del entorno familiar, destinado a controlar o intimidar a un miembro del hogar.", navController)
+        CategoryItem(
+            title = "Vehicular",
+            description = "Infracción de delito relacionado con el uso indebido de vehículos.",
+            navController = navController
+        )
         Spacer(modifier = Modifier.height(8.dp))
-        CategoryItem("Deudas", "Falta de pago de una obligación financiera que puede derivar en acciones legales por parte del acreedor.", navController)
+        CategoryItem(
+            title = "Robo y hurto",
+            description = "Tomar algo ajeno sin permiso, con intención de no devolverlo.",
+            navController = navController
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        CategoryItem(
+            title = "Extorsión y Amenaza",
+            description = "Uso de amenazas o coerción para obtener dinero o bienes mediante intimidación.",
+            navController = navController
+        )
     }
 }
 
@@ -127,12 +179,23 @@ fun CategoryItem(title: String, description: String, navController: NavControlle
             },
         verticalAlignment = Alignment.CenterVertically
     ) {
+        Box(
+            modifier = Modifier
+                .size(48.dp)
+                .clip(RoundedCornerShape(8.dp))
+                .background(Color.Gray)
+                .padding(8.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(text = "Img", color = Color.White, fontSize = 10.sp)
+        }
+        Spacer(modifier = Modifier.width(16.dp))
         Column(
             modifier = Modifier.weight(1f)
         ) {
             Text(text = title, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.Black)
             Spacer(modifier = Modifier.height(4.dp))
-            Text(text = description, fontSize = 14.sp, color = Color.Black)
+            Text(text = description, fontSize = 14.sp, color = Color.Gray)
         }
         Spacer(modifier = Modifier.width(16.dp))
         Icon(
@@ -146,25 +209,24 @@ fun CategoryItem(title: String, description: String, navController: NavControlle
 
 @Composable
 fun ServicesSection(navController: NavController?) {
-    Column(modifier = Modifier
-        .padding(16.dp)
-        .padding(top = 0.dp)) {
-        ServiceItem("Asesoria Legal", "Consulta profesional donde se " +
-                "ofrece orientación y consejo sobre cómo proceder en una situación legal " +
-                "específica", navController)
+    Column(modifier = Modifier.padding(16.dp)) {
+        ServiceItem(
+            title = "Asesoria Legal",
+            description = "Consulta profesional donde se ofrece orientación en situaciones legales",
+            navController = navController
+        )
         Spacer(modifier = Modifier.height(8.dp))
-
-
-        ServiceItem("Representacion Legal", "Actuación en nombre del cliente en" +
-                " procesos judiciales o negociaciones, defendiendo sus derechos e " +
-                "intereses legales", navController)
+        ServiceItem(
+            title = "Representacion Legal",
+            description = "Actuación en nombre del cliente en procesos judiciales o negociaciones",
+            navController = navController
+        )
         Spacer(modifier = Modifier.height(8.dp))
-
-
-        ServiceItem("Revision de Documentos Legales", "Análisis detallado de " +
-                "contratos, acuerdos y otros documentos legales para garantizar " +
-                "su validez", navController)
-        Spacer(modifier = Modifier.height(8.dp))
+        ServiceItem(
+            title = "Revisión de documentos legales",
+            description = "Análisis detallado de contratos, acuerdos y otros documentos legales",
+            navController = navController
+        )
     }
 }
 
@@ -180,12 +242,23 @@ fun ServiceItem(title: String, description: String, navController: NavController
             },
         verticalAlignment = Alignment.CenterVertically
     ) {
+        Box(
+            modifier = Modifier
+                .size(48.dp)  // Reducimos el tamaño del cuadro
+                .clip(RoundedCornerShape(8.dp))
+                .background(Color.Gray)
+                .padding(8.dp),  // Añadimos más padding interno
+            contentAlignment = Alignment.Center
+        ) {
+            Text(text = "Img", color = Color.White, fontSize = 10.sp)
+        }
+        Spacer(modifier = Modifier.width(16.dp))
         Column(
             modifier = Modifier.weight(1f)
         ) {
             Text(text = title, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.Black)
             Spacer(modifier = Modifier.height(4.dp))
-            Text(text = description, fontSize = 14.sp, color = Color.Black)
+            Text(text = description, fontSize = 14.sp, color = Color.Gray)
         }
         Spacer(modifier = Modifier.width(16.dp))
         Icon(
