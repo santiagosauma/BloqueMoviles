@@ -21,6 +21,7 @@ import com.leotesta017.clinicapenal.usuarioEstudiante.PantallaInfoEstudiante
 import com.leotesta017.clinicapenal.usuarioGeneral.DetalleInfo
 import com.leotesta017.clinicapenal.usuarioGeneral.PantallaInfoCategorias
 import com.leotesta017.clinicapenal.usuarioGeneral.ReviewComentarios
+import com.leotesta017.clinicapenal.usuarioGeneral.SegundoFormulario
 import com.leotesta017.clinicapenal.usuarioGeneral.ServiciosInfo
 import com.leotesta017.clinicapenal.usuarioGeneral.Solicitud
 import com.leotesta017.clinicapenal.usuarioGeneral.JuriBotScreen as JuriBot
@@ -59,6 +60,7 @@ fun MyApp() {
         composable("crearsolicitud") { Solicitud(navController) }
         composable("servicios_info") { ServiciosInfo(navController)}
         composable("Juribot") { JuriBot(navController)}
+        composable("SegundoFormulario") { SegundoFormulario(navController)}
 
         //Pantallas Usuario Admin
         composable("pantalla13") { Pantalla13() }

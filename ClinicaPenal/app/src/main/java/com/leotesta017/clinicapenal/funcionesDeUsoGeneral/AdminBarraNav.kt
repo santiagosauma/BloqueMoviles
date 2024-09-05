@@ -53,8 +53,8 @@ fun AdminBarraNav(navController: NavController?, modifier: Modifier = Modifier) 
         AdminBottomBarItem(
             icon = Icons.Default.Info,
             text = "Información",
-            isSelected = currentDestination == "informacionAdmin",
-            onClick = { navController?.navigate("informacionAdmin") }
+            isSelected = currentDestination == "pantallainformacionclinica",
+            onClick = { navController?.navigate("ipantallainformacionclinica") }
         )
     }
 }

@@ -1,9 +1,11 @@
 package com.leotesta017.clinicapenal.usuarioColaborador
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
@@ -14,18 +16,20 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.font.FontWeight
 import androidx.navigation.NavController
-import com.leotesta017.clinicapenal.funcionesDeUsoGeneral.AdminBarraNav
-import com.leotesta017.clinicapenal.funcionesDeUsoGeneral.LabelCategoria
+import com.leotesta017.clinicapenal.funcionesDeUsoGeneral.BarraNav
 import com.leotesta017.clinicapenal.funcionesDeUsoGeneral.RoundedButton
-import com.leotesta017.clinicapenal.funcionesDeUsoGeneral.TopBar
 import com.leotesta017.clinicapenal.funcionesDeUsoGeneral.SearchBar
+import com.leotesta017.clinicapenal.funcionesDeUsoGeneral.TopBar
 import com.leotesta017.clinicapenal.usuarioGeneral.CategoriesSection
 import com.leotesta017.clinicapenal.usuarioGeneral.ServicesSection
 
@@ -38,29 +42,27 @@ fun PantallaInfoAdmin(navController: NavController?) {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(bottom = 140.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.Start
         ) {
             item {
                 TopBar()
                 Spacer(modifier = Modifier.height(16.dp))
-                InfoLegalSection()
-                Spacer(modifier = Modifier.height(16.dp))
                 SearchBar("")
                 Spacer(modifier = Modifier.height(16.dp))
-                SortingVertically(
-                    action1 = { LabelCategoria("Categoria") },
-                    action2 = { navController?.navigate("modificar-info") },
-                    navController = navController
-                )
+                CarruselDeNoticias(navController)
                 Spacer(modifier = Modifier.height(16.dp))
+                LabelCategoriaConBoton(
+                    label = "Información Legal",
+                    navController = navController,
+                    modifier = Modifier.padding(start = 36.dp)
+                )
                 CategoriesSection(navController)
                 Spacer(modifier = Modifier.height(16.dp))
-                SortingVertically(
-                    action1 = { LabelCategoria("Servicios") },
-                    action2 = { navController?.navigate("modificar_servicios_info") },
-                    navController = navController
+                LabelCategoriaConBoton(
+                    label = "Servicios",
+                    navController = navController,
+                    modifier = Modifier.padding(start = 36.dp)
                 )
-                Spacer(modifier = Modifier.height(16.dp))
                 ServicesSection(navController)
                 Spacer(modifier = Modifier.height(16.dp))
             }
@@ -85,7 +87,7 @@ fun PantallaInfoAdmin(navController: NavController?) {
             )
         }
 
-        AdminBarraNav(
+        BarraNav(
             navController = navController,
             modifier = Modifier
                 .align(Alignment.BottomCenter)
@@ -94,46 +96,78 @@ fun PantallaInfoAdmin(navController: NavController?) {
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun SortingVertically(
-    action1: @Composable () -> Unit,
-    action2: () -> Unit,
-    navController: NavController?
-) {
-    Row(
+fun CarruselDeNoticias(navController: NavController?) {
+    val totalPages = 5
+    val pagerState = rememberPagerState { totalPages }
+    val coroutineScope = rememberCoroutineScope()
+
+    Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp),
-        verticalAlignment = Alignment.CenterVertically
+            .padding(horizontal = 26.dp, vertical = 8.dp)
     ) {
-        action1()
-        Spacer(modifier = Modifier.weight(1f))
-        Button(onClick = action2) {
-            Text("Agregar Información")
+        LabelCategoriaConBoton(
+            label = "Noticias",
+            navController = navController,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(180.dp)
+        ) {
+            HorizontalPager(
+                state = pagerState,
+                modifier = Modifier.fillMaxSize(),
+            ) { page ->
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize(0.90f)
+                        .clip(RoundedCornerShape(20.dp))
+                        .background(Color.Gray),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(text = "Imagen ${page + 1}", color = Color.White)
+                }
+            }
         }
     }
 }
 
 @Composable
-fun InfoLegalSection() {
-    Box(
-        modifier = Modifier
+fun LabelCategoriaConBoton(label: String, navController: NavController?, modifier: Modifier = Modifier) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier
             .fillMaxWidth()
-            .background(Color.LightGray)
-            .padding(16.dp),
-        contentAlignment = Alignment.Center
+            .padding(end = 15.dp) // Añade padding de 15.dp a la derecha para el botón
     ) {
         Text(
-            text = "Información Legal",
+            text = label,
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
-            color = Color.Black
+            color = Color.Black,
+            modifier = Modifier.weight(1f)
         )
+
+        Button(
+            onClick = { navController?.navigate("modificar-info") },
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0B1F8C), contentColor = Color.White),
+            shape = RoundedCornerShape(24.dp),
+            modifier = Modifier.padding(end = 15.dp) // Ajustar el padding derecho bajo a 15.dp
+        ) {
+            Icon(imageVector = Icons.Filled.Add, contentDescription = "Agregar") // Añadido el ícono de "Agregar"
+            Spacer(modifier = Modifier.width(4.dp))
+            Text(text = "Agregar")
+        }
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-fun PantallaInfoPreview() {
+fun PantallaInfoCategoriasPreview() {
     PantallaInfoAdmin(navController = null)
 }
