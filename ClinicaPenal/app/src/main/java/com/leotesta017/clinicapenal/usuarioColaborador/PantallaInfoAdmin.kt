@@ -30,7 +30,6 @@ import com.leotesta017.clinicapenal.funcionesDeUsoGeneral.RoundedButton
 import com.leotesta017.clinicapenal.funcionesDeUsoGeneral.SearchBar
 import com.leotesta017.clinicapenal.funcionesDeUsoGeneral.TopBar
 
-
 @Composable
 fun PantallaInfoAdmin(navController: NavController?) {
     Box(
@@ -50,7 +49,7 @@ fun PantallaInfoAdmin(navController: NavController?) {
                 LabelCategoriaConBoton(
                     label = "Noticias",
                     navController = navController,
-                    modifier = Modifier.padding(start = 25.dp, end = 25.dp),
+                    modifier = Modifier.padding(0.dp),
                     navigateroute = "agregar-info-admin"
                 )
                 Spacer(modifier = Modifier.height(16.dp))
@@ -59,7 +58,7 @@ fun PantallaInfoAdmin(navController: NavController?) {
                 LabelCategoriaConBoton(
                     label = "Información Legal",
                     navController = navController,
-                    modifier = Modifier.padding(start = 25.dp, end = 25.dp),
+                    modifier = Modifier.padding(0.dp),
                     navigateroute = "agregar-info-admin"
                 )
                 CategoriesSectionModificableAdmin(navController)
@@ -67,7 +66,7 @@ fun PantallaInfoAdmin(navController: NavController?) {
                 LabelCategoriaConBoton(
                     label = "Servicios",
                     navController = navController,
-                    modifier = Modifier.padding(start = 25.dp, end = 25.dp),
+                    modifier = Modifier.padding(0.dp),
                     navigateroute = "agregar_servicios_info-admin"
                 )
                 ServicesSectionModificableAdmin(navController)
@@ -113,10 +112,8 @@ fun CarruselDeNoticias(navController: NavController?) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 26.dp, vertical = 8.dp)
+            .padding(end = 0.dp, start = 32.dp)
     ) {
-
-
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -143,43 +140,38 @@ fun CarruselDeNoticias(navController: NavController?) {
 @Composable
 fun LabelCategoriaConBoton(label: String, navController: NavController?, modifier: Modifier = Modifier, navigateroute : String) {
     Row(
-        verticalAlignment = Alignment.CenterVertically, // Alinea los elementos verticalmente al centro
-        horizontalArrangement = Arrangement.SpaceBetween, // Distribuye el texto y el botón
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween,
         modifier = modifier
             .fillMaxWidth()
-            .padding(end = 10.dp, start = 10.dp) // Ajusta el padding horizontal
+            .padding(end = 14.dp, start = 10.dp) // Ajuste del padding a 14dp
     ) {
-        // El label se ajustará con el peso 1 para ocupar el espacio restante
         Text(
             text = label,
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
             color = Color.Black,
-            modifier = Modifier.weight(1f) // Deja que el texto ocupe el espacio restante
+            modifier = Modifier.weight(1f)
         )
-
-        // Botón de agregar
         Button(
             onClick = { navController?.navigate(navigateroute) },
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF0B1F8C), // Color azul del botón
-                contentColor = Color.White // Texto e icono en blanco
+                containerColor = Color(0xFF0B1F8C),
+                contentColor = Color.White
             ),
             shape = RoundedCornerShape(24.dp),
             modifier = Modifier
-                .height(40.dp) // Ajustar la altura del botón
-                .padding(end = 10.dp, start = 10.dp) // Asegura que haya espacio entre el texto y el botón
+                .height(40.dp)
         ) {
             Icon(
-                imageVector = Icons.Filled.Add, // Icono de agregar
+                imageVector = Icons.Filled.Add,
                 contentDescription = "Agregar"
             )
-            Spacer(modifier = Modifier.width(4.dp)) // Espacio entre el icono y el texto
+            Spacer(modifier = Modifier.width(4.dp))
             Text(text = "Agregar")
         }
     }
 }
-
 
 @Composable
 fun CategoriesSectionModificableAdmin(navController: NavController?) {
@@ -189,13 +181,13 @@ fun CategoriesSectionModificableAdmin(navController: NavController?) {
             description = "Maltrato físico o emocional dentro del ámbito familiar",
             navController = navController
         )
-        Spacer(modifier = Modifier.height(12.dp)) // Más espacio entre los ítems
+        Spacer(modifier = Modifier.height(12.dp))
         CategoryItemModificableAdmin(
             title = "Adeudo",
             description = "Falta de pago de una deuda o compromiso financiero.",
             navController = navController
         )
-        Spacer(modifier = Modifier.height(12.dp)) // Más espacio entre los ítems
+        Spacer(modifier = Modifier.height(12.dp))
         CategoryItemModificableAdmin(
             title = "Vehicular",
             description = "Infracción de delito relacionado con el uso indebido de vehículos.",
@@ -222,7 +214,7 @@ fun CategoryItemModificableAdmin(title: String, description: String, navControll
         modifier = Modifier
             .fillMaxWidth()
             .background(Color.White)
-            .padding(horizontal = 16.dp, vertical = 12.dp) // Padding horizontal y vertical
+            .padding(horizontal = 16.dp, vertical = 12.dp)
             .clickable {
                 navController?.navigate("modificar-info")
             },
@@ -230,7 +222,7 @@ fun CategoryItemModificableAdmin(title: String, description: String, navControll
     ) {
         Box(
             modifier = Modifier
-                .size(40.dp) // Cuadro más pequeño
+                .size(40.dp)
                 .clip(RoundedCornerShape(8.dp))
                 .background(Color.Gray)
                 .padding(8.dp),
@@ -238,7 +230,7 @@ fun CategoryItemModificableAdmin(title: String, description: String, navControll
         ) {
             Text(text = "Img", color = Color.White, fontSize = 10.sp)
         }
-        Spacer(modifier = Modifier.width(24.dp)) // Espacio entre la imagen y el texto
+        Spacer(modifier = Modifier.width(24.dp))
         Column(
             modifier = Modifier.weight(1f)
         ) {
@@ -246,7 +238,7 @@ fun CategoryItemModificableAdmin(title: String, description: String, navControll
             Spacer(modifier = Modifier.height(4.dp))
             Text(text = description, fontSize = 13.sp, color = Color.Gray)
         }
-        Spacer(modifier = Modifier.width(24.dp)) // Espacio entre el texto y la flecha
+        Spacer(modifier = Modifier.width(24.dp))
         Icon(
             imageVector = Icons.AutoMirrored.Filled.ArrowForward,
             contentDescription = "Flecha para Detalles",
@@ -285,7 +277,7 @@ fun ServiceItemModificableAdmin(title: String, description: String, navControlle
         modifier = Modifier
             .fillMaxWidth()
             .background(Color.White)
-            .padding(horizontal = 16.dp, vertical = 12.dp) // Padding horizontal y vertical
+            .padding(horizontal = 16.dp, vertical = 12.dp)
             .clickable {
                 navController?.navigate("modificar_servicios_info")
             },
@@ -293,7 +285,7 @@ fun ServiceItemModificableAdmin(title: String, description: String, navControlle
     ) {
         Box(
             modifier = Modifier
-                .size(40.dp) // Cuadro más pequeño
+                .size(40.dp)
                 .clip(RoundedCornerShape(8.dp))
                 .background(Color.Gray)
                 .padding(8.dp),
@@ -301,7 +293,7 @@ fun ServiceItemModificableAdmin(title: String, description: String, navControlle
         ) {
             Text(text = "Img", color = Color.White, fontSize = 10.sp)
         }
-        Spacer(modifier = Modifier.width(24.dp)) // Espacio entre la imagen y el texto
+        Spacer(modifier = Modifier.width(24.dp))
         Column(
             modifier = Modifier.weight(1f)
         ) {
@@ -309,7 +301,7 @@ fun ServiceItemModificableAdmin(title: String, description: String, navControlle
             Spacer(modifier = Modifier.height(4.dp))
             Text(text = description, fontSize = 13.sp, color = Color.Gray)
         }
-        Spacer(modifier = Modifier.width(24.dp)) // Espacio entre el texto y la flecha
+        Spacer(modifier = Modifier.width(24.dp))
         Icon(
             imageVector = Icons.AutoMirrored.Filled.ArrowForward,
             contentDescription = "Flecha para Detalles",
@@ -318,9 +310,6 @@ fun ServiceItemModificableAdmin(title: String, description: String, navControlle
         )
     }
 }
-
-
-
 
 @Preview(showBackground = true)
 @Composable

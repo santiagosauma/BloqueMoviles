@@ -9,7 +9,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.pantallainformacion.PantallaInfoClinica
 import com.leotesta017.clinicapenal.loginRegister.*
-import com.leotesta017.clinicapenal.usuarioColaborador.Pantalla13
 import com.leotesta017.clinicapenal.solicitud.GeneralSolicitud
 import com.leotesta017.clinicapenal.usuarioColaborador.ActualizarCasos
 import com.leotesta017.clinicapenal.usuarioColaborador.Agendar
@@ -69,7 +68,6 @@ fun MyApp() {
         composable("SegundoFormulario") { SegundoFormulario(navController)}
 
         //Pantallas Usuario Admin
-        composable("pantalla13") { Pantalla13() }
         composable("pantallainfoadmin") { PantallaInfoAdmin(navController)}
         composable("modificar-info") { ModificarInfoAdmin(navController)}
         composable("modificar_servicios_info") { ModificarServiciosAdmin(navController)}
