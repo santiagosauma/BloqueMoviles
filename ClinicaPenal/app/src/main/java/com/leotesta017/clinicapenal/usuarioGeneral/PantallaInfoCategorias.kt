@@ -22,6 +22,7 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.navigation.NavController
 import com.leotesta017.clinicapenal.funcionesDeUsoGeneral.BarraNav
@@ -72,7 +73,7 @@ fun PantallaInfoCategorias(navController: NavController?) {
             RoundedButton(
                 icon = Icons.AutoMirrored.Filled.Chat,
                 label = "JuriBot",
-                onClick = { navController?.navigate("Juribot") }
+                onClick = { navController?.navigate("ReviewComentarios") }
             )
             RoundedButton(
                 icon = Icons.Default.CalendarToday,
@@ -106,8 +107,10 @@ fun CarruselDeNoticias() {
             text = "Noticias",
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
-            color = Color(0xFF1A73E8),
-            modifier = Modifier.padding(bottom = 8.dp)
+            color = Color.Black,
+            modifier = Modifier
+                .padding(start = 10.dp, bottom = 8.dp)
+
         )
 
         Box(
@@ -117,14 +120,16 @@ fun CarruselDeNoticias() {
         ) {
             HorizontalPager(
                 state = pagerState,
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier.fillMaxSize(),
             ) { page ->
                 Box(
                     modifier = Modifier
-                        .fillMaxSize()
-                        .clip(RoundedCornerShape(16.dp))
-                        .background(Color.Gray)
-                        .padding(horizontal = 16.dp),
+                        .fillMaxSize(0.90f)
+                        .graphicsLayer {
+                            translationX = 50f
+                        }
+                        .clip(RoundedCornerShape(20.dp))
+                        .background(Color.Gray),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(text = "Imagen ${page + 1}", color = Color.White)
@@ -153,7 +158,7 @@ fun CategoriesSection(navController: NavController?) {
             description = "Maltrato físico o emocional dentro del ámbito familiar",
             navController = navController
         )
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(12.dp)) // Más espacio entre los ítems
         CategoryItem(
             title = "Adeudo",
             description = "Falta de pago de una deuda o compromiso financiero.",
@@ -186,7 +191,7 @@ fun CategoryItem(title: String, description: String, navController: NavControlle
         modifier = Modifier
             .fillMaxWidth()
             .background(Color.White)
-            .padding(horizontal = 16.dp, vertical = 12.dp)
+            .padding(horizontal = 16.dp, vertical = 12.dp) // Padding horizontal y vertical
             .clickable {
                 navController?.navigate("detalle_info")
             },
@@ -194,7 +199,7 @@ fun CategoryItem(title: String, description: String, navController: NavControlle
     ) {
         Box(
             modifier = Modifier
-                .size(40.dp)
+                .size(40.dp) // Cuadro más pequeño
                 .clip(RoundedCornerShape(8.dp))
                 .background(Color.Gray)
                 .padding(8.dp),
@@ -202,7 +207,7 @@ fun CategoryItem(title: String, description: String, navController: NavControlle
         ) {
             Text(text = "Img", color = Color.White, fontSize = 10.sp)
         }
-        Spacer(modifier = Modifier.width(24.dp))
+        Spacer(modifier = Modifier.width(24.dp)) // Espacio entre la imagen y el texto
         Column(
             modifier = Modifier.weight(1f)
         ) {
@@ -210,7 +215,7 @@ fun CategoryItem(title: String, description: String, navController: NavControlle
             Spacer(modifier = Modifier.height(4.dp))
             Text(text = description, fontSize = 13.sp, color = Color.Gray)
         }
-        Spacer(modifier = Modifier.width(24.dp))
+        Spacer(modifier = Modifier.width(24.dp)) // Espacio entre el texto y la flecha
         Icon(
             imageVector = Icons.AutoMirrored.Filled.ArrowForward,
             contentDescription = "Flecha para Detalles",
@@ -249,7 +254,7 @@ fun ServiceItem(title: String, description: String, navController: NavController
         modifier = Modifier
             .fillMaxWidth()
             .background(Color.White)
-            .padding(horizontal = 16.dp, vertical = 12.dp)
+            .padding(horizontal = 16.dp, vertical = 12.dp) // Padding horizontal y vertical
             .clickable {
                 navController?.navigate("servicios_info")
             },
@@ -257,7 +262,7 @@ fun ServiceItem(title: String, description: String, navController: NavController
     ) {
         Box(
             modifier = Modifier
-                .size(40.dp)
+                .size(40.dp) // Cuadro más pequeño
                 .clip(RoundedCornerShape(8.dp))
                 .background(Color.Gray)
                 .padding(8.dp),
@@ -265,7 +270,7 @@ fun ServiceItem(title: String, description: String, navController: NavController
         ) {
             Text(text = "Img", color = Color.White, fontSize = 10.sp)
         }
-        Spacer(modifier = Modifier.width(24.dp))
+        Spacer(modifier = Modifier.width(24.dp)) // Espacio entre la imagen y el texto
         Column(
             modifier = Modifier.weight(1f)
         ) {
@@ -273,7 +278,7 @@ fun ServiceItem(title: String, description: String, navController: NavController
             Spacer(modifier = Modifier.height(4.dp))
             Text(text = description, fontSize = 13.sp, color = Color.Gray)
         }
-        Spacer(modifier = Modifier.width(24.dp))
+        Spacer(modifier = Modifier.width(24.dp)) // Espacio entre el texto y la flecha
         Icon(
             imageVector = Icons.AutoMirrored.Filled.ArrowForward,
             contentDescription = "Flecha para Detalles",
