@@ -80,7 +80,7 @@ fun ActualizarCasos(navController: NavController?) {
 
                 Button(
                     onClick = {
-                        navController?.navigate("aqui_va_tu_ruta") // Aquí va tu ruta para Agendar
+                        navController?.navigate("agendar")
                     },
                     modifier = Modifier
                         .padding(horizontal = 16.dp)

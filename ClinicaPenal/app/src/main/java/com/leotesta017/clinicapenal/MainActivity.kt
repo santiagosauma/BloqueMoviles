@@ -12,6 +12,7 @@ import com.leotesta017.clinicapenal.loginRegister.*
 import com.leotesta017.clinicapenal.usuarioColaborador.Pantalla13
 import com.leotesta017.clinicapenal.solicitud.GeneralSolicitud
 import com.leotesta017.clinicapenal.usuarioColaborador.ActualizarCasos
+import com.leotesta017.clinicapenal.usuarioColaborador.Agendar
 import com.leotesta017.clinicapenal.usuarioColaborador.AgregarInfoAdmin
 import com.leotesta017.clinicapenal.usuarioColaborador.AgregarServiciosInfoAdmin
 import com.leotesta017.clinicapenal.usuarioColaborador.GeneralSolicitudAdmin
@@ -76,6 +77,7 @@ fun MyApp() {
         composable("generalsolicitudadmin") { GeneralSolicitudAdmin(navController)}
         composable("actualizarcasos") {ActualizarCasos(navController)}
         composable("infoclinicaadmin") { PantallaInfoClinicaAdmin(navController) }
+        composable("agendar") { Agendar(navController) }
 
         //Pantalla Usuario Estudiante
         composable("pantallainfoestudiante"){ PantallaInfoEstudiante(navController)}
