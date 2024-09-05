@@ -5,7 +5,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
@@ -19,9 +18,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.rememberCoroutineScope
@@ -29,7 +25,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.navigation.NavController
 import com.leotesta017.clinicapenal.funcionesDeUsoGeneral.BarraNav
-import com.leotesta017.clinicapenal.funcionesDeUsoGeneral.LabelCategoria
 import com.leotesta017.clinicapenal.funcionesDeUsoGeneral.RoundedButton
 import com.leotesta017.clinicapenal.funcionesDeUsoGeneral.SearchBar
 import com.leotesta017.clinicapenal.funcionesDeUsoGeneral.TopBar
@@ -52,10 +47,16 @@ fun PantallaInfoCategorias(navController: NavController?) {
                 Spacer(modifier = Modifier.height(16.dp))
                 CarruselDeNoticias()
                 Spacer(modifier = Modifier.height(16.dp))
-                LabelCategoria("Información Legal")
+                LabelCategoria(
+                    label = "Información Legal",
+                    modifier = Modifier.padding(start = 36.dp) // Padding a 36.dp a la izquierda
+                )
                 CategoriesSection(navController)
                 Spacer(modifier = Modifier.height(16.dp))
-                LabelCategoria("Servicios")
+                LabelCategoria(
+                    label = "Servicios",
+                    modifier = Modifier.padding(start = 36.dp) // Padding a 36.dp a la izquierda
+                )
                 ServicesSection(navController)
                 Spacer(modifier = Modifier.height(16.dp))
             }
@@ -99,7 +100,7 @@ fun CarruselDeNoticias() {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .padding(horizontal = 26.dp, vertical = 8.dp) // Padding a 16.dp a la izquierda
     ) {
         Text(
             text = "Noticias",
@@ -122,7 +123,8 @@ fun CarruselDeNoticias() {
                     modifier = Modifier
                         .fillMaxSize()
                         .clip(RoundedCornerShape(16.dp))
-                        .background(Color.Gray),
+                        .background(Color.Gray)
+                        .padding(horizontal = 16.dp), // Espacio entre los bloques
                     contentAlignment = Alignment.Center
                 ) {
                     Text(text = "Imagen ${page + 1}", color = Color.White)
@@ -133,6 +135,17 @@ fun CarruselDeNoticias() {
 }
 
 @Composable
+fun LabelCategoria(label: String, modifier: Modifier = Modifier) {
+    Text(
+        text = label,
+        fontSize = 20.sp,
+        fontWeight = FontWeight.Bold,
+        color = Color.Black,
+        modifier = modifier
+    )
+}
+
+@Composable
 fun CategoriesSection(navController: NavController?) {
     Column(modifier = Modifier.padding(16.dp)) {
         CategoryItem(
@@ -140,25 +153,25 @@ fun CategoriesSection(navController: NavController?) {
             description = "Maltrato físico o emocional dentro del ámbito familiar",
             navController = navController
         )
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(12.dp)) // Más espacio entre los ítems
         CategoryItem(
             title = "Adeudo",
             description = "Falta de pago de una deuda o compromiso financiero.",
             navController = navController
         )
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(12.dp)) // Más espacio entre los ítems
         CategoryItem(
             title = "Vehicular",
             description = "Infracción de delito relacionado con el uso indebido de vehículos.",
             navController = navController
         )
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(12.dp))
         CategoryItem(
             title = "Robo y hurto",
             description = "Tomar algo ajeno sin permiso, con intención de no devolverlo.",
             navController = navController
         )
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(12.dp))
         CategoryItem(
             title = "Extorsión y Amenaza",
             description = "Uso de amenazas o coerción para obtener dinero o bienes mediante intimidación.",
@@ -173,7 +186,7 @@ fun CategoryItem(title: String, description: String, navController: NavControlle
         modifier = Modifier
             .fillMaxWidth()
             .background(Color.White)
-            .padding(16.dp)
+            .padding(horizontal = 16.dp, vertical = 12.dp) // Padding horizontal y vertical
             .clickable {
                 navController?.navigate("detalle_info")
             },
@@ -181,7 +194,7 @@ fun CategoryItem(title: String, description: String, navController: NavControlle
     ) {
         Box(
             modifier = Modifier
-                .size(48.dp)
+                .size(40.dp) // Cuadro más pequeño
                 .clip(RoundedCornerShape(8.dp))
                 .background(Color.Gray)
                 .padding(8.dp),
@@ -189,15 +202,15 @@ fun CategoryItem(title: String, description: String, navController: NavControlle
         ) {
             Text(text = "Img", color = Color.White, fontSize = 10.sp)
         }
-        Spacer(modifier = Modifier.width(16.dp))
+        Spacer(modifier = Modifier.width(24.dp)) // Espacio entre la imagen y el texto
         Column(
             modifier = Modifier.weight(1f)
         ) {
-            Text(text = title, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+            Text(text = title, fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.Black)
             Spacer(modifier = Modifier.height(4.dp))
-            Text(text = description, fontSize = 14.sp, color = Color.Gray)
+            Text(text = description, fontSize = 13.sp, color = Color.Gray)
         }
-        Spacer(modifier = Modifier.width(16.dp))
+        Spacer(modifier = Modifier.width(24.dp)) // Espacio entre el texto y la flecha
         Icon(
             imageVector = Icons.AutoMirrored.Filled.ArrowForward,
             contentDescription = "Flecha para Detalles",
@@ -215,13 +228,13 @@ fun ServicesSection(navController: NavController?) {
             description = "Consulta profesional donde se ofrece orientación en situaciones legales",
             navController = navController
         )
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(12.dp))
         ServiceItem(
             title = "Representacion Legal",
             description = "Actuación en nombre del cliente en procesos judiciales o negociaciones",
             navController = navController
         )
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(12.dp))
         ServiceItem(
             title = "Revisión de documentos legales",
             description = "Análisis detallado de contratos, acuerdos y otros documentos legales",
@@ -236,7 +249,7 @@ fun ServiceItem(title: String, description: String, navController: NavController
         modifier = Modifier
             .fillMaxWidth()
             .background(Color.White)
-            .padding(16.dp)
+            .padding(horizontal = 16.dp, vertical = 12.dp) // Padding horizontal y vertical
             .clickable {
                 navController?.navigate("servicios_info")
             },
@@ -244,23 +257,23 @@ fun ServiceItem(title: String, description: String, navController: NavController
     ) {
         Box(
             modifier = Modifier
-                .size(48.dp)  // Reducimos el tamaño del cuadro
+                .size(40.dp) // Cuadro más pequeño
                 .clip(RoundedCornerShape(8.dp))
                 .background(Color.Gray)
-                .padding(8.dp),  // Añadimos más padding interno
+                .padding(8.dp),
             contentAlignment = Alignment.Center
         ) {
             Text(text = "Img", color = Color.White, fontSize = 10.sp)
         }
-        Spacer(modifier = Modifier.width(16.dp))
+        Spacer(modifier = Modifier.width(24.dp)) // Espacio entre la imagen y el texto
         Column(
             modifier = Modifier.weight(1f)
         ) {
-            Text(text = title, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+            Text(text = title, fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.Black)
             Spacer(modifier = Modifier.height(4.dp))
-            Text(text = description, fontSize = 14.sp, color = Color.Gray)
+            Text(text = description, fontSize = 13.sp, color = Color.Gray)
         }
-        Spacer(modifier = Modifier.width(16.dp))
+        Spacer(modifier = Modifier.width(24.dp)) // Espacio entre el texto y la flecha
         Icon(
             imageVector = Icons.AutoMirrored.Filled.ArrowForward,
             contentDescription = "Flecha para Detalles",
