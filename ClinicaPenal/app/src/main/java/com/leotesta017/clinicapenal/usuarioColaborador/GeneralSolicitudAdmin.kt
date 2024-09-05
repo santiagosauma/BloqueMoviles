@@ -1,6 +1,7 @@
 package com.leotesta017.clinicapenal.usuarioColaborador
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -210,8 +211,11 @@ fun SolicitudItem(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp)
-            .clip(RoundedCornerShape(16.dp)) // Bordes redondeados
-            .shadow(1.dp), // Sombra para el Card
+            .clip(RoundedCornerShape(16.dp))
+            .shadow(1.dp)
+            .clickable {
+                navController?.navigate("actualizarcasos")
+            },
         colors = CardDefaults.cardColors(
             containerColor = Color(0xFFE4E4E4) // Color de fondo del Card
         )
@@ -303,6 +307,7 @@ fun SolicitudItem(
     }
 }
 
+
 @Composable
 fun CasoRepresentacionItem(
     casosRepresentacion: Casos_Representacion,
@@ -316,8 +321,11 @@ fun CasoRepresentacionItem(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp)
-            .clip(RoundedCornerShape(16.dp)) // Bordes redondeados
-            .shadow(1.dp), // Sombra para el Card
+            .clip(RoundedCornerShape(16.dp))
+            .shadow(1.dp)
+            .clickable {
+                navController?.navigate("actualizarcasos")
+            },
         colors = CardDefaults.cardColors(
             containerColor = Color(0xFFE4E4E4) // Color de fondo del Card
         )
@@ -408,6 +416,7 @@ fun CasoRepresentacionItem(
         )
     }
 }
+
 
 
 @Preview(showBackground = true)

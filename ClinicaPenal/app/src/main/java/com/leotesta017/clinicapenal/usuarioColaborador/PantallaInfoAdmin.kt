@@ -67,7 +67,7 @@ fun PantallaInfoAdmin(navController: NavController?) {
                 LabelCategoriaConBoton(
                     label = "Servicios",
                     navController = navController,
-                    modifier = Modifier.padding(start = 36.dp),
+                    modifier = Modifier.padding(start = 25.dp, end = 25.dp),
                     navigateroute = "agregar_servicios_info-admin"
                 )
                 ServicesSectionModificableAdmin(navController)

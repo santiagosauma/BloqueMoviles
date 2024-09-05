@@ -11,6 +11,7 @@ import com.example.pantallainformacion.PantallaInfoClinica
 import com.leotesta017.clinicapenal.loginRegister.*
 import com.leotesta017.clinicapenal.usuarioColaborador.Pantalla13
 import com.leotesta017.clinicapenal.solicitud.GeneralSolicitud
+import com.leotesta017.clinicapenal.usuarioColaborador.ActualizarCasos
 import com.leotesta017.clinicapenal.usuarioColaborador.AgregarInfoAdmin
 import com.leotesta017.clinicapenal.usuarioColaborador.AgregarServiciosInfoAdmin
 import com.leotesta017.clinicapenal.usuarioColaborador.GeneralSolicitudAdmin
@@ -72,6 +73,7 @@ fun MyApp() {
         composable("agregar-info-admin") { AgregarInfoAdmin(navController) }
         composable("agregar_servicios_info-admin") { AgregarServiciosInfoAdmin(navController) }
         composable("generalsolicitudadmin") { GeneralSolicitudAdmin(navController)}
+        composable("actualizarcasos") {ActualizarCasos(navController)}
 
         //Pantalla Usuario Estudiante
         composable("pantallainfoestudiante"){ PantallaInfoEstudiante(navController)}

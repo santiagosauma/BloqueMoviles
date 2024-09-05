@@ -72,7 +72,7 @@ fun AgregarServiciosInfoAdmin(navController: NavController?) {
                     }
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "Agregar Información",
+                        text = "Agregar Servicio",
                         style = MaterialTheme.typography.headlineSmall.copy(color = Color.Black),
                         modifier = Modifier.weight(1f)
                     )
