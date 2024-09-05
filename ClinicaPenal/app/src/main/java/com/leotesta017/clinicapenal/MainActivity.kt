@@ -23,6 +23,7 @@ import com.leotesta017.clinicapenal.usuarioGeneral.PantallaInfoCategorias
 import com.leotesta017.clinicapenal.usuarioGeneral.ReviewComentarios
 import com.leotesta017.clinicapenal.usuarioGeneral.ServiciosInfo
 import com.leotesta017.clinicapenal.usuarioGeneral.Solicitud
+import com.leotesta017.clinicapenal.usuarioGeneral.JuriBotScreen as JuriBot
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -57,6 +58,7 @@ fun MyApp() {
         composable("detalle_info") { DetalleInfo(navController) }
         composable("crearsolicitud") { Solicitud(navController) }
         composable("servicios_info") { ServiciosInfo(navController)}
+        composable("Juribot") { JuriBot(navController)}
 
         //Pantallas Usuario Admin
         composable("pantalla13") { Pantalla13() }
