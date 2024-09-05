@@ -49,7 +49,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.leotesta017.clinicapenal.funcionesDeUsoGeneral.AdminBarraNav
-import com.leotesta017.clinicapenal.funcionesDeUsoGeneral.BarraNav
 import com.leotesta017.clinicapenal.funcionesDeUsoGeneral.RoundedButton
 import com.leotesta017.clinicapenal.funcionesDeUsoGeneral.TopBar
 

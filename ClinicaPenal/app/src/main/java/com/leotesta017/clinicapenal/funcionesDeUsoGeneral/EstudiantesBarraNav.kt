@@ -54,8 +54,8 @@ fun EstudiantesBarraNav(navController: NavController?, modifier: Modifier = Modi
         EstudiantesBottomBarItem(
             icon = Icons.Default.Info,
             text = "Información",
-            isSelected = currentDestination == "informacionestudiante",
-            onClick = { navController?.navigate("informacionestudiante") }
+            isSelected = currentDestination == "informacionestudiate",
+            onClick = { navController?.navigate("informacionestudiate") }
         )
     }
 }

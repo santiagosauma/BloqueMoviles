@@ -118,7 +118,7 @@ fun ActualizarCasos(navController: NavController?) {
                         .height(48.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Blue)
                 ) {
-                    Text("Re-Asginar", color = Color.White)
+                    Text("Re-Asignar", color = Color.White)
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
