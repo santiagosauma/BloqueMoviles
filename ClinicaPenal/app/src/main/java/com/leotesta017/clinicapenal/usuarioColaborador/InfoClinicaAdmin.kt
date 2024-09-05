@@ -180,7 +180,7 @@ fun SeccionContacto() {
                     withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
                         append("• Correo:")
                     }
-                    append(" bufetec@tec.mx ")
+                    append(" ClinicaPenal@tec.mx ")
                 },
                 fontSize = 12.sp,
                 color = Color.Black
