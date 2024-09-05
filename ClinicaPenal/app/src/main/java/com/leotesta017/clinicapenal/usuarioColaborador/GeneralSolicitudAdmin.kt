@@ -128,13 +128,13 @@ fun GeneralSolicitudAdmin(navController: NavController?) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White)  // Fondo blanco para evitar problemas de renderizado
+            .background(Color.White)
     ) {
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(bottom = 56.dp),
-            horizontalAlignment = Alignment.Start // Alineación a la izquierda
+            horizontalAlignment = Alignment.Start
         ) {
             item {
                 TopBar()
@@ -147,7 +147,7 @@ fun GeneralSolicitudAdmin(navController: NavController?) {
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(start = 20.dp)
                 )
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(10.dp))
             }
 
             items(solicitudes) { solicitud ->
@@ -158,13 +158,10 @@ fun GeneralSolicitudAdmin(navController: NavController?) {
                         solicitudes = solicitudes.filterNot { it.id == id }
                     }
                 )
-                HorizontalDivider(color = Color.Gray)
+                Spacer(modifier = Modifier.height(4.dp))
             }
 
-
-
-
-            item{
+            item {
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
                     text = "Casos Representacion",
@@ -175,8 +172,6 @@ fun GeneralSolicitudAdmin(navController: NavController?) {
                 Spacer(modifier = Modifier.height(16.dp))
             }
 
-
-
             items(casos_representacion) { casos_representacion ->
                 CasoRepresentacionItem(
                     casosRepresentacion = casos_representacion,
@@ -185,7 +180,7 @@ fun GeneralSolicitudAdmin(navController: NavController?) {
                         solicitudes = solicitudes.filterNot { it.id == id }
                     }
                 )
-                HorizontalDivider(color = Color.Gray)
+                Spacer(modifier = Modifier.height(8.dp))
             }
         }
         Spacer(modifier = Modifier.height(16.dp))
@@ -217,7 +212,7 @@ fun SolicitudItem(
                 navController?.navigate("actualizarcasos")
             },
         colors = CardDefaults.cardColors(
-            containerColor = Color(0xFFE4E4E4) // Color de fondo del Card
+            containerColor = Color(0xFFE4E4E4)
         )
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -258,7 +253,7 @@ fun SolicitudItem(
                         Box(
                             modifier = Modifier
                                 .size(12.dp)
-                                .background(solicitud.estadoColor, shape = CircleShape) // Usando CircleShape
+                                .background(solicitud.estadoColor, shape = CircleShape)
                         )
                     }
                     IconButton(onClick = { expanded = !expanded }) {
@@ -307,7 +302,6 @@ fun SolicitudItem(
     }
 }
 
-
 @Composable
 fun CasoRepresentacionItem(
     casosRepresentacion: Casos_Representacion,
@@ -327,7 +321,7 @@ fun CasoRepresentacionItem(
                 navController?.navigate("actualizarcasos")
             },
         colors = CardDefaults.cardColors(
-            containerColor = Color(0xFFE4E4E4) // Color de fondo del Card
+            containerColor = Color(0xFFE4E4E4)
         )
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -368,7 +362,7 @@ fun CasoRepresentacionItem(
                         Box(
                             modifier = Modifier
                                 .size(12.dp)
-                                .background(casosRepresentacion.estadoColor, shape = CircleShape) // Usando CircleShape
+                                .background(casosRepresentacion.estadoColor, shape = CircleShape)
                         )
                     }
                     IconButton(onClick = { expanded = !expanded }) {
@@ -416,8 +410,6 @@ fun CasoRepresentacionItem(
         )
     }
 }
-
-
 
 @Preview(showBackground = true)
 @Composable

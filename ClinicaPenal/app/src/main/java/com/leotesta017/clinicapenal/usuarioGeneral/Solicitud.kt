@@ -25,6 +25,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.leotesta017.clinicapenal.R
+import com.leotesta017.clinicapenal.funcionesDeUsoGeneral.AdminBarraNav
 import com.leotesta017.clinicapenal.funcionesDeUsoGeneral.BarraNav
 import com.leotesta017.clinicapenal.funcionesDeUsoGeneral.TopBar
 import com.leotesta017.clinicapenal.ui.theme.ClinicaPenalTheme
@@ -54,7 +55,7 @@ fun Solicitud(navController: NavController?) {
             }
         },
         bottomBar = {
-            BarraNav(navController = navController, modifier = Modifier.fillMaxWidth())
+            AdminBarraNav(navController = navController, modifier = Modifier.fillMaxWidth())
         },
         content = { paddingValues ->
             LazyColumn(
@@ -65,7 +66,7 @@ fun Solicitud(navController: NavController?) {
             ) {
                 item {
                     Spacer(modifier = Modifier.height(20.dp))
-                    SeleccionCasoLegal() // Botón de Víctima e Investigado
+                    SeleccionCasoLegal()
                     Spacer(modifier = Modifier.height(20.dp))
                     SeleccionarLugarInput() // Input de Lugar de Procedencia
                     Spacer(modifier = Modifier.height(20.dp))
