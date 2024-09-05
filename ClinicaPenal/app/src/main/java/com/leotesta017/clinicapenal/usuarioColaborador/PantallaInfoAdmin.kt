@@ -144,7 +144,7 @@ fun LabelCategoriaConBoton(label: String, navController: NavController?, modifie
         horizontalArrangement = Arrangement.SpaceBetween,
         modifier = modifier
             .fillMaxWidth()
-            .padding(end = 14.dp, start = 10.dp) // Ajuste del padding a 14dp
+            .padding(end = 14.dp, start = 10.dp)
     ) {
         Text(
             text = label,

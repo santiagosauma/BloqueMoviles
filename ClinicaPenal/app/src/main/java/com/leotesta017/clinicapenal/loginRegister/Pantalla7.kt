@@ -38,8 +38,8 @@ fun Pantalla7(navController: NavController) {
             onClick = { navController.navigate("pantalla8") },
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFFb4b9da), // Color personalizado
-                contentColor = Color.Black // Texto negro
+                containerColor = Color(0xFFb4b9da),
+                contentColor = Color.Black
             )
         ) {
             Text(text = "Estudiante")

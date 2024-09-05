@@ -50,7 +50,7 @@ fun ComentarioScreen(navController: NavController?) {
                         text = "Comentario",
                         style = MaterialTheme.typography.headlineSmall.copy(
                             color = Color.Black,
-                            fontWeight = FontWeight.Bold // Poner el texto en negrita
+                            fontWeight = FontWeight.Bold
                         ),
                         modifier = Modifier.weight(1f)
                     )
@@ -69,10 +69,9 @@ fun ComentarioScreen(navController: NavController?) {
             ) {
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Barra de herramientas para formateo
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Start // Poner los botones juntos
+                    horizontalArrangement = Arrangement.Start
                 ) {
                     IconButton(onClick = { isBold = !isBold }) {
                         Icon(
@@ -92,7 +91,6 @@ fun ComentarioScreen(navController: NavController?) {
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Campo de texto para comentario
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -125,7 +123,6 @@ fun ComentarioScreen(navController: NavController?) {
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Botones de Guardar y Descartar, colocados justo debajo del input
                 Row(
                     modifier = Modifier
                         .fillMaxWidth(),

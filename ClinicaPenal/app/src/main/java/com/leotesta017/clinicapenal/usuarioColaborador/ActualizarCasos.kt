@@ -135,7 +135,7 @@ fun ActualizarCasos(navController: NavController?) {
 
                 Button(
                     onClick = {
-                        navController?.navigate("comentar") // Aquí va tu ruta para Comentar
+                        navController?.navigate("comentar")
                     },
                     modifier = Modifier
                         .padding(horizontal = 16.dp)

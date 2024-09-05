@@ -48,8 +48,8 @@ fun Pantalla3(navController: NavController) {
             onClick = { navController.navigate("pantalla4") },
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFFb4b9da), // Color personalizado
-                contentColor = Color.Black // Texto negro
+                containerColor = Color(0xFFb4b9da),
+                contentColor = Color.Black
             )
         ) {
             Text(text = "Crear Cuenta")
@@ -60,7 +60,7 @@ fun Pantalla3(navController: NavController) {
             onClick = { navController.navigate("pantalla5") },
             modifier = Modifier
                 .fillMaxWidth()
-                .offset(y = (-48).dp), // Ajusta este valor para subir el botón
+                .offset(y = (-48).dp),
             colors = ButtonDefaults.buttonColors(containerColor = Color.Blue)
         ) {
             Text(text = "Iniciar Sesión")

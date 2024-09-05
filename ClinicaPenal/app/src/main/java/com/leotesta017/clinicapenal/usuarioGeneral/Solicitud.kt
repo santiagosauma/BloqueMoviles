@@ -68,11 +68,11 @@ fun Solicitud(navController: NavController?) {
                     Spacer(modifier = Modifier.height(20.dp))
                     SeleccionCasoLegal()
                     Spacer(modifier = Modifier.height(20.dp))
-                    SeleccionarLugarInput() // Input de Lugar de Procedencia
+                    SeleccionarLugarInput()
                     Spacer(modifier = Modifier.height(20.dp))
                     SeleccionarFecha()
                     Spacer(modifier = Modifier.height(20.dp))
-                    SeleccionarHora() // Ajuste en la selección de hora
+                    SeleccionarHora()
                     Spacer(modifier = Modifier.height(20.dp))
                     CheckboxConInformacion()
                     Spacer(modifier = Modifier.height(20.dp))
@@ -103,7 +103,7 @@ fun SeleccionarHora() {
                     modifier = Modifier.clickable { expanded = !expanded }
                 )
             },
-            readOnly = true, // Hace que no se pueda escribir en el campo
+            readOnly = true,
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable { expanded = !expanded },
@@ -111,7 +111,7 @@ fun SeleccionarHora() {
                 containerColor = Color(0xFFF2F2F2),
                 focusedIndicatorColor = Color.Blue,
                 unfocusedIndicatorColor = Color.Gray,
-                cursorColor = Color.Transparent // Quita el cursor
+                cursorColor = Color.Transparent
             )
         )
 

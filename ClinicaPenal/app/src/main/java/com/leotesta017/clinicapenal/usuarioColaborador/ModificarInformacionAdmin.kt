@@ -185,12 +185,11 @@ fun RichTextEditor() {
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Contenedor scrollable para el BasicTextField
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(350.dp) // Establece una altura fija
-                .verticalScroll(rememberScrollState()) // Habilita el scroll vertical
+                .height(350.dp)
+                .verticalScroll(rememberScrollState())
                 .background(Color.LightGray)
                 .padding(8.dp)
         ) {
@@ -203,7 +202,7 @@ fun RichTextEditor() {
                         }
                     )
                 },
-                modifier = Modifier.fillMaxSize(), // Usa fillMaxSize para que el BasicTextField ocupe el espacio del Box
+                modifier = Modifier.fillMaxSize(),
                 textStyle = TextStyle(
                     fontSize = 16.sp,
                     color = Color.Black

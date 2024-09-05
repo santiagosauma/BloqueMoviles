@@ -72,8 +72,8 @@ fun Pantalla9(navController: NavController) {
                 .fillMaxWidth()
                 .padding(top = 16.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color.Blue, // Color personalizado
-                contentColor = Color.White // Texto negro
+                containerColor = Color.Blue,
+                contentColor = Color.White
             )
         ) {
             Text(text = "Acceder")

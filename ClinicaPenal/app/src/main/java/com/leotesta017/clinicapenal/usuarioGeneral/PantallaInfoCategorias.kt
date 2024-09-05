@@ -101,7 +101,7 @@ fun CarruselDeNoticias() {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 26.dp, vertical = 8.dp) // Padding a 16.dp a la izquierda
+            .padding(horizontal = 26.dp, vertical = 8.dp)
     ) {
         Text(
             text = "Noticias",
@@ -158,13 +158,13 @@ fun CategoriesSection(navController: NavController?) {
             description = "Maltrato físico o emocional dentro del ámbito familiar",
             navController = navController
         )
-        Spacer(modifier = Modifier.height(12.dp)) // Más espacio entre los ítems
+        Spacer(modifier = Modifier.height(12.dp))
         CategoryItem(
             title = "Adeudo",
             description = "Falta de pago de una deuda o compromiso financiero.",
             navController = navController
         )
-        Spacer(modifier = Modifier.height(12.dp)) // Más espacio entre los ítems
+        Spacer(modifier = Modifier.height(12.dp))
         CategoryItem(
             title = "Vehicular",
             description = "Infracción de delito relacionado con el uso indebido de vehículos.",
@@ -191,7 +191,7 @@ fun CategoryItem(title: String, description: String, navController: NavControlle
         modifier = Modifier
             .fillMaxWidth()
             .background(Color.White)
-            .padding(horizontal = 16.dp, vertical = 12.dp) // Padding horizontal y vertical
+            .padding(horizontal = 16.dp, vertical = 12.dp)
             .clickable {
                 navController?.navigate("detalle_info")
             },
@@ -199,7 +199,7 @@ fun CategoryItem(title: String, description: String, navController: NavControlle
     ) {
         Box(
             modifier = Modifier
-                .size(40.dp) // Cuadro más pequeño
+                .size(40.dp)
                 .clip(RoundedCornerShape(8.dp))
                 .background(Color.Gray)
                 .padding(8.dp),
@@ -207,7 +207,7 @@ fun CategoryItem(title: String, description: String, navController: NavControlle
         ) {
             Text(text = "Img", color = Color.White, fontSize = 10.sp)
         }
-        Spacer(modifier = Modifier.width(24.dp)) // Espacio entre la imagen y el texto
+        Spacer(modifier = Modifier.width(24.dp))
         Column(
             modifier = Modifier.weight(1f)
         ) {
@@ -215,7 +215,7 @@ fun CategoryItem(title: String, description: String, navController: NavControlle
             Spacer(modifier = Modifier.height(4.dp))
             Text(text = description, fontSize = 13.sp, color = Color.Gray)
         }
-        Spacer(modifier = Modifier.width(24.dp)) // Espacio entre el texto y la flecha
+        Spacer(modifier = Modifier.width(24.dp))
         Icon(
             imageVector = Icons.AutoMirrored.Filled.ArrowForward,
             contentDescription = "Flecha para Detalles",
@@ -254,7 +254,7 @@ fun ServiceItem(title: String, description: String, navController: NavController
         modifier = Modifier
             .fillMaxWidth()
             .background(Color.White)
-            .padding(horizontal = 16.dp, vertical = 12.dp) // Padding horizontal y vertical
+            .padding(horizontal = 16.dp, vertical = 12.dp)
             .clickable {
                 navController?.navigate("servicios_info")
             },
@@ -262,7 +262,7 @@ fun ServiceItem(title: String, description: String, navController: NavController
     ) {
         Box(
             modifier = Modifier
-                .size(40.dp) // Cuadro más pequeño
+                .size(40.dp)
                 .clip(RoundedCornerShape(8.dp))
                 .background(Color.Gray)
                 .padding(8.dp),
@@ -270,7 +270,7 @@ fun ServiceItem(title: String, description: String, navController: NavController
         ) {
             Text(text = "Img", color = Color.White, fontSize = 10.sp)
         }
-        Spacer(modifier = Modifier.width(24.dp)) // Espacio entre la imagen y el texto
+        Spacer(modifier = Modifier.width(24.dp))
         Column(
             modifier = Modifier.weight(1f)
         ) {
@@ -278,7 +278,7 @@ fun ServiceItem(title: String, description: String, navController: NavController
             Spacer(modifier = Modifier.height(4.dp))
             Text(text = description, fontSize = 13.sp, color = Color.Gray)
         }
-        Spacer(modifier = Modifier.width(24.dp)) // Espacio entre el texto y la flecha
+        Spacer(modifier = Modifier.width(24.dp))
         Icon(
             imageVector = Icons.AutoMirrored.Filled.ArrowForward,
             contentDescription = "Flecha para Detalles",

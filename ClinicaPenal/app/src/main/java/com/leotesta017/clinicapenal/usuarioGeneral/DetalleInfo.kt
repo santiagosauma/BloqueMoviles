@@ -43,7 +43,6 @@ fun DetalleInfo(navController: NavController?) {
             HeaderSection("Robo y Hurto", navController)
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Secciones con títulos
             SectionTitle("Descripción")
             Spacer(modifier = Modifier.height(8.dp))
             SectionContent("Descripción general del tema seleccionado.")

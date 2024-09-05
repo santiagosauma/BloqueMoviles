@@ -96,7 +96,7 @@ fun SeleccionarHoraDropdown() {
                     modifier = Modifier.clickable { expanded = !expanded }
                 )
             },
-            readOnly = true, // Hace que no se pueda escribir en el campo
+            readOnly = true,
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable { expanded = !expanded },
@@ -104,7 +104,7 @@ fun SeleccionarHoraDropdown() {
                 containerColor = Color(0xFFF2F2F2),
                 focusedIndicatorColor = Color.Blue,
                 unfocusedIndicatorColor = Color.Gray,
-                cursorColor = Color.Transparent // Quita el cursor
+                cursorColor = Color.Transparent
             )
         )
 

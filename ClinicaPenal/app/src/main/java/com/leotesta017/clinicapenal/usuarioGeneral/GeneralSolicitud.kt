@@ -87,7 +87,7 @@ fun GeneralSolicitud(navController: NavController?) {
                 fecha = "01/09/24",
                 titulo = "Finalizado: Caso ID123",
                 detalle = "Puede dejar su valoración en el Caso en el Histórico de Solicitudes",
-                isImportant = true // Esta notificación tendrá borde azul
+                isImportant = true
             ),
             Notificacion(
                 fecha = "12/08/24",
@@ -120,13 +120,13 @@ fun GeneralSolicitud(navController: NavController?) {
                 Spacer(modifier = Modifier.height(16.dp))
                 Box(
                     modifier = Modifier
-                        .fillMaxSize() // Rellena toda la pantalla
+                        .fillMaxSize()
                 ) {
                     Text(
                         text = "Historial de Solicitudes",
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
-                        modifier = Modifier.align(Alignment.Center) // Alinea el texto al centro del Box
+                        modifier = Modifier.align(Alignment.Center)
                     )
                 }
 
@@ -139,16 +139,16 @@ fun GeneralSolicitud(navController: NavController?) {
             }
 
             item {
-                Spacer(modifier = Modifier.height(16.dp)) // Espaciado entre las solicitudes y Notificaciones
+                Spacer(modifier = Modifier.height(16.dp))
                 Box(
                     modifier = Modifier
-                        .fillMaxSize() // Rellena toda la pantalla
+                        .fillMaxSize()
                 ) {
                     Text(
                         text = "Notificaciones",
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
-                        modifier = Modifier.align(Alignment.Center) // Alinea el texto al centro del Box
+                        modifier = Modifier.align(Alignment.Center)
                     )
                 }
             }
@@ -284,7 +284,7 @@ fun SolicitudItem(solicitud: Solicitud, navController: NavController?) {
 
 @Composable
 fun NotificacionItem(
-    notificacion: Notificacion, // Definir un data class para notificación
+    notificacion: Notificacion,
     navController: NavController?
 ) {
     Card(
@@ -292,10 +292,10 @@ fun NotificacionItem(
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp)
             .clip(RoundedCornerShape(16.dp))
-            .border(1.dp, if (notificacion.isImportant) Color.Blue else Color.Transparent, RoundedCornerShape(16.dp)) // Borde azul si es importante
+            .border(1.dp, if (notificacion.isImportant) Color.Blue else Color.Transparent, RoundedCornerShape(16.dp))
             .shadow(1.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color(0xFFE4E4E4) // Color de fondo gris claro
+            containerColor = Color(0xFFE4E4E4)
         )
     ) {
         Row(
@@ -304,9 +304,8 @@ fun NotificacionItem(
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Icono de campana a la izquierda
             Icon(
-                imageVector = Icons.Default.Notifications, // Icono de campana
+                imageVector = Icons.Default.Notifications,
                 contentDescription = "Icono de notificación",
                 tint = Color.Black,
                 modifier = Modifier.size(40.dp)
@@ -340,7 +339,6 @@ fun NotificacionItem(
                         fontSize = 14.sp,
                         color = Color.Blue,
                         modifier = Modifier.clickable {
-                            // Acción al hacer clic en el enlace
                             notificacion.rutaEnlace?.let { navController?.navigate(it) }
                         }
                     )
