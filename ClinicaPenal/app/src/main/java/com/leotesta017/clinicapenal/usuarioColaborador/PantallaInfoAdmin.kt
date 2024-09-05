@@ -2,6 +2,7 @@ package com.leotesta017.clinicapenal.usuarioColaborador
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -19,16 +20,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.navigation.NavController
-import com.leotesta017.clinicapenal.funcionesDeUsoGeneral.BarraNav
+import com.leotesta017.clinicapenal.funcionesDeUsoGeneral.AdminBarraNav
 import com.leotesta017.clinicapenal.funcionesDeUsoGeneral.RoundedButton
 import com.leotesta017.clinicapenal.funcionesDeUsoGeneral.SearchBar
 import com.leotesta017.clinicapenal.funcionesDeUsoGeneral.TopBar
-import com.leotesta017.clinicapenal.usuarioGeneral.CategoriesSection
-import com.leotesta017.clinicapenal.usuarioGeneral.ServicesSection
+
 
 @Composable
 fun PantallaInfoAdmin(navController: NavController?) {
@@ -49,7 +50,8 @@ fun PantallaInfoAdmin(navController: NavController?) {
                 LabelCategoriaConBoton(
                     label = "Noticias",
                     navController = navController,
-                    modifier = Modifier.padding(start = 25.dp, end = 25.dp)
+                    modifier = Modifier.padding(start = 25.dp, end = 25.dp),
+                    navigateroute = "agregar-info-admin"
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 CarruselDeNoticias(navController)
@@ -57,16 +59,18 @@ fun PantallaInfoAdmin(navController: NavController?) {
                 LabelCategoriaConBoton(
                     label = "Información Legal",
                     navController = navController,
-                    modifier = Modifier.padding(start = 25.dp, end = 25.dp)
+                    modifier = Modifier.padding(start = 25.dp, end = 25.dp),
+                    navigateroute = "agregar-info-admin"
                 )
-                CategoriesSection(navController)
+                CategoriesSectionModificableAdmin(navController)
                 Spacer(modifier = Modifier.height(16.dp))
                 LabelCategoriaConBoton(
                     label = "Servicios",
                     navController = navController,
-                    modifier = Modifier.padding(start = 36.dp)
+                    modifier = Modifier.padding(start = 36.dp),
+                    navigateroute = "agregar_servicios_info-admin"
                 )
-                ServicesSection(navController)
+                ServicesSectionModificableAdmin(navController)
                 Spacer(modifier = Modifier.height(16.dp))
             }
         }
@@ -90,7 +94,7 @@ fun PantallaInfoAdmin(navController: NavController?) {
             )
         }
 
-        BarraNav(
+        AdminBarraNav(
             navController = navController,
             modifier = Modifier
                 .align(Alignment.BottomCenter)
@@ -137,7 +141,7 @@ fun CarruselDeNoticias(navController: NavController?) {
 }
 
 @Composable
-fun LabelCategoriaConBoton(label: String, navController: NavController?, modifier: Modifier = Modifier) {
+fun LabelCategoriaConBoton(label: String, navController: NavController?, modifier: Modifier = Modifier, navigateroute : String) {
     Row(
         verticalAlignment = Alignment.CenterVertically, // Alinea los elementos verticalmente al centro
         horizontalArrangement = Arrangement.SpaceBetween, // Distribuye el texto y el botón
@@ -156,7 +160,7 @@ fun LabelCategoriaConBoton(label: String, navController: NavController?, modifie
 
         // Botón de agregar
         Button(
-            onClick = { navController?.navigate("modificar-info") },
+            onClick = { navController?.navigate(navigateroute) },
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color(0xFF0B1F8C), // Color azul del botón
                 contentColor = Color.White // Texto e icono en blanco
@@ -175,6 +179,146 @@ fun LabelCategoriaConBoton(label: String, navController: NavController?, modifie
         }
     }
 }
+
+
+@Composable
+fun CategoriesSectionModificableAdmin(navController: NavController?) {
+    Column(modifier = Modifier.padding(16.dp)) {
+        CategoryItemModificableAdmin(
+            title = "Violencia Doméstica",
+            description = "Maltrato físico o emocional dentro del ámbito familiar",
+            navController = navController
+        )
+        Spacer(modifier = Modifier.height(12.dp)) // Más espacio entre los ítems
+        CategoryItemModificableAdmin(
+            title = "Adeudo",
+            description = "Falta de pago de una deuda o compromiso financiero.",
+            navController = navController
+        )
+        Spacer(modifier = Modifier.height(12.dp)) // Más espacio entre los ítems
+        CategoryItemModificableAdmin(
+            title = "Vehicular",
+            description = "Infracción de delito relacionado con el uso indebido de vehículos.",
+            navController = navController
+        )
+        Spacer(modifier = Modifier.height(12.dp))
+        CategoryItemModificableAdmin(
+            title = "Robo y hurto",
+            description = "Tomar algo ajeno sin permiso, con intención de no devolverlo.",
+            navController = navController
+        )
+        Spacer(modifier = Modifier.height(12.dp))
+        CategoryItemModificableAdmin(
+            title = "Extorsión y Amenaza",
+            description = "Uso de amenazas o coerción para obtener dinero o bienes mediante intimidación.",
+            navController = navController
+        )
+    }
+}
+
+@Composable
+fun CategoryItemModificableAdmin(title: String, description: String, navController: NavController?) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Color.White)
+            .padding(horizontal = 16.dp, vertical = 12.dp) // Padding horizontal y vertical
+            .clickable {
+                navController?.navigate("modificar-info")
+            },
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier
+                .size(40.dp) // Cuadro más pequeño
+                .clip(RoundedCornerShape(8.dp))
+                .background(Color.Gray)
+                .padding(8.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(text = "Img", color = Color.White, fontSize = 10.sp)
+        }
+        Spacer(modifier = Modifier.width(24.dp)) // Espacio entre la imagen y el texto
+        Column(
+            modifier = Modifier.weight(1f)
+        ) {
+            Text(text = title, fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(text = description, fontSize = 13.sp, color = Color.Gray)
+        }
+        Spacer(modifier = Modifier.width(24.dp)) // Espacio entre el texto y la flecha
+        Icon(
+            imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+            contentDescription = "Flecha para Detalles",
+            tint = Color.Blue,
+            modifier = Modifier.size(24.dp)
+        )
+    }
+}
+
+@Composable
+fun ServicesSectionModificableAdmin(navController: NavController?) {
+    Column(modifier = Modifier.padding(16.dp)) {
+        ServiceItemModificableAdmin(
+            title = "Asesoria Legal",
+            description = "Consulta profesional donde se ofrece orientación en situaciones legales",
+            navController = navController
+        )
+        Spacer(modifier = Modifier.height(12.dp))
+        ServiceItemModificableAdmin(
+            title = "Representacion Legal",
+            description = "Actuación en nombre del cliente en procesos judiciales o negociaciones",
+            navController = navController
+        )
+        Spacer(modifier = Modifier.height(12.dp))
+        ServiceItemModificableAdmin(
+            title = "Revisión de documentos legales",
+            description = "Análisis detallado de contratos, acuerdos y otros documentos legales",
+            navController = navController
+        )
+    }
+}
+
+@Composable
+fun ServiceItemModificableAdmin(title: String, description: String, navController: NavController?) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Color.White)
+            .padding(horizontal = 16.dp, vertical = 12.dp) // Padding horizontal y vertical
+            .clickable {
+                navController?.navigate("modificar_servicios_info")
+            },
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier
+                .size(40.dp) // Cuadro más pequeño
+                .clip(RoundedCornerShape(8.dp))
+                .background(Color.Gray)
+                .padding(8.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(text = "Img", color = Color.White, fontSize = 10.sp)
+        }
+        Spacer(modifier = Modifier.width(24.dp)) // Espacio entre la imagen y el texto
+        Column(
+            modifier = Modifier.weight(1f)
+        ) {
+            Text(text = title, fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(text = description, fontSize = 13.sp, color = Color.Gray)
+        }
+        Spacer(modifier = Modifier.width(24.dp)) // Espacio entre el texto y la flecha
+        Icon(
+            imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+            contentDescription = "Flecha para Detalles",
+            tint = Color.Blue,
+            modifier = Modifier.size(24.dp)
+        )
+    }
+}
+
 
 
 

@@ -2,7 +2,6 @@ package com.leotesta017.clinicapenal.usuarioColaborador
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -12,13 +11,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.FormatListBulleted
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.FormatBold
 import androidx.compose.material.icons.filled.FormatItalic
 import androidx.compose.material.icons.filled.Save
@@ -55,7 +53,7 @@ import com.leotesta017.clinicapenal.funcionesDeUsoGeneral.TopBar
 
 
 @Composable
-fun ModificarInfoAdmin(navController: NavController?) {
+fun AgregarInfoAdmin(navController: NavController?) {
 
     var nombre by remember { mutableStateOf("") }
 
@@ -74,7 +72,7 @@ fun ModificarInfoAdmin(navController: NavController?) {
                     }
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "Modificar Información",
+                        text = "Agregar Información",
                         style = MaterialTheme.typography.headlineSmall.copy(color = Color.Black),
                         modifier = Modifier.weight(1f)
                     )
@@ -90,13 +88,13 @@ fun ModificarInfoAdmin(navController: NavController?) {
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
                     RoundedButton(
-                        icon = Icons.Default.Save,
-                        label = "Guardar",
+                        icon = Icons.Default.Edit,
+                        label = "Añadir",
                         onClick = {  }
                     )
                     RoundedButton(
                         icon = Icons.Default.Delete,
-                        label = "Descartar",
+                        label = "Cancelar",
                         onClick = {  }
                     )
                 }
@@ -133,7 +131,7 @@ fun ModificarInfoAdmin(navController: NavController?) {
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    RichTextEditor()
+                    AgregarInfoRichTextEditor()
                 }
             }
         }
@@ -143,14 +141,8 @@ fun ModificarInfoAdmin(navController: NavController?) {
 
 
 @Composable
-fun RichTextEditor() {
-    var textState by remember { mutableStateOf(TextFieldValue("Robo y Hurto\n\n" +
-            "La acción de tomar propiedad ajena sin el consentimiento del propietario," +
-            " con la intención de no devolverla. Este delito implica el uso de fuerza" +
-            " o amenazas para obtener el objeto o bien robado. Es considerado un " +
-            "delito grave y puede conllevar penas de prisión significativas.\n\n" +
-            "Consecuencias Legales\n• Asalto a mano armada\n• Robo de vehículos\n•" +
-            " Robo en tiendas con uso de violencia o intimidación.")) }
+fun AgregarInfoRichTextEditor() {
+    var textState by remember { mutableStateOf(TextFieldValue("Inserte Información...")) }
     var isBold by remember { mutableStateOf(false) }
     var isItalic by remember { mutableStateOf(false) }
     var isBullet by remember { mutableStateOf(false) }
@@ -185,36 +177,30 @@ fun RichTextEditor() {
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Contenedor scrollable para el BasicTextField
-        Box(
+        BasicTextField(
+            value = textState,
+            onValueChange = { value ->
+                textState = value.copy(
+                    annotatedString = buildAnnotatedString {
+                        AgregarapplyStyle(this, value.text, isBold, isItalic, isBullet)
+                    }
+                )
+            },
             modifier = Modifier
                 .fillMaxWidth()
-                .height(350.dp) // Establece una altura fija
-                .verticalScroll(rememberScrollState()) // Habilita el scroll vertical
+                .height(350.dp)
                 .background(Color.LightGray)
-                .padding(8.dp)
-        ) {
-            BasicTextField(
-                value = textState,
-                onValueChange = { value ->
-                    textState = value.copy(
-                        annotatedString = buildAnnotatedString {
-                            applyStyle(this, value.text, isBold, isItalic, isBullet)
-                        }
-                    )
-                },
-                modifier = Modifier.fillMaxSize(), // Usa fillMaxSize para que el BasicTextField ocupe el espacio del Box
-                textStyle = TextStyle(
-                    fontSize = 16.sp,
-                    color = Color.Black
-                )
-            )
-        }
+                .padding(8.dp),
+            textStyle = TextStyle(
+                fontSize = 16.sp,
+                color = Color.Black
+            ),
+        )
     }
 }
 
 
-fun applyStyle(
+fun AgregarapplyStyle(
     builder: AnnotatedString.Builder,
     text: String,
     isBold: Boolean,
@@ -238,6 +224,6 @@ fun applyStyle(
 
 @Preview(showBackground = true)
 @Composable
-fun PreviewModificarInfoAdmin() {
-    ModificarInfoAdmin(navController = null)
+fun PreviewAgregarInfoAdmin() {
+    AgregarInfoAdmin(navController = null)
 }

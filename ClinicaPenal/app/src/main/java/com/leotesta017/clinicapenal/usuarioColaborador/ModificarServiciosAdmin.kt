@@ -2,6 +2,7 @@ package com.leotesta017.clinicapenal.usuarioColaborador
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -11,11 +12,14 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.FormatListBulleted
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.FormatBold
 import androidx.compose.material.icons.filled.FormatItalic
 import androidx.compose.material.icons.filled.Save
@@ -81,7 +85,7 @@ fun ModificarServiciosAdmin(navController: NavController?) {
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
                     RoundedButton(
-                        icon = Icons.Default.Save,
+                        icon = Icons.Default.Edit,
                         label = "Guardar",
                         onClick = {  }
                     )
@@ -119,7 +123,7 @@ fun ModificarServiciosAdmin(navController: NavController?) {
                             color = MaterialTheme.colorScheme.primary,
                             fontWeight = FontWeight.Bold
                         ),
-                        modifier = Modifier.padding(top = 8.dp)
+                        modifier = Modifier.padding(top = 8.dp, start = 10.dp)
                     )
 
                     Spacer(modifier = Modifier.height(16.dp))
@@ -135,7 +139,21 @@ fun ModificarServiciosAdmin(navController: NavController?) {
 
 @Composable
 fun RichTextEditorServicio() {
-    var textState by remember { mutableStateOf(TextFieldValue("")) }
+    var textState by remember {
+        mutableStateOf(
+            TextFieldValue(
+                "Asesoría Legal\n\n" +
+                        "La asesoría legal es un servicio que proporciona orientación y asistencia en asuntos legales. Este servicio es ofrecido por abogados profesionales que brindan consejo sobre derechos legales, obligaciones y posibles cursos de acción en situaciones legales.\n\n" +
+                        "Beneficios de la Asesoría Legal:\n" +
+                        "• Resolución rápida de conflictos legales\n" +
+                        "• Evitar costosos litigios\n" +
+                        "• Conocimiento de derechos y deberes\n" +
+                        "• Orientación en procedimientos legales complejos\n\n" +
+                        "Con la asesoría legal, puede obtener una mejor comprensión de sus derechos y tomar decisiones informadas antes de proceder con cualquier acción legal."
+            )
+        )
+    }
+
     var isBold by remember { mutableStateOf(false) }
     var isItalic by remember { mutableStateOf(false) }
     var isBullet by remember { mutableStateOf(false) }
@@ -170,25 +188,31 @@ fun RichTextEditorServicio() {
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        BasicTextField(
-            value = textState,
-            onValueChange = { value ->
-                textState = value.copy(
-                    annotatedString = buildAnnotatedString {
-                        applyStyle(this, value.text, isBold, isItalic, isBullet)
-                    }
-                )
-            },
+        // Contenedor scrollable para el BasicTextField
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(350.dp)
+                .height(350.dp) // Establece una altura fija
+                .verticalScroll(rememberScrollState()) // Habilita el scroll vertical
                 .background(Color.LightGray)
-                .padding(8.dp),
-            textStyle = TextStyle(
-                fontSize = 16.sp,
-                color = Color.Black
-            ),
-        )
+                .padding(8.dp)
+        ) {
+            BasicTextField(
+                value = textState,
+                onValueChange = { value ->
+                    textState = value.copy(
+                        annotatedString = buildAnnotatedString {
+                            applyStyle(this, value.text, isBold, isItalic, isBullet)
+                        }
+                    )
+                },
+                modifier = Modifier.fillMaxSize(),
+                textStyle = TextStyle(
+                    fontSize = 16.sp,
+                    color = Color.Black
+                )
+            )
+        }
     }
 }
 

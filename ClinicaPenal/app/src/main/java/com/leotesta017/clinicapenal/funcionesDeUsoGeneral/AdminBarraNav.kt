@@ -14,17 +14,18 @@ import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.leotesta017.clinicapenal.ui.theme.ClinicaPenalTheme
 
 @Composable
 fun AdminBarraNav(navController: NavController?, modifier: Modifier = Modifier) {
@@ -53,27 +54,24 @@ fun AdminBarraNav(navController: NavController?, modifier: Modifier = Modifier) 
         AdminBottomBarItem(
             icon = Icons.Default.Info,
             text = "Información",
-            isSelected = currentDestination == "pantallainformacionclinica",
-            onClick = { navController?.navigate("ipantallainformacionclinica") }
+            isSelected = currentDestination == "",
+            onClick = { navController?.navigate("") }
         )
     }
 }
 
 @Composable
-fun AdminBottomBarItem(
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
-    text: String,
-    isSelected: Boolean,
-    onClick: () -> Unit
-) {
+fun AdminBottomBarItem(icon: ImageVector, text: String, isSelected: Boolean, onClick: () -> Unit) {
     Column(
+        modifier = Modifier
+            .clickable(onClick = onClick)
+            .padding(horizontal = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.clickable(onClick = onClick)
+        verticalArrangement = Arrangement.Center
     ) {
-
         Box(
             modifier = Modifier
-                .size(50.dp)
+                .size(48.dp)
                 .background(
                     color = if (isSelected) Color(0xFF0B1F8C) else Color.Transparent,
                     shape = CircleShape
@@ -88,8 +86,8 @@ fun AdminBottomBarItem(
         }
         Text(
             text = text,
-            fontSize = 12.sp,
-            color = Color.Black
+            color = Color.Black,
+            style = MaterialTheme.typography.bodySmall
         )
     }
 }
@@ -98,7 +96,6 @@ fun AdminBottomBarItem(
 @Preview(showBackground = true)
 @Composable
 fun PreviewAdminBarraNav() {
-    ClinicaPenalTheme {
-        AdminBarraNav(navController = null)
-    }
+    AdminBarraNav(navController = null)
+
 }
