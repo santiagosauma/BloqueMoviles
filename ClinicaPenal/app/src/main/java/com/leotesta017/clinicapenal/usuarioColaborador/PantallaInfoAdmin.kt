@@ -2,13 +2,10 @@ package com.leotesta017.clinicapenal.usuarioColaborador
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CalendarToday
@@ -49,12 +46,18 @@ fun PantallaInfoAdmin(navController: NavController?) {
                 Spacer(modifier = Modifier.height(16.dp))
                 SearchBar("")
                 Spacer(modifier = Modifier.height(16.dp))
+                LabelCategoriaConBoton(
+                    label = "Noticias",
+                    navController = navController,
+                    modifier = Modifier.padding(start = 25.dp, end = 25.dp)
+                )
+                Spacer(modifier = Modifier.height(16.dp))
                 CarruselDeNoticias(navController)
                 Spacer(modifier = Modifier.height(16.dp))
                 LabelCategoriaConBoton(
                     label = "Información Legal",
                     navController = navController,
-                    modifier = Modifier.padding(start = 36.dp)
+                    modifier = Modifier.padding(start = 25.dp, end = 25.dp)
                 )
                 CategoriesSection(navController)
                 Spacer(modifier = Modifier.height(16.dp))
@@ -78,7 +81,7 @@ fun PantallaInfoAdmin(navController: NavController?) {
             RoundedButton(
                 icon = Icons.AutoMirrored.Filled.Chat,
                 label = "JuriBot",
-                onClick = { navController?.navigate("ReviewComentarios") }
+                onClick = { navController?.navigate("Juribot") }
             )
             RoundedButton(
                 icon = Icons.Default.CalendarToday,
@@ -108,11 +111,7 @@ fun CarruselDeNoticias(navController: NavController?) {
             .fillMaxWidth()
             .padding(horizontal = 26.dp, vertical = 8.dp)
     ) {
-        LabelCategoriaConBoton(
-            label = "Noticias",
-            navController = navController,
-            modifier = Modifier.padding(bottom = 8.dp)
-        )
+
 
         Box(
             modifier = Modifier
@@ -140,31 +139,44 @@ fun CarruselDeNoticias(navController: NavController?) {
 @Composable
 fun LabelCategoriaConBoton(label: String, navController: NavController?, modifier: Modifier = Modifier) {
     Row(
-        verticalAlignment = Alignment.CenterVertically,
+        verticalAlignment = Alignment.CenterVertically, // Alinea los elementos verticalmente al centro
+        horizontalArrangement = Arrangement.SpaceBetween, // Distribuye el texto y el botón
         modifier = modifier
             .fillMaxWidth()
-            .padding(end = 15.dp) // Añade padding de 15.dp a la derecha para el botón
+            .padding(end = 10.dp, start = 10.dp) // Ajusta el padding horizontal
     ) {
+        // El label se ajustará con el peso 1 para ocupar el espacio restante
         Text(
             text = label,
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
             color = Color.Black,
-            modifier = Modifier.weight(1f)
+            modifier = Modifier.weight(1f) // Deja que el texto ocupe el espacio restante
         )
 
+        // Botón de agregar
         Button(
             onClick = { navController?.navigate("modificar-info") },
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0B1F8C), contentColor = Color.White),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color(0xFF0B1F8C), // Color azul del botón
+                contentColor = Color.White // Texto e icono en blanco
+            ),
             shape = RoundedCornerShape(24.dp),
-            modifier = Modifier.padding(end = 15.dp) // Ajustar el padding derecho bajo a 15.dp
+            modifier = Modifier
+                .height(40.dp) // Ajustar la altura del botón
+                .padding(end = 10.dp, start = 10.dp) // Asegura que haya espacio entre el texto y el botón
         ) {
-            Icon(imageVector = Icons.Filled.Add, contentDescription = "Agregar") // Añadido el ícono de "Agregar"
-            Spacer(modifier = Modifier.width(4.dp))
+            Icon(
+                imageVector = Icons.Filled.Add, // Icono de agregar
+                contentDescription = "Agregar"
+            )
+            Spacer(modifier = Modifier.width(4.dp)) // Espacio entre el icono y el texto
             Text(text = "Agregar")
         }
     }
 }
+
+
 
 @Preview(showBackground = true)
 @Composable

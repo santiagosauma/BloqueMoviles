@@ -3,11 +3,9 @@ package com.leotesta017.clinicapenal.usuarioGeneral
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -80,7 +78,7 @@ fun ServiciosHeaderSection(title: String, navController: NavController?) {
         ) {
             IconButton(onClick = { navController?.popBackStack() }) {
                 Icon(
-                    imageVector = Icons.Default.ArrowBack,
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "Back",
                     tint = Color.Black
                 )
@@ -94,21 +92,6 @@ fun ServiciosHeaderSection(title: String, navController: NavController?) {
                     .padding(start = 8.dp)
                     .weight(1f)
             )
-        }
-        Spacer(modifier = Modifier.height(16.dp))
-        Button(
-            onClick = { navController?.navigate("crearsolicitud") },
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1A237E)),
-            shape = RoundedCornerShape(50),
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Icon(
-                imageVector = Icons.Default.Edit,
-                contentDescription = "Solicitud de Cita",
-                tint = Color.White
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(text = "Solicitud de Cita", color = Color.White)
         }
     }
 }
@@ -144,5 +127,5 @@ fun ServiciosSectionContent(content: String) {
 @Preview(showBackground = true)
 @Composable
 fun ServiciosInfo() {
-    DetalleInfo(navController = null)
+    ServiciosInfo(navController = null)
 }
