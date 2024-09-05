@@ -16,6 +16,7 @@ import com.leotesta017.clinicapenal.usuarioColaborador.AgregarInfoAdmin
 import com.leotesta017.clinicapenal.usuarioColaborador.AgregarServiciosInfoAdmin
 import com.leotesta017.clinicapenal.usuarioColaborador.ComentarioScreen
 import com.leotesta017.clinicapenal.usuarioColaborador.GeneralSolicitudAdmin
+import com.leotesta017.clinicapenal.usuarioColaborador.JuriBotAdmin
 import com.leotesta017.clinicapenal.usuarioColaborador.ModificarInfoAdmin
 import com.leotesta017.clinicapenal.usuarioColaborador.ModificarServiciosAdmin
 import com.leotesta017.clinicapenal.usuarioColaborador.PantallaInfoAdmin
@@ -79,6 +80,7 @@ fun MyApp() {
         composable("infoclinicaadmin") { PantallaInfoClinicaAdmin(navController) }
         composable("agendar") { Agendar(navController) }
         composable("comentar") { ComentarioScreen(navController) }
+        composable("JuriBotAdmin") { JuriBotAdmin(navController) }
 
         //Pantalla Usuario Estudiante
         composable("pantallainfoestudiante"){ PantallaInfoEstudiante(navController)}

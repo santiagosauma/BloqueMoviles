@@ -84,7 +84,7 @@ fun PantallaInfoAdmin(navController: NavController?) {
             RoundedButton(
                 icon = Icons.AutoMirrored.Filled.Chat,
                 label = "JuriBot",
-                onClick = { navController?.navigate("Juribot") }
+                onClick = { navController?.navigate("JuriBotAdmin") }
             )
             RoundedButton(
                 icon = Icons.Default.CalendarToday,
