@@ -52,6 +52,7 @@ android {
 
 dependencies {
 
+    implementation ("com.squareup.okhttp3:okhttp:4.9.3")
     // Firebase Authentication
     implementation("com.google.firebase:firebase-auth-ktx")
 
@@ -95,7 +96,6 @@ dependencies {
 
     // Import the Firebase BoM
     implementation(platform("com.google.firebase:firebase-bom:33.1.2"))
-
 
     // TODO: Add the dependencies for Firebase products you want to use
     // When using the BoM, don't specify versions in Firebase dependencies

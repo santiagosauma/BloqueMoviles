@@ -1,5 +1,6 @@
 package com.leotesta017.clinicapenal
 
+import JuriBotScreen
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -31,7 +32,6 @@ import com.leotesta017.clinicapenal.usuarioGeneral.ReviewComentarios
 import com.leotesta017.clinicapenal.usuarioGeneral.SegundoFormulario
 import com.leotesta017.clinicapenal.usuarioGeneral.ServiciosInfo
 import com.leotesta017.clinicapenal.usuarioGeneral.Solicitud
-import com.leotesta017.clinicapenal.usuarioGeneral.JuriBotScreen as JuriBot
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -66,7 +66,7 @@ fun MyApp() {
         composable("detalle_info") { DetalleInfo(navController) }
         composable("crearsolicitud") { Solicitud(navController) }
         composable("servicios_info") { ServiciosInfo(navController)}
-        composable("Juribot") { JuriBot(navController)}
+        composable("Juribot") { JuriBotScreen(navController)}
         composable("SegundoFormulario") { SegundoFormulario(navController)}
 
         //Pantallas Usuario Admin
