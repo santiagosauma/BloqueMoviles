@@ -50,6 +50,7 @@ import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.RoundedButton
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.SearchBar
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.TopBar
 import com.leotesta017.clinicapenal.viewmodel.CategoryViewModel
+import com.leotesta017.clinicapenal.viewmodel.ServicioViewModel
 import com.leotesta017.clinicapenal.viewmodel.VideoViewModel
 
 @Composable
@@ -254,8 +255,6 @@ fun VideoItemWithDescription(videoUrl: String, title: String, description: Strin
 }
 
 
-
-
 @Composable
 fun LabelCategoria(label: String, modifier: Modifier = Modifier) {
     Text(
@@ -339,30 +338,32 @@ fun CategoryItem(title: String, description: String, navController: NavControlle
 
 
 @Composable
-fun ServicesSection(navController: NavController?) {
+fun ServicesSection(navController: NavController?, viewModel: ServicioViewModel = viewModel()) {
+    // Obtenemos el estado actual de los servicios desde el ViewModel
+    val servicios by viewModel.servicios.collectAsState()
+    val error by viewModel.error.collectAsState()
+
     Column(modifier = Modifier.padding(16.dp)) {
-        ServiceItem(
-            title = "Asesoria Legal",
-            description = "Consulta profesional donde se ofrece orientación en situaciones legales",
-            navController = navController
-        )
-        Spacer(modifier = Modifier.height(12.dp))
-        ServiceItem(
-            title = "Representacion Legal",
-            description = "Actuación en nombre del cliente en procesos judiciales o negociaciones",
-            navController = navController
-        )
-        Spacer(modifier = Modifier.height(12.dp))
-        ServiceItem(
-            title = "Revisión de documentos legales",
-            description = "Análisis detallado de contratos, acuerdos y otros documentos legales",
-            navController = navController
-        )
+        // Si hay un error, mostramos el mensaje de error
+        if (error != null) {
+            Text(text = error ?: "Error desconocido", color = Color.Red)
+        } else {
+            // Mostramos los servicios dinámicamente desde la base de datos
+            servicios.forEach { servicio ->
+                ServiceItem(
+                    title = servicio.titulo,
+                    description = servicio.descripcion,
+                    imageUrl = servicio.url_imagen,  // Pasamos la URL de la imagen
+                    navController = navController
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+            }
+        }
     }
 }
 
 @Composable
-fun ServiceItem(title: String, description: String, navController: NavController?) {
+fun ServiceItem(title: String, description: String, navController: NavController?, imageUrl: String) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -373,17 +374,19 @@ fun ServiceItem(title: String, description: String, navController: NavController
             },
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Box(
+        // Mostrar la imagen desde la URL con AsyncImage (de Coil)
+        AsyncImage(
+            model = imageUrl,
+            contentDescription = null,
             modifier = Modifier
                 .size(40.dp)
                 .clip(RoundedCornerShape(8.dp))
-                .background(Color.Gray)
-                .padding(8.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(text = "Img", color = Color.White, fontSize = 10.sp)
-        }
+                .background(Color.Gray),
+            contentScale = ContentScale.Crop
+        )
+
         Spacer(modifier = Modifier.width(24.dp))
+
         Column(
             modifier = Modifier.weight(1f)
         ) {
@@ -391,7 +394,9 @@ fun ServiceItem(title: String, description: String, navController: NavController
             Spacer(modifier = Modifier.height(4.dp))
             Text(text = description, fontSize = 13.sp, color = Color.Gray)
         }
+
         Spacer(modifier = Modifier.width(24.dp))
+
         Icon(
             imageVector = Icons.AutoMirrored.Filled.ArrowForward,
             contentDescription = "Flecha para Detalles",
@@ -400,6 +405,7 @@ fun ServiceItem(title: String, description: String, navController: NavController
         )
     }
 }
+
 
 @Preview(showBackground = true)
 @Composable
