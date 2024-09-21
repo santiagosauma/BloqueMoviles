@@ -52,7 +52,6 @@ android {
 
 dependencies {
 
-    implementation ("com.squareup.okhttp3:okhttp:4.9.3")
     // Firebase Authentication
     implementation("com.google.firebase:firebase-auth-ktx")
 
@@ -74,6 +73,7 @@ dependencies {
     implementation("androidx.activity:activity-compose:1.7.0")
     implementation("io.coil-kt:coil-compose:2.0.0")
 
+    implementation ("io.noties.markwon:core:4.6.2")
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
