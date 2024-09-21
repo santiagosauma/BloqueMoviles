@@ -88,7 +88,7 @@ class ChatViewModel : ViewModel() {
                                 .getJSONObject("content")
                                 .getJSONArray("parts")
                                 .getJSONObject(0)
-                                .getString("text")
+                                .getString("text") //Coment
                             return@withContext content
                         } else {
                             return@withContext "Error: No candidates returned."
