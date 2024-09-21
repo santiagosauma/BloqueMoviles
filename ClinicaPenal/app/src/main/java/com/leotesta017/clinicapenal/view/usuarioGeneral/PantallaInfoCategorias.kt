@@ -1,6 +1,15 @@
+
 package com.leotesta017.clinicapenal.view.usuarioGeneral
 
+
+import android.annotation.SuppressLint
+import android.content.Intent
+import android.net.Uri
+import android.webkit.WebView
+import android.webkit.WebViewClient
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.foundation.ExperimentalFoundationApi
+import coil.compose.AsyncImage
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -20,15 +29,28 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavController
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.BarraNav
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.RoundedButton
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.SearchBar
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.TopBar
+import com.leotesta017.clinicapenal.viewmodel.CategoryViewModel
+import com.leotesta017.clinicapenal.viewmodel.VideoViewModel
 
 @Composable
 fun PantallaInfoCategorias(navController: NavController?) {
@@ -93,15 +115,17 @@ fun PantallaInfoCategorias(navController: NavController?) {
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun CarruselDeNoticias() {
-    val totalPages = 5
+fun CarruselDeNoticias(viewModel: VideoViewModel = viewModel()) {
+    val videos by viewModel.videos.collectAsState()
+    val error by viewModel.error.collectAsState()
+
+    val totalPages = videos.size
     val pagerState = rememberPagerState { totalPages }
-    val coroutineScope = rememberCoroutineScope()
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 26.dp, vertical = 8.dp)
+            .padding(horizontal = 15.dp, vertical = 8.dp)
     ) {
         Text(
             text = "Noticias",
@@ -110,34 +134,127 @@ fun CarruselDeNoticias() {
             color = Color.Black,
             modifier = Modifier
                 .padding(start = 10.dp, bottom = 8.dp)
-
         )
 
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(180.dp)
-        ) {
-            HorizontalPager(
-                state = pagerState,
-                modifier = Modifier.fillMaxSize(),
-            ) { page ->
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize(0.90f)
-                        .graphicsLayer {
-                            translationX = 50f
+        if (error != null) {
+            Text(text = error ?: "Error desconocido", color = Color.Red)
+        } else {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+            ) {
+                if (totalPages > 0) {
+                    HorizontalPager(
+                        state = pagerState,
+                        modifier = Modifier.fillMaxSize(),
+                    ) { page ->
+                        val videoUrl = videos[page].url_video
+                        val titulo = videos[page].titulo
+                        val descripcion = videos[page].descripcion
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize(0.90f)
+                                .graphicsLayer {
+                                    translationX = 50f
+                                }
+
+                                .clip(RoundedCornerShape(20.dp))
+                                .background(Color.White),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            // Mostrar el botón de reproducción con la descripción
+                            VideoItemWithDescription(
+                                videoUrl = videoUrl,
+                                title = titulo,
+                                description = descripcion
+                            )
                         }
-                        .clip(RoundedCornerShape(20.dp))
-                        .background(Color.Gray),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(text = "Imagen ${page + 1}", color = Color.White)
+                    }
+                } else {
+                    Text(text = "No hay videos disponibles", color = Color.Gray)
                 }
             }
         }
     }
 }
+
+@Composable
+fun VideoItemWithDescription(videoUrl: String, title: String, description: String) {
+    val context = LocalContext.current
+    var expanded by remember { mutableStateOf(false) }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(10.dp)
+    ) {
+        // Cuadro del video con fondo negro
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color.Black, RoundedCornerShape(5.dp))
+                .padding(5.dp)
+                .height(200.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Button(
+                onClick = {
+                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(videoUrl))
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    context.startActivity(intent)
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.Gray,
+                    contentColor = Color.White
+                ),
+                modifier = Modifier
+                    .size(80.dp)
+                    .clip(CircleShape)
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.PlayArrow,
+                    contentDescription = "Reproducir Video",
+                    tint = Color.Black
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Mostrar el título
+        Text(
+            text = title,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+
+        // Mostrar la descripción del video
+        Text(
+            text = description,
+            fontSize = 13.sp,
+            color = Color.Gray,
+            maxLines = if (expanded) Int.MAX_VALUE else 3, // Controlar si se muestra todo el texto o no
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier
+                .clickable { expanded = !expanded } // Al hacer clic se expande o se contrae
+                .padding(top = 8.dp)
+        )
+
+        // Texto "Ver más" o "Ver menos" para controlar la expansión
+        Text(
+            text = if (expanded) "Ver menos" else "Ver más",
+            color = Color.Blue,
+            fontSize = 13.sp,
+            modifier = Modifier
+                .clickable { expanded = !expanded }
+                .padding(top = 4.dp)
+        )
+    }
+}
+
+
+
 
 @Composable
 fun LabelCategoria(label: String, modifier: Modifier = Modifier) {
@@ -150,43 +267,34 @@ fun LabelCategoria(label: String, modifier: Modifier = Modifier) {
     )
 }
 
+
 @Composable
-fun CategoriesSection(navController: NavController?) {
+fun CategoriesSection(navController: NavController?, viewModel: CategoryViewModel = viewModel()) {
+    // Obtenemos el estado actual de las categorías desde el ViewModel
+    val categories by viewModel.categories.collectAsState()
+    val error by viewModel.error.collectAsState()
+
     Column(modifier = Modifier.padding(16.dp)) {
-        CategoryItem(
-            title = "Violencia Doméstica",
-            description = "Maltrato físico o emocional dentro del ámbito familiar",
-            navController = navController
-        )
-        Spacer(modifier = Modifier.height(12.dp))
-        CategoryItem(
-            title = "Adeudo",
-            description = "Falta de pago de una deuda o compromiso financiero.",
-            navController = navController
-        )
-        Spacer(modifier = Modifier.height(12.dp))
-        CategoryItem(
-            title = "Vehicular",
-            description = "Infracción de delito relacionado con el uso indebido de vehículos.",
-            navController = navController
-        )
-        Spacer(modifier = Modifier.height(12.dp))
-        CategoryItem(
-            title = "Robo y hurto",
-            description = "Tomar algo ajeno sin permiso, con intención de no devolverlo.",
-            navController = navController
-        )
-        Spacer(modifier = Modifier.height(12.dp))
-        CategoryItem(
-            title = "Extorsión y Amenaza",
-            description = "Uso de amenazas o coerción para obtener dinero o bienes mediante intimidación.",
-            navController = navController
-        )
+        // Si hay un error, mostramos el mensaje de error
+        if (error != null) {
+            Text(text = error ?: "Error desconocido", color = Color.Red)
+        } else {
+            // Mostramos las categorías dinámicamente desde la base de datos
+            categories.forEach { category ->
+                CategoryItem(
+                    title = category.titulo,
+                    description = category.descripcion,
+                    imageUrl = category.url_imagen,  // Pasamos la URL de la imagen
+                    navController = navController
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+            }
+        }
     }
 }
 
 @Composable
-fun CategoryItem(title: String, description: String, navController: NavController?) {
+fun CategoryItem(title: String, description: String, navController: NavController?, imageUrl: String) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -197,17 +305,19 @@ fun CategoryItem(title: String, description: String, navController: NavControlle
             },
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Box(
+        // Mostrar la imagen desde la URL con AsyncImage (de Coil)
+        AsyncImage(
+            model = imageUrl,
+            contentDescription = null,
             modifier = Modifier
                 .size(40.dp)
                 .clip(RoundedCornerShape(8.dp))
-                .background(Color.Gray)
-                .padding(8.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(text = "Img", color = Color.White, fontSize = 10.sp)
-        }
+                .background(Color.Gray),
+            contentScale = ContentScale.Crop
+        )
+
         Spacer(modifier = Modifier.width(24.dp))
+
         Column(
             modifier = Modifier.weight(1f)
         ) {
@@ -215,7 +325,9 @@ fun CategoryItem(title: String, description: String, navController: NavControlle
             Spacer(modifier = Modifier.height(4.dp))
             Text(text = description, fontSize = 13.sp, color = Color.Gray)
         }
+
         Spacer(modifier = Modifier.width(24.dp))
+
         Icon(
             imageVector = Icons.AutoMirrored.Filled.ArrowForward,
             contentDescription = "Flecha para Detalles",
@@ -224,6 +336,7 @@ fun CategoryItem(title: String, description: String, navController: NavControlle
         )
     }
 }
+
 
 @Composable
 fun ServicesSection(navController: NavController?) {
