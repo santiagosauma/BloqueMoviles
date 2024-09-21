@@ -74,7 +74,7 @@ class ChatViewModel : ViewModel() {
                     .url("https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=AIzaSyCU-9kLsA2wd4rXZYg9gjk4ypo9ILwVV1s")
                     .post(requestBody)
                     .addHeader("Content-Type", "application/json")
-                    .build()
+                    .build() // Coment
 
                 val response = client.newCall(request).execute()
 
