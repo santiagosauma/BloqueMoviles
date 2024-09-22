@@ -30,6 +30,7 @@ import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -382,33 +383,46 @@ fun VideoItemWithDescription(videoUrl: String,
 
 //FUNCIONES PARA ITEMS DE CATEGORIAS
 @Composable
-fun CategoriesSection(navController: NavController?,
-                      viewModel: CategoryViewModel = viewModel(),
-                      route: String)
-{
-    // Obtenemos el estado actual de las categorías desde el ViewModel
-    val categories by viewModel.categories.collectAsState()
+fun CategoriesSection(
+    navController: NavController?,
+    viewModel: CategoryViewModel = viewModel(),
+    route: String
+) {
+    // Obtenemos el estado actual de las categorías básicas y el error desde el ViewModel
+    val categories by viewModel.categoriasBasicas.collectAsState()
     val error by viewModel.error.collectAsState()
 
     Column(modifier = Modifier.padding(16.dp)) {
-        // Si hay un error, mostramos el mensaje de error
-        if (error != null) {
-            Text(text = error ?: "Error desconocido", color = Color.Red)
-        } else {
-            // Mostramos las categorías dinámicamente desde la base de datos
-            categories.forEach { category ->
-                CategoryItem(
-                    title = category.titulo,
-                    description = category.descripcion,
-                    imageUrl = category.url_imagen,  // Pasamos la URL de la imagen
-                    navController = navController,
-                    route =  route
-                )
-                Spacer(modifier = Modifier.height(12.dp))
+        when {
+            categories.isEmpty() && error == null -> {
+                // Mostrar un indicador de carga mientras se están obteniendo las categorías
+                CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+            }
+            error != null -> {
+                // Si hay un error, mostramos el mensaje de error
+                Text(text = error ?: "Error desconocido", color = Color.Red)
+            }
+            categories.isNotEmpty() -> {
+                // Mostramos las categorías dinámicamente desde la base de datos
+                categories.forEach { category ->
+                    CategoryItem(
+                        title = category.titulo,
+                        description = category.descripcion,
+                        imageUrl = category.url_imagen,  // Pasamos la URL de la imagen
+                        navController = navController,
+                        route = route
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+                }
+            }
+            else -> {
+                // Si no hay categorías ni error, mostrar un mensaje vacío o alternativo
+                Text(text = "No hay categorías disponibles", color = Color.Gray)
             }
         }
     }
 }
+
 
 @Composable
 fun CategoryItem(title: String,
@@ -461,52 +475,63 @@ fun CategoryItem(title: String,
 
 //FUNCIONES PARA ITEMS DE SERVICIO
 @Composable
-fun ServicesSection(navController: NavController?,
-                    viewModel: ServicioViewModel = viewModel(),
-                    route: String)
-{
-    // Obtenemos el estado actual de los servicios desde el ViewModel
-    val servicios by viewModel.servicios.collectAsState()
+fun ServicesSection(
+    navController: NavController?,
+    viewModel: ServicioViewModel = viewModel(),
+    route: String
+) {
+    val servicios by viewModel.serviciosBasicos.collectAsState()
     val error by viewModel.error.collectAsState()
 
     Column(modifier = Modifier.padding(16.dp)) {
-        // Si hay un error, mostramos el mensaje de error
-        if (error != null) {
-            Text(text = error ?: "Error desconocido", color = Color.Red)
-        } else {
-            // Mostramos los servicios dinámicamente desde la base de datos
-            servicios.forEach { servicio ->
-                ServiceItem(
-                    title = servicio.titulo,
-                    description = servicio.descripcion,
-                    imageUrl = servicio.url_imagen,  // Pasamos la URL de la imagen
-                    navController = navController,
-                    route = route
-                )
-                Spacer(modifier = Modifier.height(12.dp))
+        when {
+            servicios.isEmpty() && error == null -> {
+                CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+            }
+            error != null -> {
+                Text(text = error ?: "Error desconocido", color = Color.Red)
+            }
+            servicios.isNotEmpty() -> {
+                servicios.forEach { servicio ->
+                    ServiceItem(
+                        title = servicio.titulo,
+                        description = servicio.descripcion,
+                        imageUrl = servicio.url_imagen,
+                        navController = navController,
+                        route = route,
+                        servicioId = servicio.id // Pasar el ID del servicio
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+                }
+            }
+            else -> {
+                Text(text = "No hay servicios disponibles", color = Color.Gray)
             }
         }
     }
 }
 
+
+
 @Composable
-fun ServiceItem(title: String,
-                description: String,
-                navController: NavController?,
-                imageUrl: String,
-                route: String)
-{
+fun ServiceItem(
+    title: String,
+    description: String,
+    navController: NavController?,
+    imageUrl: String,
+    route: String,
+    servicioId: String // Este ID es necesario para cargar la pantalla de detalles
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .background(Color.White)
             .padding(horizontal = 16.dp, vertical = 12.dp)
             .clickable {
-                navController?.navigate(route)
+                navController?.navigate("$route/$servicioId") // Navegar con el ID del servicio
             },
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Mostrar la imagen desde la URL con AsyncImage (de Coil)
         AsyncImage(
             model = imageUrl,
             contentDescription = null,
@@ -537,6 +562,7 @@ fun ServiceItem(title: String,
         )
     }
 }
+
 
 
 

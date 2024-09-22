@@ -5,9 +5,11 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.pantallainformacion.PantallaInfoClinica
 import com.leotesta017.clinicapenal.view.loginRegister.*
 import com.leotesta017.clinicapenal.solicitud.GeneralSolicitud
@@ -65,7 +67,13 @@ fun MyApp() {
         composable("ReviewComentarios") { ReviewComentarios(navController) }
         composable("detalle_info") { DetalleInfo(navController) }
         composable("crearsolicitud") { Solicitud(navController) }
-        composable("servicios_info") { ServiciosInfo(navController)}
+        composable(
+            route = "servicios_info/{servicioId}",
+            arguments = listOf(navArgument("servicioId") { type = NavType.StringType })
+        ) {
+            ServiciosInfo(navController = navController)
+        }
+
         composable("Juribot") { JuriBotScreen(navController)}
         composable("SegundoFormulario") { SegundoFormulario(navController)}
 

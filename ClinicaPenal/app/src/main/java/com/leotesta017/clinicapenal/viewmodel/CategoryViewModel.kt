@@ -3,36 +3,46 @@ package com.leotesta017.clinicapenal.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.leotesta017.clinicapenal.model.Categoria
+import com.leotesta017.clinicapenal.model.Ejemplo
+import com.leotesta017.clinicapenal.model.Recursos
 import com.leotesta017.clinicapenal.repository.CategoryRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import java.io.IOException
 
 class CategoryViewModel : ViewModel() {
 
     private val repository = CategoryRepository()
 
-    // Estado que contiene la lista de categorías
-    private val _categories = MutableStateFlow<List<Categoria>>(emptyList())
-    val categories: StateFlow<List<Categoria>> = _categories
+    // Estado que contiene la lista de categorías básicas
+    private val _categoriasBasicas = MutableStateFlow<List<Categoria>>(emptyList())
+    val categoriasBasicas: StateFlow<List<Categoria>> = _categoriasBasicas
 
     // Estado para manejar posibles errores
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error
 
-    // Método para obtener las categorías
+    // Método para obtener las categorías básicas
     init {
-        fetchCategories()
+        fetchCategoriasBasicas()
     }
 
-    private fun fetchCategories() {
+    private fun fetchCategoriasBasicas() {
         viewModelScope.launch {
             try {
-                val categoryList = repository.getCategories()
-                _categories.value = categoryList
+                val categoriasList = repository.getCategoriasBasicas()
+                _categoriasBasicas.value = categoriasList
             } catch (e: Exception) {
                 _error.value = "Error al cargar las categorías"
             }
         }
     }
+
+    // Método para obtener recursos y ejemplos de una categoría específica
+    suspend fun fetchRecursosYejemplos(categoriaId: String): Pair<List<Recursos>, List<Ejemplo>> {
+        return repository.getRecursosYejemplosDeCategoria(categoriaId)
+    }
 }
+
+
