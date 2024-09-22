@@ -1,97 +1,26 @@
 package com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral
 
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
+
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.compose.currentBackStackEntryAsState
 import com.leotesta017.clinicapenal.view.theme.ClinicaPenalTheme
 
 @Composable
 fun EstudiantesBarraNav(navController: NavController?, modifier: Modifier = Modifier) {
-    val currentBackStackEntry = navController?.currentBackStackEntryAsState()?.value
-    val currentDestination = currentBackStackEntry?.destination?.route
-
-    Row(
-        modifier = modifier
-            .background(Color.White)
-            .padding(top = 15.dp, bottom = 10.dp),
-        horizontalArrangement = Arrangement.SpaceAround,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        EstudiantesBottomBarItem(
-            icon = Icons.Default.Menu,
-            text = "Inicio",
-            isSelected = currentDestination == "pantallainfoestudiante",
-            onClick = { navController?.navigate("pantallainfoestudiante") }
-        )
-        EstudiantesBottomBarItem(
-            icon = Icons.Default.Folder,
-            text = "Solicitudes",
-            isSelected = currentDestination == "generasolicitudestudiante",
-            onClick = { navController?.navigate("generasolicitudestudiante") }
-        )
-        EstudiantesBottomBarItem(
-            icon = Icons.Default.Info,
-            text = "Información",
-            isSelected = currentDestination == "informacionestudiate",
-            onClick = { navController?.navigate("informacionestudiate") }
-        )
-    }
-}
-
-@Composable
-fun EstudiantesBottomBarItem(
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
-    text: String,
-    isSelected: Boolean,
-    onClick: () -> Unit
-) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.clickable(onClick = onClick)
-    ) {
-        Box(
-            modifier = Modifier
-                .size(50.dp)
-                .background(
-                    color = if (isSelected) Color(0xFF0B1F8C) else Color.Transparent,
-                    shape = CircleShape
-                ),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = text,
-                tint = if (isSelected) Color(0xFFFFFFFF) else Color.Black,
-            )
-        }
-        Text(
-            text = text,
-            fontSize = 12.sp,
-            color = Color.Black
-        )
-    }
+    GenericBarraNav(
+        navController = navController,
+        modifier = modifier,
+        destinations = listOf("pantallainfoestudiante", "generasolicitudestudiante", "informacionestudiate"),
+        icons = listOf(Icons.Default.Menu, Icons.Default.Folder, Icons.Default.Info),
+        texts = listOf("Inicio", "Solicitudes", "Información")
+    )
 }
 
 @Preview(showBackground = true)

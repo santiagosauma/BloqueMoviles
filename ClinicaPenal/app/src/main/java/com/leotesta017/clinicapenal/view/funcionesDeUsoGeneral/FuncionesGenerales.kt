@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
@@ -23,12 +24,14 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.automirrored.filled.Chat
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -54,6 +57,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import androidx.compose.ui.unit.Dp
+import androidx.navigation.compose.currentBackStackEntryAsState
 
 //VIEW MODEL
 import com.leotesta017.clinicapenal.viewmodel.CategoryViewModel
@@ -81,7 +85,8 @@ fun TopBar() {
 
 //FUNCION PARA IMPLEMENTAR UN SEARCH BAR EN VARIAS VISTAS
 @Composable
-fun SearchBar(searchText: String) {
+fun SearchBar(searchText: String)
+{
     OutlinedTextField(
         value = searchText,
         onValueChange = {},
@@ -98,7 +103,10 @@ fun SearchBar(searchText: String) {
 }
 
 @Composable
-fun RoundedButton(icon: ImageVector, label: String, onClick: () -> Unit) {
+fun RoundedButton(icon: ImageVector,
+                  label: String,
+                  onClick: () -> Unit)
+{
     Row(
         modifier = Modifier
             .clickable(onClick = onClick)
@@ -151,17 +159,20 @@ fun PantallasExtra(navController: NavController?,
 }
 
 @Composable
-fun SpacedItem(spacing: Dp = 16.dp, content: @Composable () -> Unit) {
+fun SpacedItem(spacing: Dp = 16.dp,
+               content: @Composable () -> Unit)
+{
     content()
     Spacer(modifier = Modifier.height(spacing))
 
 }
 
 
-//FUNCIONES PARA LA VISTA DE INFORMACION DE SERVICIOS Y CATEGORIAS
+//FUNCIONES PARA LA VISTA DE INFORMACION DE NOTICIAS/SERVICIOS/CATEGORIAS
 @Composable
 fun LabelCategoria(label: String,
-                   modifier: Modifier = Modifier) {
+                   modifier: Modifier = Modifier)
+{
     Text(
         text = label,
         fontSize = 20.sp,
@@ -172,9 +183,65 @@ fun LabelCategoria(label: String,
 }
 
 
+@Composable
+fun LabelCategoriaConBoton(label: String,
+                           navController: NavController?,
+                           modifier: Modifier = Modifier,
+                           navigateroute : String)
+{
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween,
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(end = 14.dp, start = 10.dp)
+    ) {
+        Text(
+            text = label,
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color.Black,
+            modifier = Modifier.weight(1f)
+        )
+        Button(
+            onClick = { navController?.navigate(navigateroute) },
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color(0xFF0B1F8C),
+                contentColor = Color.White
+            ),
+            shape = RoundedCornerShape(24.dp),
+            modifier = Modifier
+                .height(40.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Filled.Add,
+                contentDescription = "Agregar"
+            )
+            Spacer(modifier = Modifier.width(4.dp))
+            Text(text = "Agregar")
+        }
+    }
+}
+
+
+//FUNCIONES PARA ITEMS DE NOTICIAS
+@Composable
+fun MyTextNoticias(text: String)
+{
+    Text(
+        text = text,
+        fontSize = 20.sp,
+        fontWeight = FontWeight.Bold,
+        color = Color.Black,
+        modifier = Modifier
+            .padding(start = 10.dp, bottom = 8.dp)
+    )
+}
+
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun CarruselDeNoticias(viewModel: VideoViewModel = viewModel())
+fun CarruselDeNoticias(viewModel: VideoViewModel = viewModel(),
+                       contentText: @Composable (() -> Unit)? = null)
 {
     val videos by viewModel.videos.collectAsState()
     val error by viewModel.error.collectAsState()
@@ -187,14 +254,9 @@ fun CarruselDeNoticias(viewModel: VideoViewModel = viewModel())
             .fillMaxWidth()
             .padding(horizontal = 15.dp, vertical = 8.dp)
     ) {
-        Text(
-            text = "Noticias",
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.Black,
-            modifier = Modifier
-                .padding(start = 10.dp, bottom = 8.dp)
-        )
+
+        contentText?.invoke()
+
 
         if (error != null) {
             Text(text = error ?: "Error desconocido", color = Color.Red)
@@ -317,6 +379,8 @@ fun VideoItemWithDescription(videoUrl: String,
     }
 }
 
+
+//FUNCIONES PARA ITEMS DE CATEGORIAS
 @Composable
 fun CategoriesSection(navController: NavController?,
                       viewModel: CategoryViewModel = viewModel(),
@@ -394,6 +458,8 @@ fun CategoryItem(title: String,
     }
 }
 
+
+//FUNCIONES PARA ITEMS DE SERVICIO
 @Composable
 fun ServicesSection(navController: NavController?,
                     viewModel: ServicioViewModel = viewModel(),
@@ -469,6 +535,73 @@ fun ServiceItem(title: String,
             tint = Color.Blue,
             modifier = Modifier.size(24.dp)
         )
+    }
+}
+
+
+
+//BARRA DE NAVEGACION
+@Composable
+fun GenericBottomBarItem(icon: ImageVector,
+                         text: String,
+                         isSelected: Boolean,
+                         onClick: () -> Unit)
+{
+    Column(
+        modifier = Modifier
+            .clickable(onClick = onClick)
+            .padding(horizontal = 16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Box(
+            modifier = Modifier
+                .size(48.dp)
+                .background(
+                    color = if (isSelected) Color(0xFF0B1F8C) else Color.Transparent,
+                    shape = CircleShape
+                ),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = text,
+                tint = if (isSelected) Color(0xFFFFFFFF) else Color.Black,
+            )
+        }
+        Text(
+            text = text,
+            color = Color.Black,
+            style = MaterialTheme.typography.bodySmall
+        )
+    }
+}
+
+@Composable
+fun GenericBarraNav(navController: NavController?,
+                    modifier: Modifier = Modifier,
+                    destinations: List<String>,
+                    icons: List<ImageVector>,
+                    texts: List<String>)
+{
+    val currentBackStackEntry = navController?.currentBackStackEntryAsState()?.value
+    val currentDestination = currentBackStackEntry?.destination?.route
+
+    Row(
+        modifier = modifier
+            .background(Color.White)
+            .padding(top = 15.dp, bottom = 10.dp),
+        horizontalArrangement = Arrangement.SpaceAround,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        destinations.indices.forEach { index ->
+            GenericBottomBarItem(
+                icon = icons[index],
+                text = texts[index],
+                isSelected = currentDestination == destinations[index],
+                onClick = { navController?.navigate(destinations[index]) }
+            )
+        }
     }
 }
 
