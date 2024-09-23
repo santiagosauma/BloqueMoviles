@@ -115,8 +115,39 @@ fun MyApp() {
 
         //Pantallas Usuario Admin
         composable("pantallainfoadmin") { PantallaInfoAdmin(navController)}
-        composable("modificar-info") { ModificarInfoAdmin(navController)}
-        composable("modificar_servicios_info") { ModificarServiciosAdmin(navController)}
+
+        composable(
+            route = "modificar-info/{titulo}/{descripcion}/{servicioId}",
+            arguments = listOf(
+                navArgument("titulo"){type = NavType.StringType},
+                navArgument("descripcion"){type = NavType.StringType},
+                navArgument("servicioId"){type = NavType.StringType})
+        ) { backStackEntry ->
+            val titulo = backStackEntry.arguments?.getString("titulo") ?: ""
+            val descripcion = backStackEntry.arguments?.getString("descripcion") ?: ""
+            val servicioId = backStackEntry.arguments?.getString("servicioId") ?: ""
+
+            ModificarInfoAdmin(
+                navController
+            )
+        }
+
+        composable(
+            route ="modificar_servicios_info/{titulo}/{descripcion}/{servicioId}",
+            arguments = listOf(
+                navArgument("titulo"){type = NavType.StringType},
+                navArgument("descripcion"){type = NavType.StringType},
+                navArgument("servicioId"){type = NavType.StringType})
+        ) { backStackEntry ->
+            val titulo = backStackEntry.arguments?.getString("titulo") ?: ""
+            val descripcion = backStackEntry.arguments?.getString("descripcion") ?: ""
+            val servicioId = backStackEntry.arguments?.getString("servicioId") ?: ""
+
+            ModificarServiciosAdmin(
+                navController
+            )
+        }
+
         composable("agregar-info-admin") { AgregarInfoAdmin(navController) }
         composable("agregar_servicios_info-admin") { AgregarServiciosInfoAdmin(navController) }
         composable("generalsolicitudadmin") { GeneralSolicitudAdmin(navController)}
