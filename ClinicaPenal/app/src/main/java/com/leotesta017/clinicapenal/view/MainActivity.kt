@@ -121,11 +121,11 @@ fun MyApp() {
             arguments = listOf(
                 navArgument("titulo"){type = NavType.StringType},
                 navArgument("descripcion"){type = NavType.StringType},
-                navArgument("servicioId"){type = NavType.StringType})
+                navArgument("categoriaId"){type = NavType.StringType})
         ) { backStackEntry ->
             val titulo = backStackEntry.arguments?.getString("titulo") ?: ""
             val descripcion = backStackEntry.arguments?.getString("descripcion") ?: ""
-            val servicioId = backStackEntry.arguments?.getString("servicioId") ?: ""
+            val servicioId = backStackEntry.arguments?.getString("categoriaId") ?: ""
 
             ModificarInfoAdmin(
                 navController
