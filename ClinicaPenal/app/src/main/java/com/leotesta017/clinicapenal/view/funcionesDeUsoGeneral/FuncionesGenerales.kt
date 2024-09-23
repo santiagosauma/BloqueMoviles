@@ -3,6 +3,7 @@ package com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -52,9 +53,13 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -716,6 +721,195 @@ fun SectionContent(content: String) {
         color = Color.Black,
         modifier = Modifier.padding(horizontal = 16.dp)
     )
+}
+
+
+//FUNCIONES PARA LA PANTALLA DE INFO DE LA CLINICA
+@Composable
+fun SeccionNosotros(title: String, description: String) {
+    Box(
+        modifier = Modifier
+            .width(350.dp)
+            .background(Color.LightGray)
+            .padding(15.dp)
+    ) {
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(text = title, fontSize = 17.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+            Spacer(modifier = Modifier.height(10.dp))
+            Text(
+                text = description,
+                fontSize = 14.sp,
+                color = Color.Black
+            )
+        }
+    }
+}
+
+@Composable
+fun SeccionHorarios(title: String, schedule: String) {
+    Box(
+        modifier = Modifier
+            .width(350.dp)
+            .background(Color.LightGray)
+            .padding(16.dp)
+    ) {
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(text = title, fontSize = 17.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+            Spacer(modifier = Modifier.height(10.dp))
+            Text(
+                text = schedule,
+                fontSize = 14.sp,
+                color = Color.Black
+            )
+        }
+    }
+}
+
+@Composable
+fun SeccionDirecciones(title: String, addresses: List<String>) {
+    Box(
+        modifier = Modifier
+            .width(350.dp)
+            .background(Color.LightGray)
+            .padding(16.dp)
+    ) {
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(text = title, fontSize = 17.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+            Spacer(modifier = Modifier.height(10.dp))
+            addresses.forEach { address ->
+                Text(
+                    text = buildAnnotatedString {
+                        withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                            append("• ")
+                        }
+                        append(address)
+                    },
+                    fontSize = 12.sp,
+                    color = Color.Black
+                )
+                Spacer(modifier = Modifier.height(10.dp))
+            }
+        }
+    }
+}
+
+@Composable
+fun SeccionContacto(title: String, phone: String, email: String) {
+    Box(
+        modifier = Modifier
+            .width(350.dp)
+            .background(Color.LightGray)
+            .padding(16.dp)
+    ) {
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(text = title, fontSize = 17.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+            Spacer(modifier = Modifier.height(10.dp))
+            Text(
+                text = buildAnnotatedString {
+                    withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                        append("• Teléfono: ")
+                    }
+                    append(phone)
+                },
+                fontSize = 12.sp,
+                color = Color.Black
+            )
+            Spacer(modifier = Modifier.height(10.dp))
+            Text(
+                text = buildAnnotatedString {
+                    withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                        append("• Correo: ")
+                    }
+                    append(email)
+                },
+                fontSize = 12.sp,
+                color = Color.Black
+            )
+        }
+    }
+}
+
+@Composable
+fun RedesSociales(title: String, icons: List<Int>, onIconClick: (Int) -> Unit) {
+    Box(
+        modifier = Modifier
+            .width(350.dp)
+            .background(Color.LightGray)
+            .padding(16.dp)
+    ) {
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(text = title, fontSize = 17.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+            Spacer(modifier = Modifier.height(10.dp))
+            Row(
+                modifier = Modifier
+                    .width(350.dp)
+                    .padding(5.dp),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                icons.forEach { icon ->
+                    Image(
+                        painter = painterResource(id = icon),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(30.dp)
+                            .clickable { onIconClick(icon) }
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun Calendarios(title: String, events: List<Pair<String, String>>) {
+    Box(
+        modifier = Modifier
+            .width(350.dp)
+            .background(Color.LightGray)
+            .padding(16.dp)
+    ) {
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.Start
+        ) {
+            Text(text = title, fontSize = 17.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+            Spacer(modifier = Modifier.height(10.dp))
+            events.forEach { event ->
+                Text(
+                    text = buildAnnotatedString {
+                        withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                            append("• ${event.first}: ")
+                        }
+                        append(event.second)
+                    },
+                    fontSize = 12.sp,
+                    color = Color.Black
+                )
+                Spacer(modifier = Modifier.height(10.dp))
+            }
+        }
+    }
 }
 
 

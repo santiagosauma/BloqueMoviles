@@ -74,7 +74,7 @@ fun ServiciosInfo(
                     Text(text = error ?: "Error desconocido", color = Color.Red)
                 }
                 contenido.isNotEmpty() ->{
-                    
+
 
                     //EDITAR ESTA PARTE PARA EL MARKDOWN DEL CONTENIDO
                     SpacedItem(spacing = 16) {
