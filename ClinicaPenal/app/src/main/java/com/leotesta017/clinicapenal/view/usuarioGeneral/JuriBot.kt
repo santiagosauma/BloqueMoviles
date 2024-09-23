@@ -1,6 +1,8 @@
+import android.os.Build
 import android.text.method.LinkMovementMethod
 import android.text.util.Linkify
 import android.widget.TextView
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -48,10 +50,11 @@ import java.net.SocketTimeoutException
 import java.util.concurrent.TimeUnit
 import io.noties.markwon.Markwon
 import androidx.compose.foundation.layout.imePadding
-import androidx.compose.ui.tooling.preview.Preview
 
 class ChatViewModel : ViewModel() {
-    var messages by mutableStateOf(listOf<Pair<String, Boolean>>())
+    var messages by mutableStateOf(
+        listOf("👋 ¡Hola! Soy JuriBot, tu asistente jurídico especializado en derecho mexicano. Estoy aquí para responder a tus preguntas legales." to false)
+    )
         private set
 
     fun sendMessage(message: String) {
@@ -319,10 +322,4 @@ fun MessageBubble(message: String, isUserMessage: Boolean) {
             })
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun JuriBotScreenPreview() {
-    JuriBotScreen(navController = null)
 }
