@@ -13,8 +13,8 @@ class ServicioViewModel : ViewModel() {
     private val repository = ServicioRepository()
 
     // Estado que contiene la lista de servicios básicos
-    private val _serviciosBasicos = MutableStateFlow<List<Servicio>>(emptyList())
-    val serviciosBasicos: StateFlow<List<Servicio>> = _serviciosBasicos
+    private val _servicios = MutableStateFlow<List<Servicio>>(emptyList())
+    val servicios: StateFlow<List<Servicio>> = _servicios
 
     // Estado que contiene el contenido de un servicio
     private val _contenido = MutableStateFlow<String>("")
@@ -24,16 +24,16 @@ class ServicioViewModel : ViewModel() {
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error
 
-    // Método para obtener los servicios básicos
+    // Método para obtener los servicios
     init {
-        fetchServiciosBasicos()
+        fetchServicios()
     }
 
-    private fun fetchServiciosBasicos() {
+    private fun fetchServicios() {
         viewModelScope.launch {
             try {
-                val serviciosList = repository.getServiciosBasicos()
-                _serviciosBasicos.value = serviciosList
+                val serviciosList = repository.getServicios()
+                _servicios.value = serviciosList
             } catch (e: Exception) {
                 _error.value = "Error al cargar los servicios"
             }

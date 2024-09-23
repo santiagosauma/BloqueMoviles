@@ -5,6 +5,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -68,20 +69,43 @@ fun MyApp() {
         composable("crearsolicitud") { Solicitud(navController) }
 
         composable(
-            route = "detalle_info"
-        ) {
+            route = "detalle_info/{titulo}/{descripcion}/{categoriaId}",
+            arguments = listOf(
+                navArgument("titulo"){type = NavType.StringType},
+                navArgument("descripcion"){type = NavType.StringType},
+                navArgument("categoriaId"){type = NavType.StringType}
+
+                )
+
+        ) { backStackEntry ->
+            val titulo = backStackEntry.arguments?.getString("titulo") ?: ""
+            val descripcion = backStackEntry.arguments?.getString("descripcion") ?: ""
+            val categoriaId = backStackEntry.arguments?.getString("categoriaId") ?: ""
             DetalleInfo(
-                navController
+                navController = navController,
+                titulo = titulo,
+                descripcion = descripcion,
+                categoriaId = categoriaId
             )
         }
 
 
         composable(
-            route = "servicios_info"
-        )
-        {
+            route = "servicios_info/{titulo}/{descripcion}/{servicioId}" ,
+            arguments = listOf(
+                navArgument("titulo"){type = NavType.StringType},
+                navArgument("descripcion"){type = NavType.StringType},
+                navArgument("servicioId"){type = NavType.StringType})
+        ) { backStackEntry ->
+            val titulo = backStackEntry.arguments?.getString("titulo") ?: ""
+            val descripcion = backStackEntry.arguments?.getString("descripcion") ?: ""
+            val servicioId = backStackEntry.arguments?.getString("servicioId") ?: ""
+
             ServiciosInfo(
                 navController = navController,
+                titulo = titulo,
+                descripcion = descripcion,
+                servicioId = servicioId
             )
         }
 

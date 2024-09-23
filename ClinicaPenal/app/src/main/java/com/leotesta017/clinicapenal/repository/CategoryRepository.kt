@@ -10,7 +10,7 @@ class CategoryRepository {
     private val firestore = Firebase.firestore
 
     // Método para obtener todas las categorías con solo los datos básicos
-    suspend fun getCategoriasBasicas(): List<Categoria> {
+    suspend fun getCategorias(): List<Categoria> {
         return try {
             val snapshot = firestore.collection("categorias").get().await()
             snapshot.documents.map { document ->
@@ -25,4 +25,14 @@ class CategoryRepository {
             emptyList()  // Devuelve una lista vacía en caso de error
         }
     }
+
+    suspend fun getContenidoById(categoriaId: String): String {
+        return try {
+            val document = firestore.collection("categorias").document(categoriaId).get().await()
+            document.getString("contenido") ?: ""
+        } catch (e: Exception) {
+            ""  // Devuelve un string vacío en caso de error
+        }
+    }
+
 }

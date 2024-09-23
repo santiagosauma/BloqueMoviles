@@ -22,6 +22,7 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material.icons.filled.Add
@@ -60,6 +61,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.max
 import androidx.navigation.compose.currentBackStackEntryAsState
 
 //VIEW MODEL
@@ -363,10 +365,10 @@ fun VideoItemWithDescription(videoUrl: String,
             text = description,
             fontSize = 13.sp,
             color = Color.Gray,
-            maxLines = if (expanded) Int.MAX_VALUE else 3, // Controlar si se muestra todo el texto o no
+            maxLines = if (expanded) Int.MAX_VALUE else 2,
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier
-                .clickable { expanded = !expanded } // Al hacer clic se expande o se contrae
+                .clickable { expanded = !expanded }
                 .padding(top = 8.dp)
         )
 
@@ -389,7 +391,7 @@ fun CategoriesSection(
     viewModel: CategoryViewModel = viewModel(),
     route: String
 ) {
-    val categories by viewModel.categoriasBasicas.collectAsState()
+    val categories by viewModel.categorias.collectAsState()
     val error by viewModel.error.collectAsState()
 
     Column(modifier = Modifier.padding(16.dp)) {
@@ -437,7 +439,7 @@ fun CategoryItem(
             .background(Color.White)
             .padding(horizontal = 16.dp, vertical = 12.dp)
             .clickable {
-                navController?.navigate("$route") // Navegar con el ID de la categoría
+                navController?.navigate("$route/$title/$description/$categoriaId") // Navegar con el ID de la categoría
             },
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -456,9 +458,20 @@ fun CategoryItem(
         Column(
             modifier = Modifier.weight(1f)
         ) {
-            Text(text = title, fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+            Text(
+                text = title,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.Black
+            )
             Spacer(modifier = Modifier.height(4.dp))
-            Text(text = description, fontSize = 13.sp, color = Color.Gray)
+            Text(
+                text = description,
+                fontSize = 13.sp,
+                color = Color.Gray,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
+            )
         }
 
         Spacer(modifier = Modifier.width(24.dp))
@@ -481,7 +494,7 @@ fun ServicesSection(
     viewModel: ServicioViewModel = viewModel(),
     route: String
 ) {
-    val servicios by viewModel.serviciosBasicos.collectAsState()
+    val servicios by viewModel.servicios.collectAsState()
     val error by viewModel.error.collectAsState()
 
     Column(modifier = Modifier.padding(16.dp)) {
@@ -529,7 +542,7 @@ fun ServiceItem(
             .background(Color.White)
             .padding(horizontal = 16.dp, vertical = 12.dp)
             .clickable {
-                navController?.navigate("$route") // Navegar con el ID del servicio
+                navController?.navigate("$route/$title/$description/$servicioId") // Navegar con el ID del servicio
             },
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -548,9 +561,20 @@ fun ServiceItem(
         Column(
             modifier = Modifier.weight(1f)
         ) {
-            Text(text = title, fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+            Text(
+                text = title,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.Black
+            )
             Spacer(modifier = Modifier.height(4.dp))
-            Text(text = description, fontSize = 13.sp, color = Color.Gray)
+            Text(
+                text = description,
+                fontSize = 13.sp,
+                color = Color.Gray,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
+            )
         }
 
         Spacer(modifier = Modifier.width(24.dp))
@@ -647,7 +671,7 @@ fun HeaderSection(title: String, navController: NavController?) {
         ) {
             IconButton(onClick = { navController?.popBackStack() }) {
                 Icon(
-                    imageVector = Icons.Default.ArrowBack,
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "Back",
                     tint = Color.Black
                 )

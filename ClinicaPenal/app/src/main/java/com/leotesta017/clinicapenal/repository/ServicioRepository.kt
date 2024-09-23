@@ -10,7 +10,7 @@ class ServicioRepository {
     private val firestore = Firebase.firestore
 
     // Método para obtener todos los servicios con solo los datos básicos
-    suspend fun getServiciosBasicos(): List<Servicio> {
+    suspend fun getServicios(): List<Servicio> {
         return try {
             val snapshot = firestore.collection("servicios").get().await()
             snapshot.documents.map { document ->
