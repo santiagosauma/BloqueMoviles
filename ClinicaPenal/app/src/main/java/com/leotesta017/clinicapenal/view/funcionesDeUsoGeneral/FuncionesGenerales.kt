@@ -22,12 +22,16 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.automirrored.filled.Chat
+import androidx.compose.material.icons.automirrored.filled.FormatListBulleted
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.FormatBold
+import androidx.compose.material.icons.filled.FormatItalic
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.PlayArrow
@@ -62,10 +66,13 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
@@ -1229,3 +1236,92 @@ fun NotificacionItem(
     )
 }
 
+
+
+//FUNCIONES PARA AGREGAR INFORMACION ADMIN
+@Composable
+fun TextEditor(
+    textNewContent: String
+) {
+    var textState by remember { mutableStateOf(TextFieldValue(text = textNewContent)) }
+    var isBold by remember { mutableStateOf(false) }
+    var isItalic by remember { mutableStateOf(false) }
+    var isBullet by remember { mutableStateOf(false) }
+
+    Column(modifier = Modifier.padding(16.dp)) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            IconButton(onClick = { isBold = !isBold }) {
+                Icon(
+                    imageVector = Icons.Default.FormatBold,
+                    contentDescription = "Bold",
+                    tint = if (isBold) Color.Blue else Color.Gray
+                )
+            }
+            IconButton(onClick = { isItalic = !isItalic }) {
+                Icon(
+                    imageVector = Icons.Default.FormatItalic,
+                    contentDescription = "Italic",
+                    tint = if (isItalic) Color.Blue else Color.Gray
+                )
+            }
+            IconButton(onClick = { isBullet = !isBullet }) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.FormatListBulleted,
+                    contentDescription = "Bullet List",
+                    tint = if (isBullet) Color.Blue else Color.Gray
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        BasicTextField(
+            value = textState,
+            onValueChange = { value ->
+                textState = value.copy(
+                    annotatedString = buildAnnotatedString {
+                        ApplyStyle(
+                            builder = this,
+                            text = value.text,
+                            isBold = isBold,
+                            isItalic = isItalic,
+                            isBullet = isBullet
+                        )
+                    }
+                )
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(350.dp)
+                .background(Color.LightGray)
+                .padding(8.dp),
+            textStyle = TextStyle(
+                fontSize = 16.sp,
+                color = Color.Black
+            ),
+        )
+    }
+}
+
+fun ApplyStyle(
+    builder: AnnotatedString.Builder,
+    text: String,
+    isBold: Boolean,
+    isItalic: Boolean,
+    isBullet: Boolean
+) {
+    if (isBullet) {
+        builder.append("• ")
+    }
+    builder.withStyle(
+        style = SpanStyle(
+            fontWeight = if (isBold) FontWeight.Bold else FontWeight.Normal,
+            fontStyle = if (isItalic) FontStyle.Italic else FontStyle.Normal
+        )
+    ) {
+        builder.append(text)
+    }
+}

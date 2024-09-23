@@ -47,7 +47,9 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.AdminBarraNav
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.RoundedButton
+import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.TextEditor
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.TopBar
+import com.leotesta017.clinicapenal.view.templatesPantallas.PantallaAgregarInformacionTemplate
 
 
 @Composable
@@ -55,168 +57,55 @@ fun AgregarServiciosInfoAdmin(navController: NavController?) {
 
     var nombre by remember { mutableStateOf("") }
 
-    Scaffold(
-        topBar = {
-            Column {
-                TopBar()
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp, vertical = 3.dp)
-                        .fillMaxWidth()
-                ) {
-                    IconButton(onClick = { navController?.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
-                    }
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = "Agregar Servicio",
-                        style = MaterialTheme.typography.headlineSmall.copy(color = Color.Black),
-                        modifier = Modifier.weight(1f)
-                    )
-                }
-            }
-        },
+    PantallaAgregarInformacionTemplate(
+        navController = navController,
+        titulo = "Agregar Servicio",
+        textDescripcion = "Inserte Informacion del servicio...",
         bottomBar = {
-            Column {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 16.dp),
-                    horizontalArrangement = Arrangement.SpaceEvenly
-                ) {
-                    RoundedButton(
-                        icon = Icons.Default.Edit,
-                        label = "Añadir",
-                        onClick = {  }
-                    )
-                    RoundedButton(
-                        icon = Icons.Default.Delete,
-                        label = "Cancelar",
-                        onClick = {  }
-                    )
-                }
-                AdminBarraNav(navController = navController, modifier = Modifier.fillMaxWidth())
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 16.dp),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                RoundedButton(
+                    icon = Icons.Default.Edit,
+                    label = "Añadir",
+                    onClick = { /* Lógica para añadir */ }
+                )
+                RoundedButton(
+                    icon = Icons.Default.Delete,
+                    label = "Cancelar",
+                    onClick = { /* Lógica para cancelar */ }
+                )
             }
+            AdminBarraNav(navController = navController, modifier = Modifier.fillMaxWidth())
         },
         content = { paddingValues ->
-            LazyColumn(
+            OutlinedTextField(
+                value = nombre,
+                onValueChange = { nombre = it },
+                label = { Text("Nombre") },
                 modifier = Modifier
-                    .padding(paddingValues)
-                    .fillMaxSize()
-                    .padding(horizontal = 16.dp)
-            ) {
-                item {
-                    Spacer(modifier = Modifier.height(16.dp))
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp)
+            )
 
-                    OutlinedTextField(
-                        value = nombre,
-                        onValueChange = { nombre = it },
-                        label = { Text("Nombre") },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 8.dp)
-                    )
+            Text(
+                text = "Contenido",
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.Bold
+                ),
+                modifier = Modifier.padding(top = 8.dp, start = 10.dp)
+            )
 
-                    Text(
-                        text = "Contenido",
-                        style = MaterialTheme.typography.bodyMedium.copy(
-                            color = MaterialTheme.colorScheme.primary,
-                            fontWeight = FontWeight.Bold
-                        ),
-                        modifier = Modifier.padding(top = 8.dp,start = 10.dp)
-                    )
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    AgregarInfoServicioRichTextEditor()
-                }
-            }
+            Spacer(modifier = Modifier.height(16.dp))
+            
         }
     )
 }
 
-
-
-@Composable
-fun AgregarInfoServicioRichTextEditor() {
-    var textState by remember { mutableStateOf(TextFieldValue("Inserte Información del servicio...")) }
-    var isBold by remember { mutableStateOf(false) }
-    var isItalic by remember { mutableStateOf(false) }
-    var isBullet by remember { mutableStateOf(false) }
-
-    Column(modifier = Modifier.padding(16.dp)) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            IconButton(onClick = { isBold = !isBold }) {
-                Icon(
-                    imageVector = Icons.Default.FormatBold,
-                    contentDescription = "Bold",
-                    tint = if (isBold) Color.Blue else Color.Gray
-                )
-            }
-            IconButton(onClick = { isItalic = !isItalic }) {
-                Icon(
-                    imageVector = Icons.Default.FormatItalic,
-                    contentDescription = "Italic",
-                    tint = if (isItalic) Color.Blue else Color.Gray
-                )
-            }
-            IconButton(onClick = { isBullet = !isBullet }) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.FormatListBulleted,
-                    contentDescription = "Bullet List",
-                    tint = if (isBullet) Color.Blue else Color.Gray
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        BasicTextField(
-            value = textState,
-            onValueChange = { value ->
-                textState = value.copy(
-                    annotatedString = buildAnnotatedString {
-                        AgregarServicioapplyStyle(this, value.text, isBold, isItalic, isBullet)
-                    }
-                )
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(350.dp)
-                .background(Color.LightGray)
-                .padding(8.dp),
-            textStyle = TextStyle(
-                fontSize = 16.sp,
-                color = Color.Black
-            ),
-        )
-    }
-}
-
-
-fun AgregarServicioapplyStyle(
-    builder: AnnotatedString.Builder,
-    text: String,
-    isBold: Boolean,
-    isItalic: Boolean,
-    isBullet: Boolean
-) {
-    if (isBullet) {
-        builder.append("• ")
-    }
-    builder.withStyle(
-        style = SpanStyle(
-            fontWeight = if (isBold) FontWeight.Bold else FontWeight.Normal,
-            fontStyle = if (isItalic) FontStyle.Italic else FontStyle.Normal
-        )
-    ) {
-        builder.append(text)
-    }
-}
 
 
 
