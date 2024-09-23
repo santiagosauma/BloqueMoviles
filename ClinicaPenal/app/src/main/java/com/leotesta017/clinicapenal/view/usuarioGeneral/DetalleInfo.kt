@@ -57,7 +57,7 @@ fun DetalleInfo(
             HeaderSection(titulo, navController)
             Spacer(modifier = Modifier.height(8.dp))  // Reducir el espacio aquí
             SectionTitle("Descripción")
-            Spacer(modifier = Modifier.height(4.dp))  // Reducir el espacio aquí
+            Spacer(modifier = Modifier.height(4.dp).padding(end = 0.dp))  // Reducir el espacio aquí
             SectionContent(descripcion)
 
             when {
@@ -94,11 +94,10 @@ fun CustomMarkdownText(content: String) {
         for (line in lines) {
             when {
                 line.startsWith("####") -> {
-                    Spacer(modifier = Modifier.height(12.dp))  // Reducir el espacio aquí
                     SectionTitle(
                         title = line.removePrefix("####").trim()
                     )
-                    Spacer(modifier = Modifier.height(4.dp))  // Reducir el espacio aquí
+                    Spacer(modifier = Modifier.height(6.dp))  // Reducir el espacio aquí
                 }
                 line.startsWith("###") -> {
                     Spacer(modifier = Modifier.height(12.dp))  // Reducir el espacio aquí
