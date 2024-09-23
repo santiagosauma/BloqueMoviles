@@ -5,6 +5,7 @@ import android.net.Uri
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -17,7 +18,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
@@ -27,18 +27,25 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -48,6 +55,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -65,9 +73,11 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.max
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.leotesta017.clinicapenal.model.CasosRepresentacion
+import com.leotesta017.clinicapenal.model.Notificacion
+import com.leotesta017.clinicapenal.model.SolicitudAdmin
+import com.leotesta017.clinicapenal.model.SolicitudGeneral
 
 //VIEW MODEL
 import com.leotesta017.clinicapenal.viewmodel.CategoryViewModel
@@ -75,7 +85,9 @@ import com.leotesta017.clinicapenal.viewmodel.ServicioViewModel
 import com.leotesta017.clinicapenal.viewmodel.VideoViewModel
 
 
-//FUNCION PARA IMPLEMENTAR UN TOP BAR CON EL NOMBRE DE LA CLINICA PENAL
+// ========================================
+// ☰ SECCIÓN: Barras de Navegación/Visuales
+// ========================================
 @Composable
 fun TopBar() {
     Box(
@@ -93,7 +105,6 @@ fun TopBar() {
     }
 }
 
-//FUNCION PARA IMPLEMENTAR UN SEARCH BAR EN VARIAS VISTAS
 @Composable
 fun SearchBar(searchText: String)
 {
@@ -111,6 +122,75 @@ fun SearchBar(searchText: String)
         singleLine = true
     )
 }
+
+
+@Composable
+fun GenericBottomBarItem(icon: ImageVector,
+                         text: String,
+                         isSelected: Boolean,
+                         onClick: () -> Unit)
+{
+    Column(
+        modifier = Modifier
+            .clickable(onClick = onClick)
+            .padding(horizontal = 16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Box(
+            modifier = Modifier
+                .size(48.dp)
+                .background(
+                    color = if (isSelected) Color(0xFF0B1F8C) else Color.Transparent,
+                    shape = CircleShape
+                ),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = text,
+                tint = if (isSelected) Color(0xFFFFFFFF) else Color.Black,
+            )
+        }
+        Text(
+            text = text,
+            color = Color.Black,
+            style = MaterialTheme.typography.bodySmall
+        )
+    }
+}
+
+@Composable
+fun GenericBarraNav(navController: NavController?,
+                    modifier: Modifier = Modifier,
+                    destinations: List<String>,
+                    icons: List<ImageVector>,
+                    texts: List<String>)
+{
+    val currentBackStackEntry = navController?.currentBackStackEntryAsState()?.value
+    val currentDestination = currentBackStackEntry?.destination?.route
+
+    Row(
+        modifier = modifier
+            .background(Color.White)
+            .padding(top = 15.dp, bottom = 10.dp),
+        horizontalArrangement = Arrangement.SpaceAround,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        destinations.indices.forEach { index ->
+            GenericBottomBarItem(
+                icon = icons[index],
+                text = texts[index],
+                isSelected = currentDestination == destinations[index],
+                onClick = { navController?.navigate(destinations[index]) }
+            )
+        }
+    }
+}
+
+
+
+
 
 @Composable
 fun RoundedButton(icon: ImageVector,
@@ -136,7 +216,6 @@ fun RoundedButton(icon: ImageVector,
     }
 }
 
-//FUNCION PARA LA PARTE DE JURIBOT Y HACER SOLICITUDES
 @Composable
 fun PantallasExtra(navController: NavController?,
                    routeJuribot: String,
@@ -178,7 +257,6 @@ fun SpacedItem(spacing: Int,
 }
 
 
-//FUNCIONES PARA LA VISTA DE INFORMACION DE NOTICIAS/SERVICIOS/CATEGORIAS
 @Composable
 fun LabelCategoria(label: String,
                    modifier: Modifier = Modifier)
@@ -247,6 +325,8 @@ fun MyTextNoticias(text: String)
             .padding(start = 10.dp, bottom = 8.dp)
     )
 }
+
+
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -594,70 +674,8 @@ fun ServiceItem(
 }
 
 
-//BARRA DE NAVEGACION
-@Composable
-fun GenericBottomBarItem(icon: ImageVector,
-                         text: String,
-                         isSelected: Boolean,
-                         onClick: () -> Unit)
-{
-    Column(
-        modifier = Modifier
-            .clickable(onClick = onClick)
-            .padding(horizontal = 16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Box(
-            modifier = Modifier
-                .size(48.dp)
-                .background(
-                    color = if (isSelected) Color(0xFF0B1F8C) else Color.Transparent,
-                    shape = CircleShape
-                ),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = text,
-                tint = if (isSelected) Color(0xFFFFFFFF) else Color.Black,
-            )
-        }
-        Text(
-            text = text,
-            color = Color.Black,
-            style = MaterialTheme.typography.bodySmall
-        )
-    }
-}
 
-@Composable
-fun GenericBarraNav(navController: NavController?,
-                    modifier: Modifier = Modifier,
-                    destinations: List<String>,
-                    icons: List<ImageVector>,
-                    texts: List<String>)
-{
-    val currentBackStackEntry = navController?.currentBackStackEntryAsState()?.value
-    val currentDestination = currentBackStackEntry?.destination?.route
 
-    Row(
-        modifier = modifier
-            .background(Color.White)
-            .padding(top = 15.dp, bottom = 10.dp),
-        horizontalArrangement = Arrangement.SpaceAround,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        destinations.indices.forEach { index ->
-            GenericBottomBarItem(
-                icon = icons[index],
-                text = texts[index],
-                isSelected = currentDestination == destinations[index],
-                onClick = { navController?.navigate(destinations[index]) }
-            )
-        }
-    }
-}
 
 
 
@@ -912,4 +930,302 @@ fun Calendarios(title: String, events: List<Pair<String, String>>) {
     }
 }
 
+
+//FUNCIONES PARA PANTALLA DE MOSTRAR SOLICITUDES
+@Composable
+fun ItemTemplate(
+    id: String,
+    titulo: String,
+    detalles: List<String>,
+    estado: String,
+    estadoColor: Color,
+    navController: NavController?,
+    navRoute: String,
+    onDelete: (String) -> Unit,
+    confirmDeleteText: String
+) {
+    var expanded by remember { mutableStateOf(false) }
+    var showDialog by remember { mutableStateOf(false) }
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .clip(RoundedCornerShape(16.dp))
+            .shadow(1.dp)
+            .clickable {
+                navController?.navigate(navRoute)
+            },
+        colors = CardDefaults.cardColors(
+            containerColor = Color(0xFFE4E4E4)
+        )
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.Top
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = titulo,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 14.5.sp
+                    )
+                    detalles.forEach { detalle ->
+                        Text(
+                            text = detalle,
+                            fontSize = 14.5.sp
+                        )
+                    }
+                }
+                Column(
+                    horizontalAlignment = Alignment.End,
+                    verticalArrangement = Arrangement.SpaceBetween,
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.End,
+                    ) {
+                        Text(
+                            text = estado,
+                            color = Color.Black,
+                            fontSize = 14.5.sp
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Box(
+                            modifier = Modifier
+                                .size(12.dp)
+                                .background(estadoColor, shape = CircleShape)
+                        )
+                    }
+                    IconButton(onClick = { expanded = !expanded }) {
+                        Icon(
+                            imageVector = Icons.Default.MoreVert,
+                            contentDescription = "Más opciones",
+                            tint = Color.Black
+                        )
+                    }
+                    DropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false }
+                    ) {
+                        DropdownMenuItem(
+                            onClick = {
+                                expanded = false
+                                showDialog = true
+                            },
+                            text = { Text("Eliminar") }
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    onDelete(id)
+                    showDialog = false
+                }) {
+                    Text("Eliminar")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDialog = false }) {
+                    Text("Cancelar")
+                }
+            },
+            title = { Text("Confirmar Eliminación") },
+            text = { Text(confirmDeleteText) }
+        )
+    }
+}
+
+@Composable
+fun SolicitudAdminItem(
+    solicitud: SolicitudAdmin,
+    navController: NavController?,
+    onDelete: (String) -> Unit,
+    route: String
+) {
+    ItemTemplate(
+        id = solicitud.id,
+        titulo = "${solicitud.id} - ${solicitud.titulo}",
+        detalles = listOf(solicitud.fechaRealizada, solicitud.nombreUsuario),
+        estado = solicitud.estado,
+        estadoColor = solicitud.estadoColor,
+        navController = navController,
+        navRoute = route,
+        onDelete = onDelete,
+        confirmDeleteText = "¿Está seguro de que desea eliminar esta solicitud?"
+    )
+}
+
+@Composable
+fun CasoRepresentacionItem(
+    casosRepresentacion: CasosRepresentacion,
+    navController: NavController?,
+    onDelete: (String) -> Unit,
+    route: String
+) {
+    ItemTemplate(
+        id = casosRepresentacion.id,
+        titulo = "Caso: ${casosRepresentacion.id} - ${casosRepresentacion.tipo}",
+        detalles = listOf("Fecha: ${casosRepresentacion.fechaRealizada}", "Usuario Asignado: ${casosRepresentacion.usuarioAsignado}"),
+        estado = casosRepresentacion.estado,
+        estadoColor = casosRepresentacion.estadoColor,
+        navController = navController,
+        navRoute = route,
+        onDelete = onDelete,
+        confirmDeleteText = "¿Está seguro de que desea eliminar este caso de representación?"
+    )
+}
+
+
+@Composable
+fun GeneralItemTemplate(
+    title: String,
+    details: List<String>,
+    estado: String? = null,
+    estadoColor: Color? = null,
+    isImportant: Boolean = false,
+    icon: ImageVector? = null,  // Hacemos el ícono opcional
+    extraAction: (@Composable () -> Unit)? = null,
+    navController: NavController? = null,
+    linkText: String? = null,
+    linkRoute: String? = null
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .clip(RoundedCornerShape(16.dp))
+            .border(
+                1.dp,
+                if (isImportant) Color.Blue else Color.Transparent,
+                RoundedCornerShape(16.dp)
+            )
+            .shadow(1.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFE4E4E4))
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // Solo mostrar el ícono si no es nulo
+            icon?.let {
+                Icon(
+                    imageVector = it,
+                    contentDescription = "Icono",
+                    tint = Color.Black,
+                    modifier = Modifier.size(40.dp)
+                )
+                Spacer(modifier = Modifier.width(16.dp))
+            }
+
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = title,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp,
+                    color = Color.Black
+                )
+                details.forEach { detail ->
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = detail,
+                        fontSize = 14.sp,
+                        color = Color.Gray
+                    )
+                }
+                estado?.let {
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = it,
+                        color = estadoColor ?: Color.Black,
+                        fontSize = 14.sp
+                    )
+                }
+                linkText?.let {
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = it,
+                        fontSize = 14.sp,
+                        color = Color.Blue,
+                        modifier = Modifier.clickable { linkRoute?.let { navController?.navigate(it) } }
+                    )
+                }
+            }
+
+            extraAction?.invoke() // Aquí se muestra el menú extra si se proporciona
+        }
+    }
+}
+
+
+
+
+@Composable
+fun SolicitudGeneralItem(
+    solicitud: SolicitudGeneral,
+    navController: NavController?,
+    valorarRoute: String
+) {
+    GeneralItemTemplate(
+        title = "Caso ${solicitud.id}",
+        details = listOf(solicitud.fechaRealizada, solicitud.proximaCita),
+        estado = solicitud.estado,
+        estadoColor = solicitud.estadoColor,
+        navController = navController,
+        extraAction = {
+            if (solicitud.estado == "Finalizado") {
+                var expanded by remember { mutableStateOf(false) }
+
+                IconButton(onClick = { expanded = !expanded }) {
+                    Icon(
+                        imageVector = Icons.Default.MoreVert,
+                        contentDescription = "Más opciones",
+                        tint = Color.Black
+                    )
+                }
+
+                DropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false }
+                ) {
+                    DropdownMenuItem(
+                        onClick = {
+                            expanded = false
+                            navController?.navigate(route = valorarRoute)
+                        },
+                        text = { Text("Valorar") }
+                    )
+                }
+            }
+        }
+    )
+}
+
+
+@Composable
+fun NotificacionItem(
+    notificacion: Notificacion,
+    navController: NavController?
+) {
+    GeneralItemTemplate(
+        title = notificacion.titulo,
+        details = listOf(notificacion.fecha, notificacion.detalle),
+        isImportant = notificacion.isImportant,
+        icon = Icons.Default.Notifications,
+        linkText = notificacion.enlace,
+        linkRoute = notificacion.rutaEnlace,
+        navController = navController
+    )
+}
 
