@@ -4,14 +4,17 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.BarraNav
@@ -21,7 +24,6 @@ import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.SectionTitle
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.SpacedItem
 import com.leotesta017.clinicapenal.view.templatesPantallas.PantallaDetalleItemTemplate
 import com.leotesta017.clinicapenal.viewmodel.CategoryViewModel
-import com.leotesta017.clinicapenal.viewmodel.ServicioViewModel
 
 @Composable
 fun DetalleInfo(
@@ -29,21 +31,17 @@ fun DetalleInfo(
     titulo: String,
     descripcion: String,
     categoriaId: String,
+    contenidoParam: String? = null,
     viewModel: CategoryViewModel = viewModel()
-
 ) {
-    // Llamar a fetchContenidoById para cargar el contenido del servicio
     LaunchedEffect(categoriaId) {
-        viewModel.fetchContenidoById(categoriaId)
+        if (contenidoParam == null) {
+            viewModel.fetchContenidoById(categoriaId)
+        }
     }
 
-    // Obtener el contenido del servicio desde el ViewModel
-    val contenido by viewModel.contenido.collectAsState()
-
-    // Aquí puedes manejar cualquier error si lo necesitas
+    val contenido by viewModel.contenido.collectAsState(initial = contenidoParam ?: "")
     val error by viewModel.error.collectAsState()
-
-
 
     PantallaDetalleItemTemplate(
         navController = navController,
@@ -56,16 +54,12 @@ fun DetalleInfo(
             )
         },
         content = {
-
             HeaderSection(titulo, navController)
-            SpacedItem(spacing = 16) {
-                SectionTitle("Descripción")
-            }
-            SpacedItem(spacing = 10 ){
-                SectionContent(descripcion)
-            }
+            Spacer(modifier = Modifier.height(8.dp))  // Reducir el espacio aquí
+            SectionTitle("Descripción")
+            Spacer(modifier = Modifier.height(4.dp))  // Reducir el espacio aquí
+            SectionContent(descripcion)
 
-            //FUNCIONES PARA EL PROCESAMIENTO MARKDOWN DEL CONTENIDO CON UN GET EN BASE AL ID
             when {
                 contenido.isEmpty() && error == null -> {
                     CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
@@ -73,32 +67,81 @@ fun DetalleInfo(
                 error != null -> {
                     Text(text = error ?: "Error desconocido", color = Color.Red)
                 }
-                contenido.isNotEmpty() ->{
-
-
-                    //EDITAR ESTA PARTE PARA EL MARKDOWN DEL CONTENIDO
-                    SpacedItem(spacing = 16) {
-                        SectionContent(content = contenido)
-                    }
-
+                contenido.isNotEmpty() -> {
+                    val processedContent = preprocesarMarkdown(contenido)
+                    CustomMarkdownText(content = processedContent)
                 }
                 else -> {
-                    Text(text = "No hay categorías disponibles", color = Color.Gray)
+                    Text(text = "No hay contenido disponible", color = Color.Gray)
                 }
             }
         }
     )
 }
 
-@Preview(showBackground = true)
+fun preprocesarMarkdown(markdown: String): String {
+    return markdown
+        .replace("####", "\n####")
+        .replace("###", "\n###")
+        .replace("- ", "\n• ") // Cambiar guiones por bolitas
+        .replace("\n\n", "\n")
+}
+
 @Composable
-fun DetalleInfoPreview() {
-    val titulo = "Robo"
-    val descripcion = "detalle de descripcion"
-    val id = "1"
-    DetalleInfo(
-        navController = null,
-        titulo = titulo,
-        descripcion =  descripcion,
-        categoriaId = id)
+fun CustomMarkdownText(content: String) {
+    Column(modifier = Modifier.fillMaxWidth().padding(vertical = 0.dp)) {
+        val lines = content.split("\n")
+        for (line in lines) {
+            when {
+                line.startsWith("####") -> {
+                    Spacer(modifier = Modifier.height(12.dp))  // Reducir el espacio aquí
+                    SectionTitle(
+                        title = line.removePrefix("####").trim()
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))  // Reducir el espacio aquí
+                }
+                line.startsWith("###") -> {
+                    Spacer(modifier = Modifier.height(12.dp))  // Reducir el espacio aquí
+                    Text(
+                        text = line.removePrefix("###").trim(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(Color(0xFFF5F5F5))
+                            .padding(16.dp),
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Black
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))  // Reducir el espacio aquí
+                }
+                else -> {
+                    Text(
+                        text = parseMarkdownToAnnotatedString(line),
+                        fontSize = 16.sp,
+                        color = Color.Black,
+                        modifier = Modifier.padding(start = 16.dp)
+                    )
+                    Spacer(modifier = Modifier.height(2.dp))  // Reducir el espacio aquí
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun parseMarkdownToAnnotatedString(text: String): AnnotatedString {
+    return buildAnnotatedString {
+        var currentIndex = 0
+        val boldRegex = Regex("""\*\*(.*?)\*\*""")
+        boldRegex.findAll(text).forEach { matchResult ->
+            val start = matchResult.range.first
+            val end = matchResult.range.last
+            append(text.substring(currentIndex, start))
+            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                append(matchResult.groupValues[1])
+            }
+            currentIndex = end + 1
+        }
+        append(text.substring(currentIndex, text.length))
+    }
 }
