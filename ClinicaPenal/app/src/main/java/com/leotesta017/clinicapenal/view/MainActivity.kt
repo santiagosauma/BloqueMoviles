@@ -117,7 +117,7 @@ fun MyApp() {
         composable("pantallainfoadmin") { PantallaInfoAdmin(navController)}
 
         composable(
-            route = "modificar-info/{titulo}/{descripcion}/{servicioId}",
+            route = "modificar-info/{titulo}/{descripcion}/{categoriaId}",
             arguments = listOf(
                 navArgument("titulo"){type = NavType.StringType},
                 navArgument("descripcion"){type = NavType.StringType},
