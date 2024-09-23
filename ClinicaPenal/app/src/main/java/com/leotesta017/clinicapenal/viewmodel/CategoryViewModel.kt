@@ -3,13 +3,10 @@ package com.leotesta017.clinicapenal.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.leotesta017.clinicapenal.model.Categoria
-import com.leotesta017.clinicapenal.model.Ejemplo
-import com.leotesta017.clinicapenal.model.Recursos
 import com.leotesta017.clinicapenal.repository.CategoryRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import java.io.IOException
 
 class CategoryViewModel : ViewModel() {
 
@@ -38,11 +35,4 @@ class CategoryViewModel : ViewModel() {
             }
         }
     }
-
-    // Método para obtener recursos y ejemplos de una categoría específica
-    suspend fun fetchRecursosYejemplos(categoriaId: String): Pair<List<Recursos>, List<Ejemplo>> {
-        return repository.getRecursosYejemplosDeCategoria(categoriaId)
-    }
 }
-
-

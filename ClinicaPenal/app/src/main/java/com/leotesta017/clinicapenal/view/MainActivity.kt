@@ -65,14 +65,27 @@ fun MyApp() {
         composable("pantallainformacionclinica") { PantallaInfoClinica(navController) }
         composable("solicitud") { GeneralSolicitud(navController) }
         composable("ReviewComentarios") { ReviewComentarios(navController) }
-        composable("detalle_info") { DetalleInfo(navController) }
         composable("crearsolicitud") { Solicitud(navController) }
+
         composable(
-            route = "servicios_info/{servicioId}",
-            arguments = listOf(navArgument("servicioId") { type = NavType.StringType })
+            route = "detalle_info"
         ) {
-            ServiciosInfo(navController = navController)
+            DetalleInfo(
+                navController
+            )
         }
+
+
+        composable(
+            route = "servicios_info"
+        )
+        {
+            ServiciosInfo(
+                navController = navController,
+            )
+        }
+
+
 
         composable("Juribot") { JuriBotScreen(navController)}
         composable("SegundoFormulario") { SegundoFormulario(navController)}

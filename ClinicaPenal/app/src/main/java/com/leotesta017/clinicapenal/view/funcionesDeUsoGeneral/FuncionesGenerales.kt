@@ -25,6 +25,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Search
@@ -32,6 +33,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -160,11 +162,11 @@ fun PantallasExtra(navController: NavController?,
 }
 
 @Composable
-fun SpacedItem(spacing: Dp = 16.dp,
+fun SpacedItem(spacing: Int,
                content: @Composable () -> Unit)
 {
     content()
-    Spacer(modifier = Modifier.height(spacing))
+    Spacer(modifier = Modifier.height(spacing.dp))
 
 }
 
@@ -380,7 +382,6 @@ fun VideoItemWithDescription(videoUrl: String,
     }
 }
 
-
 //FUNCIONES PARA ITEMS DE CATEGORIAS
 @Composable
 fun CategoriesSection(
@@ -388,35 +389,31 @@ fun CategoriesSection(
     viewModel: CategoryViewModel = viewModel(),
     route: String
 ) {
-    // Obtenemos el estado actual de las categorías básicas y el error desde el ViewModel
     val categories by viewModel.categoriasBasicas.collectAsState()
     val error by viewModel.error.collectAsState()
 
     Column(modifier = Modifier.padding(16.dp)) {
         when {
             categories.isEmpty() && error == null -> {
-                // Mostrar un indicador de carga mientras se están obteniendo las categorías
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
             }
             error != null -> {
-                // Si hay un error, mostramos el mensaje de error
                 Text(text = error ?: "Error desconocido", color = Color.Red)
             }
             categories.isNotEmpty() -> {
-                // Mostramos las categorías dinámicamente desde la base de datos
                 categories.forEach { category ->
                     CategoryItem(
                         title = category.titulo,
                         description = category.descripcion,
-                        imageUrl = category.url_imagen,  // Pasamos la URL de la imagen
+                        imageUrl = category.url_imagen, // Pasamos la URL de la imagen
                         navController = navController,
-                        route = route
+                        route = route,
+                        categoriaId = category.id // Pasar el ID de la categoría
                     )
                     Spacer(modifier = Modifier.height(12.dp))
                 }
             }
             else -> {
-                // Si no hay categorías ni error, mostrar un mensaje vacío o alternativo
                 Text(text = "No hay categorías disponibles", color = Color.Gray)
             }
         }
@@ -424,23 +421,26 @@ fun CategoriesSection(
 }
 
 
+
 @Composable
-fun CategoryItem(title: String,
-                 description: String,
-                 navController: NavController?,
-                 imageUrl: String, route: String)
-{
+fun CategoryItem(
+    title: String,
+    description: String,
+    navController: NavController?,
+    imageUrl: String,
+    route: String,
+    categoriaId: String // Este ID es necesario para cargar la pantalla de detalles
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .background(Color.White)
             .padding(horizontal = 16.dp, vertical = 12.dp)
             .clickable {
-                navController?.navigate(route)
+                navController?.navigate("$route") // Navegar con el ID de la categoría
             },
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Mostrar la imagen desde la URL con AsyncImage (de Coil)
         AsyncImage(
             model = imageUrl,
             contentDescription = null,
@@ -471,6 +471,7 @@ fun CategoryItem(title: String,
         )
     }
 }
+
 
 
 //FUNCIONES PARA ITEMS DE SERVICIO
@@ -528,7 +529,7 @@ fun ServiceItem(
             .background(Color.White)
             .padding(horizontal = 16.dp, vertical = 12.dp)
             .clickable {
-                navController?.navigate("$route/$servicioId") // Navegar con el ID del servicio
+                navController?.navigate("$route") // Navegar con el ID del servicio
             },
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -562,8 +563,6 @@ fun ServiceItem(
         )
     }
 }
-
-
 
 
 //BARRA DE NAVEGACION
@@ -631,5 +630,68 @@ fun GenericBarraNav(navController: NavController?,
     }
 }
 
+
+
+//FUNCIONES PARA LA PANTALLA DE DETALLE
+@Composable
+fun HeaderSection(title: String, navController: NavController?) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            IconButton(onClick = { navController?.popBackStack() }) {
+                Icon(
+                    imageVector = Icons.Default.ArrowBack,
+                    contentDescription = "Back",
+                    tint = Color.Black
+                )
+            }
+            Text(
+                text = title,
+                fontSize = 25.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.Black,
+                modifier = Modifier
+                    .padding(start = 8.dp)
+                    .weight(1f)
+            )
+        }
+
+    }
+}
+
+@Composable
+fun SectionTitle(title: String) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Color.LightGray)
+            .padding(vertical = 12.dp)
+    ) {
+        Text(
+            text = title,
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color.Black,
+            modifier = Modifier.padding(horizontal = 16.dp)
+        )
+    }
+}
+
+@Composable
+fun SectionContent(content: String) {
+    Text(
+        text = content,
+        fontSize = 16.sp,
+        color = Color.Black,
+        modifier = Modifier.padding(horizontal = 16.dp)
+    )
+}
 
 

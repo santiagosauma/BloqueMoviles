@@ -35,8 +35,12 @@ fun PantallaInfoGenerica(
             horizontalAlignment = Alignment.Start
         ) {
             item {
-                SpacedItem { topBar() }
-                SpacedItem { searchBar() }
+                SpacedItem(spacing = 16) {
+                    topBar()
+                }
+                SpacedItem(spacing = 16) {
+                    searchBar()
+                }
                 noticias()
                 informacionLegal()
                 servicios()

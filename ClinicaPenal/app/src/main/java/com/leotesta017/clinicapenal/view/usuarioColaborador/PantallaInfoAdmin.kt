@@ -13,7 +13,9 @@ import com.leotesta017.clinicapenal.view.templatesPantallas.PantallaInfoGenerica
 
 //FUNCIONES GENERALES
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.AdminBarraNav
+import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.CarruselDeNoticias
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.CategoriesSection
+import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.LabelCategoriaConBoton
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.PantallasExtra
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.ServicesSection
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.SpacedItem
@@ -28,25 +30,25 @@ fun PantallaInfoAdmin(navController: NavController?) {
     PantallaInfoGenerica(
         navController = navController,
         noticias = {
-            com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.LabelCategoriaConBoton(
+            LabelCategoriaConBoton(
                 label = "Noticias",
                 navController = navController,
                 modifier = Modifier.padding(0.dp),
                 navigateroute = "modificar-info"
             )
-            SpacedItem {
-                com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.CarruselDeNoticias(viewModel = VideoViewModel())
+            SpacedItem(spacing = 16) {
+                CarruselDeNoticias(viewModel = VideoViewModel())
             }
         },
         informacionLegal = {
-            com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.LabelCategoriaConBoton(
+            LabelCategoriaConBoton(
                 label = "Información Legal",
                 navController = navController,
                 modifier = Modifier.padding(0.dp),
                 navigateroute = "agregar-info-admin"
             )
 
-            SpacedItem {
+            SpacedItem(spacing = 16) {
                 CategoriesSection(
                     navController = navController,
                     viewModel = CategoryViewModel(),
@@ -55,14 +57,14 @@ fun PantallaInfoAdmin(navController: NavController?) {
             }
         },
         servicios = {
-            com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.LabelCategoriaConBoton(
+            LabelCategoriaConBoton(
                 label = "Servicios",
                 navController = navController,
                 modifier = Modifier.padding(0.dp),
                 navigateroute = "agregar_servicios_info-admin"
             )
 
-            SpacedItem {
+            SpacedItem(spacing = 16) {
                 ServicesSection(
                     navController = navController,
                     viewModel = ServicioViewModel(),

@@ -33,7 +33,7 @@ fun PantallaInfoCategorias(navController: NavController?) {
         navController = navController,
 
         noticias = {
-            SpacedItem {
+            SpacedItem(spacing = 16) {
                 CarruselDeNoticias(
                     viewModel = VideoViewModel(),
                     contentText = {
@@ -49,7 +49,7 @@ fun PantallaInfoCategorias(navController: NavController?) {
                 modifier = Modifier.padding(start = 36.dp)
             )
 
-            SpacedItem {
+            SpacedItem(spacing = 16) {
                 CategoriesSection(
                     navController = navController,
                     viewModel = CategoryViewModel(),
@@ -64,7 +64,7 @@ fun PantallaInfoCategorias(navController: NavController?) {
                 modifier = Modifier.padding(start = 36.dp)
             )
 
-            SpacedItem {
+            SpacedItem(spacing = 16) {
                 ServicesSection(
                     navController = navController,
                     viewModel = ServicioViewModel(),

@@ -3,8 +3,6 @@ package com.leotesta017.clinicapenal.repository
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.leotesta017.clinicapenal.model.Categoria
-import com.leotesta017.clinicapenal.model.Ejemplo
-import com.leotesta017.clinicapenal.model.Recursos
 import kotlinx.coroutines.tasks.await
 
 class CategoryRepository {
@@ -27,13 +25,4 @@ class CategoryRepository {
             emptyList()  // Devuelve una lista vacía en caso de error
         }
     }
-
-    suspend fun getRecursosYejemplosDeCategoria(categoriaId: String): Pair<List<Recursos>, List<Ejemplo>> {
-        return getRecursosYejemplos(
-            collectionName = "categorias",
-            documentId = categoriaId,
-            firestore = firestore
-        )
-    }
-
 }

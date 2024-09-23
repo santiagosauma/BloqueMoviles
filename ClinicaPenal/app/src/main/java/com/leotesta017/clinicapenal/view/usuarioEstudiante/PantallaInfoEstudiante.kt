@@ -38,7 +38,7 @@ fun PantallaInfoEstudiante(navController: NavController?) {
                 modifier = Modifier.padding(0.dp),
                 navigateroute = "modificar-info"
             )
-            SpacedItem {
+            SpacedItem(spacing = 16) {
                 CarruselDeNoticias(viewModel = VideoViewModel())
             }
         },
@@ -52,7 +52,7 @@ fun PantallaInfoEstudiante(navController: NavController?) {
                 navigateroute = "agregar-info-admin"
             )
 
-            SpacedItem {
+            SpacedItem(spacing = 16) {
                 CategoriesSection(
                     navController = navController,
                     viewModel = CategoryViewModel(),
@@ -70,7 +70,7 @@ fun PantallaInfoEstudiante(navController: NavController?) {
                 navigateroute = "agregar_servicios_info-admin"
             )
 
-            SpacedItem {
+            SpacedItem(spacing = 16) {
                 ServicesSection(
                     navController = navController,
                     viewModel = ServicioViewModel(),

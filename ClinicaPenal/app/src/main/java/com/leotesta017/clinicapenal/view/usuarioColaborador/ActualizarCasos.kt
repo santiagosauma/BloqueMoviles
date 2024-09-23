@@ -16,8 +16,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.AdminBarraNav
+import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.SectionTitle
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.TopBar
-import com.leotesta017.clinicapenal.view.usuarioGeneral.SectionTitle
 
 @Composable
 fun ActualizarCasos(navController: NavController?) {

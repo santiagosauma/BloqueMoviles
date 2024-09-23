@@ -5,6 +5,4 @@ data class Categoria(
     val titulo: String = "",
     val descripcion: String = "",
     val url_imagen: String = "",
-    val ejemplos: List<Ejemplo> = emptyList(), // Lista de ejemplos asociados
-    val recursos: List<Recursos> = emptyList() // Lista de recursos asociados
 )

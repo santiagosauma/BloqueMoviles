@@ -2,27 +2,22 @@ package com.leotesta017.clinicapenal.view.usuarioGeneral
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.BarraNav
-import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.TopBar
+import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.HeaderSection
+import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.SectionContent
+import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.SectionTitle
+import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.SpacedItem
+import com.leotesta017.clinicapenal.view.templatesPantallas.PantallaDetalleItemTemplate
 
 @Composable
 fun DetalleInfo(navController: NavController?) {
-    Scaffold(
-        topBar = { TopBar() },
+    PantallaDetalleItemTemplate(
+        navController = navController,
         bottomBar = {
             BarraNav(
                 navController = navController,
@@ -31,96 +26,18 @@ fun DetalleInfo(navController: NavController?) {
                     .background(Color(0xFF1A237E))
             )
         },
-    ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .verticalScroll(rememberScrollState())
-        ) {
+        content = {
+
             HeaderSection("Robo y Hurto", navController)
-            Spacer(modifier = Modifier.height(16.dp))
-
-            SectionTitle("Descripción")
-            Spacer(modifier = Modifier.height(8.dp))
-            SectionContent("Descripción general del tema seleccionado.")
-            Spacer(modifier = Modifier.height(16.dp))
-
-            SectionTitle("Ejemplos Comunes")
-            Spacer(modifier = Modifier.height(8.dp))
-            SectionContent("Ejemplo 1\nEjemplo 2\nEjemplo 3")
-            Spacer(modifier = Modifier.height(16.dp))
-
-            SectionTitle("Consecuencias Legales")
-            Spacer(modifier = Modifier.height(8.dp))
-            SectionContent("Descripción de las consecuencias legales relacionadas.")
-            Spacer(modifier = Modifier.height(16.dp))
-
-            SectionTitle("Recursos")
-            Spacer(modifier = Modifier.height(8.dp))
-            SectionContent("Recursos adicionales:\n- Recurso 1\n- Recurso 2")
-        }
-    }
-}
-
-@Composable
-fun HeaderSection(title: String, navController: NavController?) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp)
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            IconButton(onClick = { navController?.popBackStack() }) {
-                Icon(
-                    imageVector = Icons.Default.ArrowBack,
-                    contentDescription = "Back",
-                    tint = Color.Black
-                )
+            SpacedItem(spacing = 16) {
+                SectionTitle("Descripción")
             }
-            Text(
-                text = title,
-                fontSize = 25.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.Black,
-                modifier = Modifier
-                    .padding(start = 8.dp)
-                    .weight(1f) 
-            )
+            SpacedItem(spacing = 8) {
+                SectionContent("Descripción general del tema seleccionado.")
+            }
+
+            //FUNCIONES PARA EL PROCESAMIENTO MARKDOWN DEL CONTENIDO
         }
-
-    }
-}
-
-@Composable
-fun SectionTitle(title: String) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(Color.LightGray)
-            .padding(vertical = 12.dp)
-    ) {
-        Text(
-            text = title,
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.Black,
-            modifier = Modifier.padding(horizontal = 16.dp)
-        )
-    }
-}
-
-@Composable
-fun SectionContent(content: String) {
-    Text(
-        text = content,
-        fontSize = 16.sp,
-        color = Color.Black,
-        modifier = Modifier.padding(horizontal = 16.dp)
     )
 }
 
