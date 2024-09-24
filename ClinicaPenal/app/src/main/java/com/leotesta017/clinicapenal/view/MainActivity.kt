@@ -24,6 +24,8 @@ import com.leotesta017.clinicapenal.view.usuarioColaborador.ModificarInfoAdmin
 import com.leotesta017.clinicapenal.view.usuarioColaborador.ModificarServiciosAdmin
 import com.leotesta017.clinicapenal.view.usuarioColaborador.PantallaInfoAdmin
 import com.leotesta017.clinicapenal.view.usuarioColaborador.PantallaInfoClinicaAdmin
+import com.leotesta017.clinicapenal.view.usuarioEstudiante.AgregarInfoEstudiante
+import com.leotesta017.clinicapenal.view.usuarioEstudiante.AgregarServiciosInfoEstudiante
 import com.leotesta017.clinicapenal.view.usuarioEstudiante.DetalleCasoEstudiante
 import com.leotesta017.clinicapenal.view.usuarioEstudiante.GenerarSolicitudEstudiante
 import com.leotesta017.clinicapenal.view.usuarioEstudiante.InformacionClinicaEstudiante
@@ -48,19 +50,38 @@ class MainActivity : ComponentActivity() {
 fun MyApp() {
     val navController = rememberNavController()
     NavHost(navController, startDestination = "intro1") {
+
+        /*=======================================================================================*/
+        // PANTALLAS DE LOGIN
+        /*=======================================================================================*/
+
+        //PRIMERAS DOS PANTALlAS DE CARGA
         composable("intro1") { IntroScreen1(navController) }
         composable("intro2") { IntroScreen2(navController) }
+
+        //PANTALLA PARA ESCOGER SI INCIAR SESION O CREAR CUENTA
         composable("pantalla3") { Pantalla3(navController) }
+
+        //PANTALLA PARA CREAR CUENTA
         composable("pantalla4") { Pantalla4(navController) }
+
+        //PANTALLA PARA INICIAR SESION
         composable("pantalla5") { Pantalla5(navController) }
+
+
+        //PANTALLA PARA ESCOGER SI CREAR CUENTA DE ESTUDIANTE O DE ADMIN
         composable("pantalla6") { Pantalla6(navController) }
+
+
         composable("pantalla7") { Pantalla7(navController) }
         composable("pantalla8") { Pantalla8(navController) }
         composable("pantalla9") { Pantalla9(navController) }
         composable("pantalla10") { Pantalla10(navController) }
 
 
-        //Pantallas Usuario General
+        /*=======================================================================================*/
+        // PANTALLAS DE USUARIO GENERAL
+        /*=======================================================================================*/
         composable("pantallainfocategoriasgeneral") { PantallaInfoCategorias (navController) }
         composable("pantallainformacionclinica") { PantallaInfoClinica(navController) }
         composable("solicitud") { GeneralSolicitud(navController) }
@@ -113,7 +134,9 @@ fun MyApp() {
         composable("Juribot") { JuriBotScreen(navController)}
         composable("SegundoFormulario") { SegundoFormulario(navController)}
 
-        //Pantallas Usuario Admin
+        /*=======================================================================================*/
+        // PANTALLAS DE ADMIN
+        /*=======================================================================================*/
         composable("pantallainfoadmin") { PantallaInfoAdmin(navController)}
 
         composable(
@@ -155,13 +178,31 @@ fun MyApp() {
         composable("infoclinicaadmin") { PantallaInfoClinicaAdmin(navController) }
         composable("agendar") { Agendar(navController) }
         composable("comentar") { ComentarioScreen(navController) }
+
+        //PANTALLA DEL JURIBOT PARA ADMIN
         composable("JuriBotAdmin") { JuriBotAdmin(navController) }
 
-        //Pantalla Usuario Estudiante
+
+
+
+        /*=======================================================================================*/
+        // PANTALLAS DE ESTUDIANTE
+        /*=======================================================================================*/
+        //PANTALLA DE INICIO DE ESTUDIANTE
         composable("pantallainfoestudiante"){ PantallaInfoEstudiante(navController)}
+
+        //PANTALLA DE HISTORIAL DE SOLICITUDES
         composable("generasolicitudestudiante"){ GenerarSolicitudEstudiante(navController) }
+
+        //PANTALLA DE DATOS DE LA CLINICA
         composable("informacionestudiate"){ InformacionClinicaEstudiante(navController) }
+
+        //PANTALLA DE VISTA DETALLADA DEL CASO
         composable("detallecasoestudiante") { DetalleCasoEstudiante(navController) }
+
+        //AGREGAR CATEGORIA Y SERVICIOS ESTUDIANTES
+        composable("agregar-info-estudiante") { AgregarInfoEstudiante(navController)}
+        composable("agregar-servicio-estudiante") { AgregarServiciosInfoEstudiante(navController) }
 
     }
 }
