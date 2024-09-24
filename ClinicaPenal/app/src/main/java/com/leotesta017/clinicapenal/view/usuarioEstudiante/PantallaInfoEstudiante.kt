@@ -49,7 +49,7 @@ fun PantallaInfoEstudiante(navController: NavController?) {
                 label = "Información Legal",
                 navController = navController,
                 modifier = Modifier.padding(0.dp),
-                navigateroute = "agregar-info-admin"
+                navigateroute = "agregar-info-estudiante"
             )
 
             SpacedItem(spacing = 16) {
@@ -67,7 +67,7 @@ fun PantallaInfoEstudiante(navController: NavController?) {
                 label = "Servicios",
                 navController = navController,
                 modifier = Modifier.padding(0.dp),
-                navigateroute = "agregar_servicios_info-admin"
+                navigateroute = "agregar-servicio-estudiante"
             )
 
             SpacedItem(spacing = 16) {

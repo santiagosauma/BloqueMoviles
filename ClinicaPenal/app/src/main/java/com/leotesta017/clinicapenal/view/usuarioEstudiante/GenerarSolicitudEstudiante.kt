@@ -23,29 +23,37 @@ import com.leotesta017.clinicapenal.view.templatesPantallas.GenerarSolicitudPant
 fun GenerarSolicitudEstudiante(
     navController: NavController?
 ) {
-    val solicitudes = listOf(
-        SolicitudAdmin(
-            id = "ID123",
-            titulo = "Asalto",
-            nombreUsuario = "Fernando Balleza",
-            fechaRealizada = "19/07/2024",
-            estado = "Finalizado",
-            estadoColor = Color.Green
-        ),
-        // Otras solicitudes...
-    )
+    var solicitudes by remember {
+         mutableStateOf(
+             listOf(
+                SolicitudAdmin(
+                    id = "ID123",
+                    titulo = "Asalto",
+                    nombreUsuario = "Fernando Balleza",
+                    fechaRealizada = "19/07/2024",
+                    estado = "Finalizado",
+                    estadoColor = Color.Green
+                ),
+             // Otras solicitudes...
+            )
+         )
+    }
 
-    val casosRepresentacion = listOf(
-        CasosRepresentacion(
-            id = "ID123",
-            tipo = "Asalto",
-            usuarioAsignado = "Fernando Balleza",
-            fechaRealizada = "19/07/2024",
-            estado = "Finalizado",
-            estadoColor = Color.Green
-        ),
-        // Otros casos...
-    )
+    var casosRepresentacion by remember {
+        mutableStateOf(
+            listOf(
+                CasosRepresentacion(
+                    id = "ID123",
+                    tipo = "Asalto",
+                    usuarioAsignado = "Fernando Balleza",
+                    fechaRealizada = "19/07/2024",
+                    estado = "Finalizado",
+                    estadoColor = Color.Green
+                ),
+                // Otros casos...
+            )
+        )
+    }
 
     GenerarSolicitudPantallaTemplatenavController(
         navController = navController,
@@ -57,6 +65,7 @@ fun GenerarSolicitudEstudiante(
                 navController = navController,
                 onDelete = { id ->
                     // Lógica de eliminación
+                    solicitudes = solicitudes.filterNot {it.id == id}
                 },
                 route = "detallecasoestudiante"
             )
@@ -69,6 +78,7 @@ fun GenerarSolicitudEstudiante(
                 navController = navController,
                 onDelete = { id ->
                     // Lógica de eliminación
+                    casosRepresentacion = casosRepresentacion.filterNot { it.id == id }
                 },
                 route = "detallecasoestudiante"
             )

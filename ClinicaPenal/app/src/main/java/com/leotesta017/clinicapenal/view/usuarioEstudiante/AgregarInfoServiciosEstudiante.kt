@@ -3,8 +3,9 @@ package com.leotesta017.clinicapenal.view.usuarioEstudiante
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
-import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.AdminBarraNav
+import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.EstudiantesBarraNav
 import com.leotesta017.clinicapenal.view.templatesPantallas.AgregarInfoTemplate
 
 @Composable
@@ -14,7 +15,7 @@ fun AgregarServiciosInfoEstudiante(navController: NavController?) {
         titulo = "Agregar Servicio",
         textDescripcion = "Inserte Información del servicio...",
         bottomBarContent = {
-            AdminBarraNav(navController = navController, modifier = Modifier.fillMaxWidth())
+            EstudiantesBarraNav(navController = navController, modifier = Modifier.fillMaxWidth())
         },
         onAddClick = {
             // Aquí va tu lógica para añadir (POST a Firebase)
@@ -25,4 +26,8 @@ fun AgregarServiciosInfoEstudiante(navController: NavController?) {
     )
 }
 
-
+@Preview(showBackground = true)
+@Composable
+fun PreviewAgregarServiciosInfoEstudiante() {
+    AgregarServiciosInfoEstudiante(navController = null)
+}
