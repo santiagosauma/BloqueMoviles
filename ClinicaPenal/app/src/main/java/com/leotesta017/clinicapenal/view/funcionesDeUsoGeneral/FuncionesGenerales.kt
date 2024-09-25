@@ -18,23 +18,22 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.automirrored.filled.Chat
-import androidx.compose.material.icons.automirrored.filled.FormatListBulleted
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CalendarToday
-import androidx.compose.material.icons.filled.FormatBold
-import androidx.compose.material.icons.filled.FormatItalic
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -66,13 +65,10 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
@@ -1237,91 +1233,93 @@ fun NotificacionItem(
 }
 
 
+// FUNCIONES PARA PANTALLAS MODIFICAR INFO/SERVICIOS ADMIN
 
-//FUNCIONES PARA AGREGAR INFORMACION ADMIN
 @Composable
-fun TextEditor(
-    textNewContent: String
-) {
-    var textState by remember { mutableStateOf(TextFieldValue(text = textNewContent)) }
-    var isBold by remember { mutableStateOf(false) }
-    var isItalic by remember { mutableStateOf(false) }
-    var isBullet by remember { mutableStateOf(false) }
-
-    Column(modifier = Modifier.padding(16.dp)) {
+fun TopBarModificarAdmin(
+    navController: NavController?,
+    titulo: String
+){
+    Column {
+        TopBar() // Función reutilizable si tienes una implementación general
         Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            IconButton(onClick = { isBold = !isBold }) {
-                Icon(
-                    imageVector = Icons.Default.FormatBold,
-                    contentDescription = "Bold",
-                    tint = if (isBold) Color.Blue else Color.Gray
-                )
-            }
-            IconButton(onClick = { isItalic = !isItalic }) {
-                Icon(
-                    imageVector = Icons.Default.FormatItalic,
-                    contentDescription = "Italic",
-                    tint = if (isItalic) Color.Blue else Color.Gray
-                )
-            }
-            IconButton(onClick = { isBullet = !isBullet }) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.FormatListBulleted,
-                    contentDescription = "Bullet List",
-                    tint = if (isBullet) Color.Blue else Color.Gray
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        BasicTextField(
-            value = textState,
-            onValueChange = { value ->
-                textState = value.copy(
-                    annotatedString = buildAnnotatedString {
-                        ApplyStyle(
-                            builder = this,
-                            text = value.text,
-                            isBold = isBold,
-                            isItalic = isItalic,
-                            isBullet = isBullet
-                        )
-                    }
-                )
-            },
+            verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
+                .padding(horizontal = 16.dp, vertical = 3.dp)
                 .fillMaxWidth()
-                .height(350.dp)
-                .background(Color.LightGray)
-                .padding(8.dp),
-            textStyle = TextStyle(
-                fontSize = 16.sp,
-                color = Color.Black
-            ),
+        ) {
+            IconButton(onClick = { navController?.popBackStack() }) {
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
+            }
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text = titulo,
+                style = MaterialTheme.typography.headlineSmall.copy(color = Color.Black),
+                modifier = Modifier.weight(1f)
+            )
+        }
+    }
+}
+
+// BOTONES PANTALLA MODIFICAR INFO/SERVICIOS ADMIN
+@Composable
+fun BotonesModificarAdmin(onGuardar: () -> Unit, onDescartar: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 16.dp),
+        horizontalArrangement = Arrangement.SpaceEvenly
+    ) {
+        RoundedButton(
+            icon = Icons.Default.Save,
+            label = "Guardar",
+            onClick = { onGuardar() }
+        )
+        RoundedButton(
+            icon = Icons.Default.Delete,
+            label = "Descartar",
+            onClick = { onDescartar() }
         )
     }
 }
 
-fun ApplyStyle(
-    builder: AnnotatedString.Builder,
-    text: String,
-    isBold: Boolean,
-    isItalic: Boolean,
-    isBullet: Boolean
-) {
-    if (isBullet) {
-        builder.append("• ")
-    }
-    builder.withStyle(
-        style = SpanStyle(
-            fontWeight = if (isBold) FontWeight.Bold else FontWeight.Normal,
-            fontStyle = if (isItalic) FontStyle.Italic else FontStyle.Normal
-        )
+// FORMULARIO CONTENIDO PANTALLA MODIFICAR INFO/SERVICIOS ADMIN
+
+@Composable
+fun FormularioContenido(nombre: String, onNombreChange: (String) -> Unit, editor: @Composable () -> Unit) {
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 16.dp)
     ) {
-        builder.append(text)
+        item {
+            Spacer(modifier = Modifier.height(16.dp))
+
+            OutlinedTextField(
+                value = nombre,
+                onValueChange = { onNombreChange(it) },
+                label = { Text("Nombre") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp)
+            )
+
+            Text(
+                text = "Contenido",
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.Bold
+                ),
+                modifier = Modifier.padding(top = 8.dp, start = 10.dp)
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            editor()  
+        }
     }
 }
+
+
+
+
