@@ -8,7 +8,6 @@ import androidx.navigation.NavController
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.AdminBarraNav
 import com.leotesta017.clinicapenal.view.templatesPantallas.AgregarInfoTemplate
 
-
 @Composable
 fun AgregarInfoAdmin(navController: NavController?) {
     AgregarInfoTemplate(

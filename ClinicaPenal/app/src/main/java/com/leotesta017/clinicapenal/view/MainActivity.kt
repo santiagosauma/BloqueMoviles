@@ -21,7 +21,7 @@ import com.leotesta017.clinicapenal.view.usuarioColaborador.ComentarioScreen
 import com.leotesta017.clinicapenal.view.usuarioColaborador.GeneralSolicitudAdmin
 import com.leotesta017.clinicapenal.view.usuarioColaborador.JuriBotAdmin
 import com.leotesta017.clinicapenal.view.usuarioColaborador.ModificarInfoAdmin
-import com.leotesta017.clinicapenal.view.usuarioColaborador.ModificarServiciosAdmin
+import com.leotesta017.clinicapenal.view.usuarioColaborador.ModificarServiciosInfoAdmin
 import com.leotesta017.clinicapenal.view.usuarioColaborador.PantallaInfoAdmin
 import com.leotesta017.clinicapenal.view.usuarioColaborador.PantallaInfoClinicaAdmin
 import com.leotesta017.clinicapenal.view.usuarioEstudiante.AgregarInfoEstudiante
@@ -151,7 +151,10 @@ fun MyApp() {
             val servicioId = backStackEntry.arguments?.getString("categoriaId") ?: ""
 
             ModificarInfoAdmin(
-                navController
+                navController = navController,
+                id = servicioId,
+                titulo = titulo,
+                descripcion = descripcion
             )
         }
 
@@ -166,8 +169,11 @@ fun MyApp() {
             val descripcion = backStackEntry.arguments?.getString("descripcion") ?: ""
             val servicioId = backStackEntry.arguments?.getString("servicioId") ?: ""
 
-            ModificarServiciosAdmin(
-                navController
+            ModificarServiciosInfoAdmin(
+                navController = navController,
+                id = servicioId,
+                titulo = titulo,
+                descripcion = descripcion
             )
         }
 

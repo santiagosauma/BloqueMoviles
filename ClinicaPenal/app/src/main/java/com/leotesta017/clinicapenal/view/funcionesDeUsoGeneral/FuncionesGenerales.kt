@@ -21,8 +21,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
@@ -30,6 +33,9 @@ import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.FormatBold
+import androidx.compose.material.icons.filled.FormatItalic
+import androidx.compose.material.icons.filled.FormatUnderlined
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.PlayArrow
@@ -678,10 +684,6 @@ fun ServiceItem(
 
 
 
-
-
-
-
 //FUNCIONES PARA LA PANTALLA DE DETALLE
 @Composable
 fun HeaderSection(title: String, navController: NavController?) {
@@ -1320,6 +1322,62 @@ fun FormularioContenido(nombre: String, onNombreChange: (String) -> Unit, editor
     }
 }
 
+
+@Composable
+fun TextEditor(
+    initialText: String = "",
+    onTextChange: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    applyStyle: (TextStyle) -> TextStyle = { it }
+) {
+    var text by remember { mutableStateOf(initialText) }
+
+    Box(
+        modifier = modifier
+            .border(1.dp, Color.Gray, RoundedCornerShape(8.dp))
+            .padding(8.dp)
+            .fillMaxWidth()
+            .height(300.dp) // Ajusta la altura según tus necesidades
+            .verticalScroll(rememberScrollState())
+    ) {
+        BasicTextField(
+            value = text,
+            onValueChange = {
+                text = it
+                onTextChange(it)
+            },
+            textStyle = applyStyle(TextStyle.Default).copy(color = MaterialTheme.colorScheme.onBackground),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(8.dp)
+        )
+    }
+}
+
+
+@Composable
+fun ApplyStyleButtons(
+    onApplyBold: () -> Unit,
+    onApplyItalic: () -> Unit,
+    onApplyUnderline: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 8.dp),
+        horizontalArrangement = Arrangement.Start
+    ) {
+        IconButton(onClick = onApplyBold) {
+            Icon(imageVector = Icons.Default.FormatBold, contentDescription = "Negrita")
+        }
+        IconButton(onClick = onApplyItalic) {
+            Icon(imageVector = Icons.Default.FormatItalic, contentDescription = "Cursiva")
+        }
+        IconButton(onClick = onApplyUnderline) {
+            Icon(imageVector = Icons.Default.FormatUnderlined, contentDescription = "Subrayado")
+        }
+    }
+}
 
 
 

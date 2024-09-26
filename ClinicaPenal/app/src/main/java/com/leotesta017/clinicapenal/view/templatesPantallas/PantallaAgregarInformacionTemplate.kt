@@ -31,9 +31,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.ApplyStyleButtons
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.RoundedButton
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.TextEditor
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.TopBar
@@ -44,8 +47,11 @@ fun PantallaAgregarInformacionTemplate(
     titulo: String,
     textDescripcion: String,
     bottomBar: @Composable () -> Unit,
-    content: @Composable (PaddingValues) -> Unit
+    content: @Composable (PaddingValues, String, (String) -> Unit) -> Unit
 ) {
+    var currentTextStyle by remember { mutableStateOf(TextStyle.Default) }
+    var textContent by remember { mutableStateOf(textDescripcion) }
+
     Scaffold(
         topBar = {
             Column {
@@ -84,18 +90,41 @@ fun PantallaAgregarInformacionTemplate(
                 item {
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    content(paddingValues)
+                    content(paddingValues, textContent) { newText ->
+                        textContent = newText
+                    }
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                  TextEditor(
-                      textNewContent = textDescripcion
-                  )
+                    // Colocamos los botones de estilo arriba del editor
+                    ApplyStyleButtons(
+                        onApplyBold = {
+                            currentTextStyle = currentTextStyle.copy(
+                                fontWeight = if (currentTextStyle.fontWeight == FontWeight.Bold) FontWeight.Normal else FontWeight.Bold
+                            )
+                        },
+                        onApplyItalic = {
+                            currentTextStyle = currentTextStyle.copy(
+                                fontStyle = if (currentTextStyle.fontStyle == FontStyle.Italic) FontStyle.Normal else FontStyle.Italic
+                            )
+                        },
+                        onApplyUnderline = {
+                            // Aquí puedes manejar el subrayado de manera personalizada si es necesario
+                        }
+                    )
+
+                    // Editor de texto más grande y scrollable
+                    TextEditor(
+                        initialText = textContent,
+                        onTextChange = { newText -> textContent = newText },
+                        applyStyle = { currentTextStyle }
+                    )
                 }
             }
         }
     )
 }
+
 
 
 @Composable
@@ -131,7 +160,7 @@ fun AgregarInfoTemplate(
             }
             bottomBarContent()
         },
-        content = { paddingValues ->
+        content = { paddingValues, textContent, onTextChange ->
             var nombre by remember { mutableStateOf("") }
 
             OutlinedTextField(
@@ -156,3 +185,4 @@ fun AgregarInfoTemplate(
         }
     )
 }
+
