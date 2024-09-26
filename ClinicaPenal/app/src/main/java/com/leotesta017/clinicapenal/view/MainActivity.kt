@@ -1,6 +1,7 @@
 package com.leotesta017.clinicapenal.view
 
 import JuriBotScreen
+import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -89,18 +90,19 @@ fun MyApp() {
         composable("crearsolicitud") { Solicitud(navController) }
 
         composable(
-            route = "detalle_info/{titulo}/{descripcion}/{categoriaId}",
+            route = "detalle_info/{titulo}/{descripcion}/{categoriaId}/{url_image}",
             arguments = listOf(
                 navArgument("titulo"){type = NavType.StringType},
                 navArgument("descripcion"){type = NavType.StringType},
-                navArgument("categoriaId"){type = NavType.StringType}
-
+                navArgument("categoriaId"){type = NavType.StringType},
+                navArgument("url_image"){type = NavType.StringType}
                 )
 
         ) { backStackEntry ->
             val titulo = backStackEntry.arguments?.getString("titulo") ?: ""
             val descripcion = backStackEntry.arguments?.getString("descripcion") ?: ""
             val categoriaId = backStackEntry.arguments?.getString("categoriaId") ?: ""
+            val url_imagen = Uri.decode(backStackEntry.arguments?.getString("url_image") ?: "")
             DetalleInfo(
                 navController = navController,
                 titulo = titulo,
@@ -111,16 +113,18 @@ fun MyApp() {
 
 
         composable(
-            route = "servicios_info/{titulo}/{descripcion}/{servicioId}" ,
+            route = "servicios_info/{titulo}/{descripcion}/{servicioId}/{url_image}" ,
             arguments = listOf(
                 navArgument("titulo"){type = NavType.StringType},
                 navArgument("descripcion"){type = NavType.StringType},
-                navArgument("servicioId"){type = NavType.StringType})
+                navArgument("servicioId"){type = NavType.StringType},
+                navArgument("url_image"){type = NavType.StringType}
+            )
         ) { backStackEntry ->
             val titulo = backStackEntry.arguments?.getString("titulo") ?: ""
             val descripcion = backStackEntry.arguments?.getString("descripcion") ?: ""
             val servicioId = backStackEntry.arguments?.getString("servicioId") ?: ""
-
+            val url_imagen = Uri.decode(backStackEntry.arguments?.getString("url_image") ?: "")
             ServiciosInfo(
                 navController = navController,
                 titulo = titulo,
@@ -140,40 +144,46 @@ fun MyApp() {
         composable("pantallainfoadmin") { PantallaInfoAdmin(navController)}
 
         composable(
-            route = "modificar-info/{titulo}/{descripcion}/{categoriaId}",
+            route = "modificar-info/{titulo}/{descripcion}/{categoriaId}/{url_image}",
             arguments = listOf(
                 navArgument("titulo"){type = NavType.StringType},
                 navArgument("descripcion"){type = NavType.StringType},
-                navArgument("categoriaId"){type = NavType.StringType})
+                navArgument("categoriaId"){type = NavType.StringType},
+                navArgument("url_image"){type = NavType.StringType}
+            )
         ) { backStackEntry ->
             val titulo = backStackEntry.arguments?.getString("titulo") ?: ""
             val descripcion = backStackEntry.arguments?.getString("descripcion") ?: ""
             val servicioId = backStackEntry.arguments?.getString("categoriaId") ?: ""
-
+            val url_imagen = Uri.decode(backStackEntry.arguments?.getString("url_image") ?: "")
             ModificarInfoAdmin(
                 navController = navController,
                 id = servicioId,
                 titulo = titulo,
-                descripcion = descripcion
+                descripcion = descripcion,
+                urlimagen = url_imagen
             )
         }
 
         composable(
-            route ="modificar_servicios_info/{titulo}/{descripcion}/{servicioId}",
+            route ="modificar_servicios_info/{titulo}/{descripcion}/{servicioId}/{url_image}",
             arguments = listOf(
                 navArgument("titulo"){type = NavType.StringType},
                 navArgument("descripcion"){type = NavType.StringType},
-                navArgument("servicioId"){type = NavType.StringType})
+                navArgument("servicioId"){type = NavType.StringType},
+                navArgument("url_image"){type = NavType.StringType}
+            )
         ) { backStackEntry ->
             val titulo = backStackEntry.arguments?.getString("titulo") ?: ""
             val descripcion = backStackEntry.arguments?.getString("descripcion") ?: ""
             val servicioId = backStackEntry.arguments?.getString("servicioId") ?: ""
-
+            val url_imagen = Uri.decode(backStackEntry.arguments?.getString("url_image") ?: "")
             ModificarServiciosInfoAdmin(
                 navController = navController,
                 id = servicioId,
                 titulo = titulo,
-                descripcion = descripcion
+                descripcion = descripcion,
+                urlimagen = url_imagen
             )
         }
 

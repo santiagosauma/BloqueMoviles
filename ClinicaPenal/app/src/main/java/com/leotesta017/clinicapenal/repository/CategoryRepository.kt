@@ -3,6 +3,7 @@ package com.leotesta017.clinicapenal.repository
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.leotesta017.clinicapenal.model.Categoria
+import com.leotesta017.clinicapenal.model.Servicio
 import kotlinx.coroutines.tasks.await
 
 class CategoryRepository {
@@ -18,7 +19,8 @@ class CategoryRepository {
                     id = document.id,
                     titulo = document.getString("titulo") ?: "",
                     descripcion = document.getString("descripcion") ?: "",
-                    url_imagen = document.getString("url_imagen") ?: ""
+                    url_imagen = document.getString("url_imagen") ?: "",
+                    contenido = ""
                 )
             }
         } catch (e: Exception) {
@@ -35,4 +37,30 @@ class CategoryRepository {
         }
     }
 
+
+    // Método para agregar un nuevo categoria
+    suspend fun addCategoria(categoria: Categoria): Boolean {
+        return try {
+            firestore.collection("categorias")
+                .add(categoria)
+                .await()
+            true  // Devuelve true si se agregó correctamente
+        } catch (e: Exception) {
+            false  // Devuelve false en caso de error
+        }
+    }
+
+
+    // Método para actualizar una categoria existente basado en su ID
+    suspend fun updateCategoria(categoria: Categoria): Boolean {
+        return try {
+            firestore.collection("categorias")
+                .document(categoria.id)  // Se utiliza el ID del servicio para ubicar el documento
+                .set(categoria)
+                .await()
+            true  // Devuelve true si se actualizó correctamente
+        } catch (e: Exception) {
+            false  // Devuelve false en caso de error
+        }
+    }
 }

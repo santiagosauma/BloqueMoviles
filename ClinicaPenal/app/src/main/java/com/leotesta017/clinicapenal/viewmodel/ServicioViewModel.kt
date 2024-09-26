@@ -20,9 +20,13 @@ class ServicioViewModel : ViewModel() {
     private val _contenido = MutableStateFlow<String>("")
     val contenido: StateFlow<String> = _contenido
 
+    private val _isSuccess = MutableStateFlow<Boolean?>(null)
+    val isSuccess: StateFlow<Boolean?> = _isSuccess
+
     // Estado para manejar posibles errores
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error
+
 
     // Método para obtener los servicios
     init {
@@ -51,5 +55,31 @@ class ServicioViewModel : ViewModel() {
             }
         }
     }
+
+    // Método para agregar un nuevo servicio
+    fun addServicio(servicio: Servicio) {
+        viewModelScope.launch {
+            try {
+                val result = repository.addServicio(servicio)
+                _isSuccess.value = result
+            } catch (e: Exception) {
+                _error.value = "Error al agregar el servicio"
+            }
+        }
+    }
+
+    // Metodo para actualizar un servicio
+    fun updateServicio(servicio: Servicio) {
+        viewModelScope.launch {
+            try {
+                val result = repository.updateServicio(servicio)
+                _isSuccess.value = result
+            } catch (e: Exception) {
+                _error.value = "Error al actualizar el servicio"
+            }
+        }
+    }
+
+
 }
 

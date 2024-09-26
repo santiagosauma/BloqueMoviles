@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 //noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.IconButton
 //noinspection UsingMaterialAndMaterial3Libraries
@@ -162,6 +164,7 @@ fun AgregarInfoTemplate(
         },
         content = { paddingValues, textContent, onTextChange ->
             var nombre by remember { mutableStateOf("") }
+            var descripcion by remember { mutableStateOf("") }
 
             OutlinedTextField(
                 value = nombre,
@@ -172,6 +175,20 @@ fun AgregarInfoTemplate(
                     .padding(bottom = 8.dp)
             )
 
+
+            OutlinedTextField(
+                value = descripcion,
+                onValueChange = { descripcion = it },
+                label = { Text("Descripción") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp)
+                    .height(100.dp)
+                    .verticalScroll(rememberScrollState())
+            )
+
+            Spacer(modifier = Modifier.height(5.dp))
+
             Text(
                 text = "Contenido",
                 style = MaterialTheme.typography.bodyMedium.copy(
@@ -181,7 +198,7 @@ fun AgregarInfoTemplate(
                 modifier = Modifier.padding(top = 8.dp, start = 10.dp)
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(5.dp))
         }
     )
 }

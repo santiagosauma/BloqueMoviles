@@ -36,6 +36,33 @@ class ServicioRepository {
             ""  // Devuelve un string vacío en caso de error
         }
     }
+
+
+    // Método para agregar un nuevo servicio
+    suspend fun addServicio(servicio: Servicio): Boolean {
+        return try {
+            firestore.collection("servicios")
+                .add(servicio)
+                .await()
+            true  // Devuelve true si se agregó correctamente
+        } catch (e: Exception) {
+            false  // Devuelve false en caso de error
+        }
+    }
+
+
+    // Método para actualizar un servicio existente basado en su ID
+    suspend fun updateServicio(servicio: Servicio): Boolean {
+        return try {
+            firestore.collection("servicios")
+                .document(servicio.id)  // Se utiliza el ID del servicio para ubicar el documento
+                .set(servicio)
+                .await()
+            true  // Devuelve true si se actualizó correctamente
+        } catch (e: Exception) {
+            false  // Devuelve false en caso de error
+        }
+    }
 }
 
 

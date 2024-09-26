@@ -1,3 +1,4 @@
+
 package com.leotesta017.clinicapenal.view.templatesPantallas
 
 import androidx.compose.foundation.layout.Arrangement
@@ -36,11 +37,15 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.ApplyStyleButtons
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.RoundedButton
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.TextEditor
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.TopBar
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
 @Composable
@@ -128,6 +133,7 @@ fun PantallaModificarInformacionTemplate(
 }
 
 
+
 @Composable
 fun ModificarInfoTemplate(
     navController: NavController?,
@@ -135,22 +141,21 @@ fun ModificarInfoTemplate(
     initialName: String,
     initialDescription: String,
     id: String,
+    contenido: String,
+    urlimagen: String,
     bottomBarContent: @Composable () -> Unit,
-    onSaveClick: () -> Unit,
+    onSaveClick: (String, String, String, String) -> Unit, // Incluye `textContent`
     onCancelClick: () -> Unit
 ) {
     var nombre by remember { mutableStateOf(initialName) }
     var descripcion by remember { mutableStateOf(initialDescription) }
-    var textContent by remember { mutableStateOf("") }
-
-    LaunchedEffect(id) {
-        //Get para obtener el contenido por ID
-    }
+    var url_imagen by remember { mutableStateOf(urlimagen) }
+    var textContent by remember { mutableStateOf(contenido) } // Manejamos `textContent`
 
     PantallaModificarInformacionTemplate(
         navController = navController,
         titulo = titulo,
-        textDescripcion = textContent,
+        textDescripcion = contenido,
         bottomBar = {
             Row(
                 modifier = Modifier
@@ -158,20 +163,28 @@ fun ModificarInfoTemplate(
                     .padding(horizontal = 16.dp, vertical = 16.dp),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
+                var isSaving by remember {
+                    mutableStateOf(false)
+                }
+
                 RoundedButton(
                     icon = Icons.Default.Save,
                     label = "Guardar",
-                    onClick = onSaveClick
+                    onClick = {
+                        onSaveClick(nombre, descripcion, url_imagen, textContent)
+                    }
                 )
                 RoundedButton(
                     icon = Icons.Default.Delete,
                     label = "Cancelar",
-                    onClick = onCancelClick
+                    onClick = {
+                        onCancelClick()
+                    }
                 )
             }
             bottomBarContent()
         },
-        content = { paddingValues, textContent, onTextChange ->
+        content = { paddingValues, textDescripcion, onTextChange ->
             OutlinedTextField(
                 value = nombre,
                 onValueChange = { nombre = it },
@@ -180,6 +193,7 @@ fun ModificarInfoTemplate(
                     .fillMaxWidth()
                     .padding(bottom = 8.dp)
             )
+            Spacer(modifier = Modifier.height(5.dp))
 
             OutlinedTextField(
                 value = descripcion,
@@ -188,13 +202,23 @@ fun ModificarInfoTemplate(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 8.dp)
-                    .height(50.dp)
+                    .height(100.dp)
                     .verticalScroll(rememberScrollState())
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(5.dp))
+
+            OutlinedTextField(
+                value = url_imagen,
+                onValueChange = { url_imagen = it },
+                label = { Text("URL de la imagen") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp)
+            )
         }
     )
 }
+
 
 

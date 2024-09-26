@@ -21,7 +21,6 @@ import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.BarraNav
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.HeaderSection
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.SectionContent
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.SectionTitle
-import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.SpacedItem
 import com.leotesta017.clinicapenal.view.templatesPantallas.PantallaDetalleItemTemplate
 import com.leotesta017.clinicapenal.viewmodel.CategoryViewModel
 
