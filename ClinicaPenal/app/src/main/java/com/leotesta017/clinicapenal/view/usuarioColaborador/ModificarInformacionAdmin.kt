@@ -101,7 +101,7 @@ fun ModificarInfoAdmin(
 @Composable
 fun PreviewModificarInfoAdmin() {
     ModificarInfoAdmin(
-        navController = null, // No se necesita navegación real en la vista previa
+        navController = null,
         id = "456",
         titulo = "Modificar Información",
         descripcion = "Descripción de la información",

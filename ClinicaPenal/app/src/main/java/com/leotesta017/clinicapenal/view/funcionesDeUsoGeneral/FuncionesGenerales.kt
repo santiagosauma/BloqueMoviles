@@ -970,7 +970,7 @@ fun ItemTemplate(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.Top
             ) {
-                Column(modifier = Modifier.weight(1f)) {
+                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = titulo,
                         fontWeight = FontWeight.Bold,

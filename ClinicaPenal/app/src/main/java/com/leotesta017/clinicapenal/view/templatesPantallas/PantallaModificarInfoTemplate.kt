@@ -201,9 +201,10 @@ fun ModificarInfoTemplate(
                 label = { Text("Descripción") },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 8.dp)
-                    .height(100.dp)
-                    .verticalScroll(rememberScrollState())
+                    .padding(bottom = 8.dp),
+                minLines = 1,
+                maxLines = Int.MAX_VALUE,
+                textStyle = TextStyle.Default.copy(fontSize = MaterialTheme.typography.bodyLarge.fontSize)
             )
 
             Spacer(modifier = Modifier.height(5.dp))
