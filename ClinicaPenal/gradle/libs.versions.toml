@@ -1,5 +1,7 @@
 [versions]
 agp = "8.5.1"
+core = "10.0.3"
+coreVersion = "11.0.1"
 firebaseBom = "33.1.2"
 kotlin = "1.9.0"
 coreKtx = "1.13.1"
@@ -14,9 +16,13 @@ navigationRuntimeKtx = "2.7.7"
 navigationCompose = "2.7.7"
 constraintlayoutCompose = "1.0.1"
 pagingCommonAndroid = "3.3.2"
+youtubePlayer = "11.0.1"
+appcompat = "1.7.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+core = { module = "com.pierfrancescosoffritti.androidyoutubeplayer:core", version.ref = "core" }
+core-v1101 = { module = "com.pierfrancescosoffritti.androidyoutubeplayer:core", version.ref = "coreVersion" }
 firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
 google-firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
@@ -37,6 +43,8 @@ androidx-navigation-runtime-ktx = { group = "androidx.navigation", name = "navig
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
 androidx-constraintlayout-compose = { group = "androidx.constraintlayout", name = "constraintlayout-compose", version.ref = "constraintlayoutCompose" }
 androidx-paging-common-android = { group = "androidx.paging", name = "paging-common-android", version.ref = "pagingCommonAndroid" }
+youtube-player = { module = "com.google.android.youtube:youtube-player", version.ref = "youtubePlayer" }
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

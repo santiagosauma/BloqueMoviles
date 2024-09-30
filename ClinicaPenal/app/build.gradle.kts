@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.googleService)
 }
 
+
 android {
     namespace = "com.leotesta017.clinicapenal"
     compileSdk = 34
@@ -50,10 +51,13 @@ android {
     }
 }
 
+
 dependencies {
 
     // Firebase Authentication
     implementation("com.google.firebase:firebase-auth-ktx")
+
+    implementation("com.pierfrancescosoffritti.androidyoutubeplayer:core:12.1.1")
 
     // Firestore
     implementation("com.google.firebase:firebase-firestore-ktx")
@@ -87,6 +91,7 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.constraintlayout.compose)
     implementation(libs.androidx.paging.common.android)
+    implementation(libs.androidx.appcompat)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
