@@ -48,13 +48,12 @@ fun PantallaInfoAdmin(navController: NavController?) {
                 navigateroute = "agregar-info-admin"
             )
 
-            SpacedItem(spacing = 16) {
-                CategoriesSection(
+            CategoriesSection(
                     navController = navController,
                     viewModel = CategoryViewModel(),
                     route = "modificar-info"
-                )
-            }
+            )
+
         },
         servicios = {
             LabelCategoriaConBoton(
@@ -64,13 +63,12 @@ fun PantallaInfoAdmin(navController: NavController?) {
                 navigateroute = "agregar_servicios_info-admin"
             )
 
-            SpacedItem(spacing = 16) {
-                ServicesSection(
+            ServicesSection(
                     navController = navController,
                     viewModel = ServicioViewModel(),
                     route = "modificar_servicios_info"
                 )
-            }
+
         },
         pantallasExtra = {
             PantallasExtra(

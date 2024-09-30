@@ -2,6 +2,7 @@ package com.leotesta017.clinicapenal.view.templatesPantallas
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
@@ -31,7 +32,7 @@ fun PantallaInfoGenerica(
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(bottom = 140.dp),
+                .padding(bottom = 160.dp, start = 16.dp,end = 16.dp),
             horizontalAlignment = Alignment.Start
         ) {
             item {
@@ -44,11 +45,17 @@ fun PantallaInfoGenerica(
                 noticias()
                 informacionLegal()
                 servicios()
+
             }
         }
 
+
+
         pantallasExtra()
 
+
         barraNav()
+
+
     }
 }

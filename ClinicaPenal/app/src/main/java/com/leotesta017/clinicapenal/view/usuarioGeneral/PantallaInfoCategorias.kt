@@ -46,34 +46,33 @@ fun PantallaInfoCategorias(navController: NavController?) {
         informacionLegal = {
             LabelCategoria(
                 label = "Información Legal",
-                modifier = Modifier.padding(start = 36.dp)
+                modifier = Modifier.padding(start = 16.dp)
             )
 
-            SpacedItem(spacing = 16) {
-                CategoriesSection(
+            CategoriesSection(
                     navController = navController,
                     viewModel = CategoryViewModel(),
                     route = "detalle_info"
-                )
-            }
+            )
+
         },
 
         servicios = {
             LabelCategoria(
                 label = "Servicios",
-                modifier = Modifier.padding(start = 36.dp)
+                modifier = Modifier.padding(start = 16.dp)
             )
 
-            SpacedItem(spacing = 16) {
-                ServicesSection(
+            ServicesSection(
                     navController = navController,
                     viewModel = ServicioViewModel(),
                     route = "servicios_info"
-                )
-            }
+            )
+
         },
 
         pantallasExtra = {
+
             PantallasExtra(
                 navController = navController,
                 routeJuribot = "Juribot",

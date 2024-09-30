@@ -12,10 +12,13 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.paddingFrom
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
@@ -62,6 +65,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -227,16 +231,17 @@ fun PantallasExtra(navController: NavController?,
                    routeJuribot: String,
                    routeCrearSolicitud: String)
 {
-    Box(
-        modifier = Modifier.fillMaxSize()
+    Box(modifier = Modifier
+        .fillMaxSize()
+        .padding(top = 25.dp, bottom = 100.dp)
     )
     {
         Row(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .padding(bottom = 95.dp)
                 .fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.CenterVertically
         ) {
             RoundedButton(
                 icon = Icons.AutoMirrored.Filled.Chat,
@@ -288,7 +293,7 @@ fun LabelCategoriaConBoton(label: String,
         horizontalArrangement = Arrangement.SpaceBetween,
         modifier = modifier
             .fillMaxWidth()
-            .padding(end = 14.dp, start = 10.dp)
+            .padding(end = 16.dp, start = 16.dp)
     ) {
         Text(
             text = label,
@@ -328,7 +333,7 @@ fun MyTextNoticias(text: String)
         fontWeight = FontWeight.Bold,
         color = Color.Black,
         modifier = Modifier
-            .padding(start = 10.dp, bottom = 8.dp)
+            .padding(start = 15.dp, bottom = 8.dp)
     )
 }
 
@@ -336,9 +341,10 @@ fun MyTextNoticias(text: String)
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun CarruselDeNoticias(viewModel: VideoViewModel = viewModel(),
-                       contentText: @Composable (() -> Unit)? = null)
-{
+fun CarruselDeNoticias(
+    viewModel: VideoViewModel = viewModel(),
+    contentText: @Composable (() -> Unit)? = null
+) {
     val videos by viewModel.videos.collectAsState()
     val error by viewModel.error.collectAsState()
 
@@ -347,12 +353,11 @@ fun CarruselDeNoticias(viewModel: VideoViewModel = viewModel(),
 
     Column(
         modifier = Modifier
+            .fillMaxSize()
+            .padding(vertical = 8.dp)
             .fillMaxWidth()
-            .padding(horizontal = 15.dp, vertical = 8.dp)
     ) {
-
         contentText?.invoke()
-
 
         if (error != null) {
             Text(text = error ?: "Error desconocido", color = Color.Red)
@@ -360,31 +365,23 @@ fun CarruselDeNoticias(viewModel: VideoViewModel = viewModel(),
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .padding(horizontal = 7.dp) // Asegura que el carrusel tenga padding a los lados
             ) {
                 if (totalPages > 0) {
                     HorizontalPager(
                         state = pagerState,
                         modifier = Modifier.fillMaxSize(),
                     ) { page ->
-                        val videoUrl = videos[page].url_video
-                        val titulo = videos[page].titulo
-                        val descripcion = videos[page].descripcion
+                        val video = videos[page]
                         Box(
                             modifier = Modifier
-                                .fillMaxSize(0.90f)
-                                .graphicsLayer {
-                                    translationX = 50f
-                                }
-
+                                .fillMaxWidth() // Ajusta el ancho de la tarjeta
                                 .clip(RoundedCornerShape(20.dp))
-                                .background(Color.White),
-                            contentAlignment = Alignment.Center
                         ) {
-                            // Mostrar el botón de reproducción con la descripción
-                            VideoItemWithDescription(
-                                videoUrl = videoUrl,
-                                title = titulo,
-                                description = descripcion
+                            VideoCard(
+                                videoUrl = video.url_video,
+                                title = video.titulo,
+                                description = video.descripcion
                             )
                         }
                     }
@@ -397,83 +394,102 @@ fun CarruselDeNoticias(viewModel: VideoViewModel = viewModel(),
 }
 
 
+
 @Composable
-fun VideoItemWithDescription(videoUrl: String,
-                             title: String,
-                             description: String)
-{
+fun VideoCard(
+    videoUrl: String,
+    title: String,
+    description: String
+) {
     val context = LocalContext.current
     var expanded by remember { mutableStateOf(false) }
+    val maxHeight = if (expanded) Int.MAX_VALUE.dp else 400.dp
 
-    Column(
+    Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(10.dp)
+            .padding(12.dp)
+            .heightIn(min = 400.dp, max = maxHeight)
+            .clickable {
+                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(videoUrl))
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                context.startActivity(intent)
+            },
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFf0eee9)), // Color de fondo personalizado para la tarjeta
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        shape = RoundedCornerShape(16.dp)
     ) {
-        // Cuadro del video con fondo negro
-        Box(
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Color.Black, RoundedCornerShape(5.dp))
-                .padding(5.dp)
-                .height(200.dp),
-            contentAlignment = Alignment.Center
+                .padding(16.dp)
         ) {
-            Button(
-                onClick = {
-                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(videoUrl))
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    context.startActivity(intent)
-                },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.Gray,
-                    contentColor = Color.White
-                ),
+            // Cuadro del video con fondo negro
+            Box(
                 modifier = Modifier
-                    .size(80.dp)
-                    .clip(CircleShape)
+                    .fillMaxWidth()
+                    .background(Color.Black, RoundedCornerShape(5.dp))
+                    .padding(5.dp)
+                    .height(225.dp),
+                contentAlignment = Alignment.Center
             ) {
-                Icon(
-                    imageVector = Icons.Filled.PlayArrow,
-                    contentDescription = "Reproducir Video",
-                    tint = Color.Black
-                )
+                Button(
+                    onClick = {
+                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(videoUrl))
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        context.startActivity(intent)
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.Gray,
+                        contentColor = Color.White
+                    ),
+                    modifier = Modifier
+                        .size(80.dp)
+                        .clip(CircleShape)
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.PlayArrow,
+                        contentDescription = "Reproducir Video",
+                        tint = Color.Black
+                    )
+                }
             }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Mostrar el título
+            Text(
+                text = title,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+
+            // Mostrar la descripción del video
+            Text(
+                text = description,
+                fontSize = 13.sp,
+                color = Color.Gray,
+                maxLines = if (expanded) Int.MAX_VALUE else 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier
+                    .clickable { expanded = !expanded }
+                    .padding(top = 8.dp)
+            )
+
+            // Texto "Ver más" o "Ver menos" para controlar la expansión
+            Text(
+                text = if (expanded) "Ver menos" else "Ver más",
+                color = Color.Blue,
+                fontSize = 13.sp,
+                modifier = Modifier
+                    .clickable { expanded = !expanded }
+                    .padding(top = 4.dp)
+            )
         }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Mostrar el título
-        Text(
-            text = title,
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(bottom = 8.dp)
-        )
-
-        // Mostrar la descripción del video
-        Text(
-            text = description,
-            fontSize = 13.sp,
-            color = Color.Gray,
-            maxLines = if (expanded) Int.MAX_VALUE else 2,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier
-                .clickable { expanded = !expanded }
-                .padding(top = 8.dp)
-        )
-
-        // Texto "Ver más" o "Ver menos" para controlar la expansión
-        Text(
-            text = if (expanded) "Ver menos" else "Ver más",
-            color = Color.Blue,
-            fontSize = 13.sp,
-            modifier = Modifier
-                .clickable { expanded = !expanded }
-                .padding(top = 4.dp)
-        )
     }
 }
+
 
 //FUNCIONES PARA ITEMS DE CATEGORIAS
 @Composable
@@ -485,7 +501,9 @@ fun CategoriesSection(
     val categories by viewModel.categorias.collectAsState()
     val error by viewModel.error.collectAsState()
 
-    Column(modifier = Modifier.padding(16.dp)) {
+    Column(
+        modifier = Modifier.padding(4.dp)
+    ) {
         when {
             categories.isEmpty() && error == null -> {
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
@@ -503,7 +521,6 @@ fun CategoriesSection(
                         route = route,
                         categoriaId = category.id // Pasar el ID de la categoría
                     )
-                    Spacer(modifier = Modifier.height(12.dp))
                 }
             }
             else -> {
@@ -524,58 +541,73 @@ fun CategoryItem(
     route: String,
     categoriaId: String // Este ID es necesario para cargar la pantalla de detalles
 ) {
-    Row(
+    Card(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color.White)
-            .padding(horizontal = 16.dp, vertical = 12.dp)
+            .padding(16.dp)
             .clickable {
                 val encodedUrlImagen = Uri.encode(imageUrl)
                 navController?.navigate("$route/$title/$description/$categoriaId/$encodedUrlImagen") // Navegar con el ID de la categoría
             },
-        verticalAlignment = Alignment.CenterVertically
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFf0eee9)), // Color de fondo personalizado para la tarjeta
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp), // Elevación estándar para sombra
+        shape = RoundedCornerShape(16.dp) // Bordes redondeados
     ) {
-        AsyncImage(
-            model = imageUrl,
-            contentDescription = null,
-            modifier = Modifier
-                .size(40.dp)
-                .clip(RoundedCornerShape(8.dp))
-                .background(Color.Gray),
-            contentScale = ContentScale.Crop
-        )
-
-        Spacer(modifier = Modifier.width(24.dp))
-
         Column(
-            modifier = Modifier.weight(1f)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp) // Espaciado interno de la tarjeta
         ) {
-            Text(
-                text = title,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.Black
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = description,
-                fontSize = 13.sp,
-                color = Color.Gray,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis
-            )
+            // Imagen destacada en la parte superior con fondo gris
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(12.dp))
+            ) {
+                AsyncImage(
+                    model = imageUrl, // Imagen de prueba
+                    contentDescription = null,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(180.dp) // Imagen más grande
+                        .clip(RoundedCornerShape(8.dp)), // Bordes redondeados para la imagen
+                    contentScale = ContentScale.Crop
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp)) // Espaciado entre la imagen y el contenido
+
+            // Contenido del título y la descripción
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Column(
+                )
+                {
+                    // Título de la tarjeta
+                    Text(
+                        text = title,
+                        fontSize = 18.sp, // Tamaño de texto para títulos
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface // Color según el tema
+                    )
+
+                    Spacer(modifier = Modifier.height(4.dp)) // Espacio reducido entre el título y descripción
+
+                    // Descripción de la tarjeta
+                    Text(
+                        text = description,
+                        fontSize = 14.sp, // Tamaño de texto para contenido secundario
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f), // Color secundario con opacidad
+                        maxLines = 2, // Limitar a dos líneas
+                        overflow = TextOverflow.Ellipsis // Cortar el texto si es necesario
+                    )
+                }
+            }
         }
-
-        Spacer(modifier = Modifier.width(24.dp))
-
-        Icon(
-            imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-            contentDescription = "Flecha para Detalles",
-            tint = Color.Blue,
-            modifier = Modifier.size(24.dp)
-        )
     }
 }
+
 
 
 
@@ -589,7 +621,7 @@ fun ServicesSection(
     val servicios by viewModel.servicios.collectAsState()
     val error by viewModel.error.collectAsState()
 
-    Column(modifier = Modifier.padding(16.dp)) {
+    Column(modifier = Modifier.padding(4.dp)) {
         when {
             servicios.isEmpty() && error == null -> {
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
@@ -607,7 +639,6 @@ fun ServicesSection(
                         route = route,
                         servicioId = servicio.id // Pasar el ID del servicio
                     )
-                    Spacer(modifier = Modifier.height(12.dp))
                 }
             }
             else -> {
@@ -628,56 +659,70 @@ fun ServiceItem(
     route: String,
     servicioId: String // Este ID es necesario para cargar la pantalla de detalles
 ) {
-    Row(
+    Card(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color.White)
-            .padding(horizontal = 16.dp, vertical = 12.dp)
+            .padding(16.dp)
             .clickable {
                 val encodedUrlImagen = Uri.encode(imageUrl)
-                navController?.navigate("$route/$title/$description/$servicioId/$encodedUrlImagen")
+                navController?.navigate("$route/$title/$description/$servicioId/$encodedUrlImagen") // Navegar con el ID de la categoría
             },
-        verticalAlignment = Alignment.CenterVertically
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFf0eee9)), // Color de fondo personalizado para la tarjeta
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp), // Elevación estándar para sombra
+        shape = RoundedCornerShape(16.dp) // Bordes redondeados
     ) {
-        AsyncImage(
-            model = imageUrl,
-            contentDescription = null,
-            modifier = Modifier
-                .size(40.dp)
-                .clip(RoundedCornerShape(8.dp))
-                .background(Color.Gray),
-            contentScale = ContentScale.Crop
-        )
-
-        Spacer(modifier = Modifier.width(24.dp))
-
         Column(
-            modifier = Modifier.weight(1f)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp) // Espaciado interno de la tarjeta
         ) {
-            Text(
-                text = title,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.Black
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = description,
-                fontSize = 13.sp,
-                color = Color.Gray,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis
-            )
+            // Imagen destacada en la parte superior con fondo gris
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(12.dp))
+            ) {
+                AsyncImage(
+                    model = imageUrl, // Imagen de prueba
+                    contentDescription = null,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(180.dp) // Imagen más grande
+                        .clip(RoundedCornerShape(8.dp)), // Bordes redondeados para la imagen
+                    contentScale = ContentScale.Crop
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp)) // Espaciado entre la imagen y el contenido
+
+            // Contenido del título y la descripción
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Column(
+                )
+                {
+                    // Título de la tarjeta
+                    Text(
+                        text = title,
+                        fontSize = 18.sp, // Tamaño de texto para títulos
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface // Color según el tema
+                    )
+
+                    Spacer(modifier = Modifier.height(4.dp)) // Espacio reducido entre el título y descripción
+
+                    // Descripción de la tarjeta
+                    Text(
+                        text = description,
+                        fontSize = 14.sp, // Tamaño de texto para contenido secundario
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f), // Color secundario con opacidad
+                        maxLines = 2, // Limitar a dos líneas
+                        overflow = TextOverflow.Ellipsis // Cortar el texto si es necesario
+                    )
+                }
+            }
         }
-
-        Spacer(modifier = Modifier.width(24.dp))
-
-        Icon(
-            imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-            contentDescription = "Flecha para Detalles",
-            tint = Color.Blue,
-            modifier = Modifier.size(24.dp)
-        )
     }
 }
 

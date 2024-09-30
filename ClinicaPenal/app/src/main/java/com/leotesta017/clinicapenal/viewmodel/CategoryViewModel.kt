@@ -3,7 +3,6 @@ package com.leotesta017.clinicapenal.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.leotesta017.clinicapenal.model.Categoria
-import com.leotesta017.clinicapenal.model.Servicio
 import com.leotesta017.clinicapenal.repository.CategoryRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

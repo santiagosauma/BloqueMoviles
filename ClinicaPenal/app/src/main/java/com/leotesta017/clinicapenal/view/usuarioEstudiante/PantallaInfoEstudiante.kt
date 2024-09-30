@@ -52,13 +52,12 @@ fun PantallaInfoEstudiante(navController: NavController?) {
                 navigateroute = "agregar-info-estudiante"
             )
 
-            SpacedItem(spacing = 16) {
-                CategoriesSection(
+            CategoriesSection(
                     navController = navController,
                     viewModel = CategoryViewModel(),
                     route = "modificar-info"
-                )
-            }
+            )
+
         },
 
         //SECCION DE SERVICIOS
@@ -70,13 +69,12 @@ fun PantallaInfoEstudiante(navController: NavController?) {
                 navigateroute = "agregar-servicio-estudiante"
             )
 
-            SpacedItem(spacing = 16) {
-                ServicesSection(
+            ServicesSection(
                     navController = navController,
                     viewModel = ServicioViewModel(),
                     route = "modificar_servicios_info"
-                )
-            }
+            )
+
         },
 
         //SECCION DE JURIBOT Y GENERARSOLICITUD
