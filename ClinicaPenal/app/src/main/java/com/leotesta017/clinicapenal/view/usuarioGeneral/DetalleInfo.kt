@@ -18,9 +18,11 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.BarraNav
+import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.CustomMarkdownText
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.HeaderSection
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.SectionContent
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.SectionTitle
+import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.preprocesarMarkdown
 import com.leotesta017.clinicapenal.view.templatesPantallas.PantallaDetalleItemTemplate
 import com.leotesta017.clinicapenal.viewmodel.CategoryViewModel
 
@@ -78,68 +80,4 @@ fun DetalleInfo(
     )
 }
 
-fun preprocesarMarkdown(markdown: String): String {
-    return markdown
-        .replace("####", "\n####")
-        .replace("###", "\n###")
-        .replace("- ", "\n• ") // Cambiar guiones por bolitas
-        .replace("\n\n", "\n")
-}
 
-@Composable
-fun CustomMarkdownText(content: String) {
-    Column(modifier = Modifier.fillMaxWidth().padding(vertical = 0.dp)) {
-        val lines = content.split("\n")
-        for (line in lines) {
-            when {
-                line.startsWith("####") -> {
-                    SectionTitle(
-                        title = line.removePrefix("####").trim()
-                    )
-                    Spacer(modifier = Modifier.height(6.dp))  // Reducir el espacio aquí
-                }
-                line.startsWith("###") -> {
-                    Spacer(modifier = Modifier.height(12.dp))  // Reducir el espacio aquí
-                    Text(
-                        text = line.removePrefix("###").trim(),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(Color(0xFFF5F5F5))
-                            .padding(16.dp),
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.Black
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))  // Reducir el espacio aquí
-                }
-                else -> {
-                    Text(
-                        text = parseMarkdownToAnnotatedString(line),
-                        fontSize = 16.sp,
-                        color = Color.Black,
-                        modifier = Modifier.padding(start = 16.dp)
-                    )
-                    Spacer(modifier = Modifier.height(2.dp))  // Reducir el espacio aquí
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun parseMarkdownToAnnotatedString(text: String): AnnotatedString {
-    return buildAnnotatedString {
-        var currentIndex = 0
-        val boldRegex = Regex("""\*\*(.*?)\*\*""")
-        boldRegex.findAll(text).forEach { matchResult ->
-            val start = matchResult.range.first
-            val end = matchResult.range.last
-            append(text.substring(currentIndex, start))
-            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                append(matchResult.groupValues[1])
-            }
-            currentIndex = end + 1
-        }
-        append(text.substring(currentIndex, text.length))
-    }
-}
