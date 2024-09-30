@@ -23,7 +23,7 @@ private val DarkColorScheme = darkColorScheme(
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Color(0xFF002366), // Azul marino
+    primary = Color(0xFF303665), // Azul marino
     onPrimary = Color.White, // Texto en botones primarios
     secondary = Color(0xFF4B9CD3), // Azul claro
     onSecondary = Color.White,

@@ -123,7 +123,7 @@ fun TopBar() {
             text = "Clínica Penal",
             fontSize = 38.sp,
             fontWeight = FontWeight.ExtraBold,
-            color = Color.Blue
+            color = Color(0xFF303665)
         )
     }
 }
@@ -580,7 +580,7 @@ fun VideoCard(
             // Texto "Ver más" o "Ver menos" para controlar la expansión
             Text(
                 text = if (expanded) "Ver menos" else "Ver más",
-                color = Color.Blue,
+                color = Color(0xFF303665),
                 fontSize = 13.sp,
                 modifier = Modifier
                     .clickable { expanded = !expanded }
@@ -1259,7 +1259,7 @@ fun GeneralItemTemplate(
             .clip(RoundedCornerShape(16.dp))
             .border(
                 1.dp,
-                if (isImportant) Color.Blue else Color.Transparent,
+                if (isImportant) Color(0xFF303665) else Color.Transparent,
                 RoundedCornerShape(16.dp)
             )
             .shadow(1.dp),
@@ -1310,7 +1310,7 @@ fun GeneralItemTemplate(
                     Text(
                         text = it,
                         fontSize = 14.sp,
-                        color = Color.Blue,
+                        color = Color(0xFF303665),
                         modifier = Modifier.clickable { linkRoute?.let { navController?.navigate(it) } }
                     )
                 }
