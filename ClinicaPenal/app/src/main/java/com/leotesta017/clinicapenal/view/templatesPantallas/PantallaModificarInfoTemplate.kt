@@ -136,7 +136,7 @@ fun ModificarInfoTemplate(
     PantallaModificarInformacionTemplate(
         navController = navController,
         titulo = titulo,
-        textDescripcion = contenido,
+        textDescripcion = textContent,
         bottomBar = {
             Row(
                 modifier = Modifier
@@ -194,6 +194,21 @@ fun ModificarInfoTemplate(
                     .fillMaxWidth()
                     .padding(bottom = 8.dp)
             )
+
+            Spacer(modifier = Modifier.height(5.dp))
+
+            // Input para el contenido
+            OutlinedTextField(
+                value = textContent,
+                onValueChange = { newText -> textContent = newText },
+                label = { Text("Contenido") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp),
+                minLines = 6,
+                maxLines = Int.MAX_VALUE
+            )
         }
     )
 }
+

@@ -40,13 +40,9 @@ fun ModificarInfoAdmin(
     val contenido by viewModel.contenido.collectAsState()
     val error by viewModel.error.collectAsState()
 
-    // Formateamos el contenido de forma más controlada para no romper los pares de negritas
     val formattedContent = contenido
-        .replace("-", "\n-") // Aseguramos que las listas comiencen en una nueva línea
-        .replace(Regex("\\*\\*(.*?)\\*\\*"), "\n**$1**\n") // Colocamos las negritas completas en líneas separadas
-        .replace(Regex("(?<=\\*)\\*\\*(?!\\*)"), "") // Aseguramos que no haya salto entre pares de asteriscos
-        .replace(Regex("(?<!\\*)\\*\\*(?=\\w)"), "\n**") // Aseguramos que una nueva sección de negritas comience en una nueva línea
-        .trim() // Quitamos cualquier espacio en blanco innecesario al final o al inicio
+        .replace("-", "\n-")
+        .replace(Regex("\\*\\*(.*?)\\*\\*"), "\n**$1**\n") // Colocar las negritas en nuevas líneas
 
     when {
         contenido.isEmpty() && error == null -> {
@@ -64,18 +60,23 @@ fun ModificarInfoAdmin(
                 initialName = nombre,
                 initialDescription = descripcion,
                 id = id,
-                contenido = formattedContent,
+                contenido = formattedContent, // Pasamos el contenido formateado a la plantilla
                 urlimagen = urlimagen,
                 bottomBarContent = {
                     AdminBarraNav(navController = navController, modifier = Modifier.fillMaxWidth())
                 },
                 onSaveClick = { nombre, descripcion, url_imagen, textContent ->
+                    val contentToSave = textContent
+                        .replace("\n-", " -")
+                        .replace("\n", " ")
+                        .replace(Regex("\\s{2,}"), " ")
+
                     CoroutineScope(Dispatchers.IO).launch {
                         val modCategoria = Categoria(
                             id = id,
                             titulo = nombre,
                             descripcion = descripcion,
-                            contenido = textContent,
+                            contenido = contentToSave,
                             url_imagen = url_imagen
                         )
                         viewModel.updateCategoria(modCategoria)
