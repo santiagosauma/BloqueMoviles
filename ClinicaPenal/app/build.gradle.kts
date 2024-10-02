@@ -54,6 +54,9 @@ android {
 
 dependencies {
 
+    implementation("com.google.android.exoplayer:exoplayer:2.19.1")
+    implementation("com.google.android.exoplayer:exoplayer-ui:2.19.1")
+
     // Firebase Authentication
     implementation("com.google.firebase:firebase-auth-ktx")
 

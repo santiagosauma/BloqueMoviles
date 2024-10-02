@@ -17,7 +17,8 @@ class VideoRepository {
                 Video(
                     url_video = document.getString("url_video") ?: "",
                     descripcion = document.getString("descripcion") ?: "",
-                    titulo = document.getString("titulo") ?: ""
+                    titulo = document.getString("titulo") ?: "",
+                    tipo = document.getString("tipo") ?: ""
                 )
             }
         } catch (e: Exception) {

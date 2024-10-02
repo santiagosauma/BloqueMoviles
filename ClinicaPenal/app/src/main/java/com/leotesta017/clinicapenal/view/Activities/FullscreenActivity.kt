@@ -1,6 +1,6 @@
 @file:Suppress("DEPRECATION")
 
-package com.leotesta017.clinicapenal.view
+package com.leotesta017.clinicapenal.view.Activities
 
 import android.app.Activity
 import android.net.Uri

@@ -1,8 +1,15 @@
+@file:Suppress("DEPRECATION")
+
 package com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral
 
+//VIEW MODEL
+
+import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
 import android.net.Uri
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -13,14 +20,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.paddingFrom
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
@@ -38,7 +43,6 @@ import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.FormatBold
 import androidx.compose.material.icons.filled.FormatItalic
 import androidx.compose.material.icons.filled.FormatUnderlined
-import androidx.compose.material.icons.filled.Fullscreen
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Search
@@ -85,24 +89,33 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.compose.ui.zIndex
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import coil.compose.AsyncImage
 import androidx.navigation.compose.currentBackStackEntryAsState
+import coil.compose.AsyncImage
+import com.google.android.exoplayer2.ExoPlayer
+import com.google.android.exoplayer2.MediaItem
+import com.google.android.exoplayer2.PlaybackException
+import com.google.android.exoplayer2.Player
+import com.google.android.exoplayer2.source.ClippingMediaSource
+import com.google.android.exoplayer2.source.ConcatenatingMediaSource
+import com.google.android.exoplayer2.source.ProgressiveMediaSource
+import com.google.android.exoplayer2.ui.PlayerView
+import com.google.android.exoplayer2.upstream.DefaultHttpDataSource
 import com.leotesta017.clinicapenal.model.CasosRepresentacion
 import com.leotesta017.clinicapenal.model.Notificacion
 import com.leotesta017.clinicapenal.model.SolicitudAdmin
 import com.leotesta017.clinicapenal.model.SolicitudGeneral
-import com.leotesta017.clinicapenal.view.FullscreenActivity
-import com.leotesta017.clinicapenal.view.extractVideoIdFromUrl
-
-//VIEW MODEL
+import com.leotesta017.clinicapenal.view.Activities.FullscreenActivity
+import com.leotesta017.clinicapenal.view.Activities.FullscreenVideoActivity
+import com.leotesta017.clinicapenal.view.Activities.extractVideoIdFromUrl
+import com.leotesta017.clinicapenal.view.Activities.formatGoogleDriveUrl
 import com.leotesta017.clinicapenal.viewmodel.CategoryViewModel
 import com.leotesta017.clinicapenal.viewmodel.ServicioViewModel
 import com.leotesta017.clinicapenal.viewmodel.VideoViewModel
-
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
@@ -351,16 +364,127 @@ fun MyTextNoticias(text: String)
 }
 
 
-
-
-
 @Composable
+fun GoogleDriveVideoPlayer(videoUrl: String, isVisible: Boolean) {
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val context = LocalContext.current
+    val formattedUrl = formatGoogleDriveUrl(videoUrl) ?: videoUrl
+
+    // Estado para gestionar si el video está cargando
+    var isBuffering by remember { mutableStateOf(true) }
+    var exoPlayer: ExoPlayer? by remember { mutableStateOf(null) }
+
+    DisposableEffect(lifecycleOwner, isVisible) {
+        if (isVisible) {
+            exoPlayer = ExoPlayer.Builder(context).build().apply {
+                val mediaItem = MediaItem.fromUri(Uri.parse(formattedUrl))
+                setMediaItem(mediaItem)
+                prepare()
+
+                // Listener para gestionar el buffering y el estado del player
+                addListener(object : Player.Listener {
+                    override fun onPlaybackStateChanged(state: Int) {
+                        when (state) {
+                            Player.STATE_BUFFERING -> isBuffering = true
+                            Player.STATE_READY -> isBuffering = false
+                        }
+                    }
+                })
+            }
+        }
+
+        val lifecycle = lifecycleOwner.lifecycle
+        val observer = LifecycleEventObserver { _, event ->
+            when (event) {
+                Lifecycle.Event.ON_PAUSE -> {
+                    exoPlayer?.playWhenReady = false
+                }
+                Lifecycle.Event.ON_DESTROY -> {
+                    exoPlayer?.release()
+                    exoPlayer = null
+                }
+                else -> Unit
+            }
+        }
+
+        lifecycle.addObserver(observer)
+
+        onDispose {
+            lifecycle.removeObserver(observer)
+            exoPlayer?.release()
+            exoPlayer = null
+        }
+    }
+
+    // Obtener la orientación actual
+    val configuration = LocalConfiguration.current
+    val screenWidthDp = configuration.screenWidthDp.dp
+    val screenHeightDp = configuration.screenHeightDp.dp
+
+    // Ajuste de altura dependiendo de la orientación
+    val videoHeight = if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+        screenHeightDp
+    } else {
+        screenWidthDp * 9 / 16 // En vertical, mantener la proporción 16:9
+    }
+
+    // Obtenemos el contexto de densidad
+    val density = LocalDensity.current
+
+    // Usamos FrameLayout para asegurar que los controles se superponen sin afectar el área del video
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(videoHeight) // Proporción adecuada 16:9
+    ) {
+        exoPlayer?.let { player ->
+            AndroidView(factory = { context ->
+                FrameLayout(context).apply {
+                    // Crear el PlayerView dentro del FrameLayout
+                    val playerView = PlayerView(context).apply {
+                        this.player = player
+                        useController = true // Mantener los controles visibles
+                        controllerShowTimeoutMs = 3000 // Mantener controles visibles por 3 segundos
+                        layoutParams = FrameLayout.LayoutParams(
+                            FrameLayout.LayoutParams.MATCH_PARENT,
+                            FrameLayout.LayoutParams.MATCH_PARENT
+                        )
+                    }
+                    this.addView(playerView) // Añadir el PlayerView al FrameLayout
+                }
+            }, update = { view ->
+                // Ajustar el tamaño del PlayerView dependiendo de la orientación
+                view.layoutParams = view.layoutParams.apply {
+                    width = ViewGroup.LayoutParams.MATCH_PARENT
+                    height = with(density) { videoHeight.roundToPx() }
+                }
+            },
+                modifier = Modifier
+                    .fillMaxHeight()
+            )
+        }
+
+        // Mostrar un CircularProgressIndicator mientras se esté cargando el video
+        if (isBuffering) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.5f)), // Fondo semitransparente
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(color = Color.White)
+            }
+        }
+    }
+}
+
+
+    @Composable
 fun YouTubePlayerWithLifecycle(videoUrl: String, isVisible: Boolean) {
     val lifecycleOwner = LocalLifecycleOwner.current
-    val videoId = extractVideoIdFromUrl(videoUrl) // Extrae el videoId del URL
+    val videoId = extractVideoIdFromUrl(videoUrl)
     var youTubePlayerInstance: YouTubePlayer? = null
 
-    // Obtenemos el contexto de densidad para convertir Dp a Px
     val density = LocalDensity.current
     val screenWidthDp = LocalConfiguration.current.screenWidthDp.dp
 
@@ -374,7 +498,7 @@ fun YouTubePlayerWithLifecycle(videoUrl: String, isVisible: Boolean) {
                 addYouTubePlayerListener(object : AbstractYouTubePlayerListener() {
                     override fun onReady(youTubePlayer: YouTubePlayer) {
                         youTubePlayerInstance = youTubePlayer
-                        youTubePlayer.cueVideo(videoId, 0f) // Cargar el video pero no reproducirlo
+                        youTubePlayer.cueVideo(videoId, 0f)
                     }
                 })
             }
@@ -385,7 +509,7 @@ fun YouTubePlayerWithLifecycle(videoUrl: String, isVisible: Boolean) {
             // Convertir Dp a Px usando el contexto de densidad
             view.layoutParams = view.layoutParams.apply {
                 width = ViewGroup.LayoutParams.MATCH_PARENT
-                height = with(density) { (screenWidthDp * 9 / 16).toPx().toInt() } // Proporción 16:9 en pixels
+                height = with(density) { (screenWidthDp * 9 / 16).toPx().toInt() }
             }
         })
 
@@ -393,10 +517,10 @@ fun YouTubePlayerWithLifecycle(videoUrl: String, isVisible: Boolean) {
             val observer = LifecycleEventObserver { _, event ->
                 when (event) {
                     Lifecycle.Event.ON_PAUSE -> {
-                        youTubePlayerInstance?.pause() // Pausar si la actividad se pausa
+                        youTubePlayerInstance?.pause()
                     }
                     Lifecycle.Event.ON_DESTROY -> {
-                        youTubePlayerInstance?.pause() // Limpiar recursos
+                        youTubePlayerInstance?.pause()
                     }
                     else -> Unit
                 }
@@ -405,7 +529,7 @@ fun YouTubePlayerWithLifecycle(videoUrl: String, isVisible: Boolean) {
             lifecycleOwner.lifecycle.addObserver(observer)
 
             if (!isVisible) {
-                youTubePlayerInstance?.pause() // Pausar si no es visible
+                youTubePlayerInstance?.pause()
             }
 
             onDispose {
@@ -418,19 +542,33 @@ fun YouTubePlayerWithLifecycle(videoUrl: String, isVisible: Boolean) {
 }
 
 
+fun isYouTubeUrl(videoUrl: String): Boolean {
+    return videoUrl.contains("youtube") || videoUrl.contains("youtu.be")
+}
 
+fun isGoogleDriveUrl(videoUrl: String): Boolean {
+    return videoUrl.contains("drive.google.com")
+}
 
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun CarruselDeNoticias(
+    tipoPantalla: String? = null,
     viewModel: VideoViewModel = viewModel(),
     contentText: @Composable (() -> Unit)? = null
 ) {
     val videos by viewModel.videos.collectAsState()
     val error by viewModel.error.collectAsState()
 
-    val totalPages = videos.size
+    // Filtrar los videos en base al tipo de pantalla
+    val filteredVideos = if (tipoPantalla == "estudiante") {
+        videos.filter { it.tipo == "estudiante" }
+    } else {
+        videos.filter { it.tipo != "estudiante" }
+    }
+
+    val totalPages = filteredVideos.size
     val pagerState = rememberPagerState { totalPages }
 
     // Obtenemos el contexto actual
@@ -457,23 +595,29 @@ fun CarruselDeNoticias(
                         state = pagerState,
                         modifier = Modifier.fillMaxSize(),
                     ) { page ->
-                        val video = videos[page]
-                        val isVisible = pagerState.currentPage == page // Determina si esta página es visible
+                        val video = filteredVideos[page]
+                        val isVisible = pagerState.currentPage == page
 
                         Box(
                             modifier = Modifier
-                                .fillMaxWidth() // Ajusta el ancho de la tarjeta
+                                .fillMaxWidth()
                                 .clip(RoundedCornerShape(20.dp))
                         ) {
                             VideoCard(
-                                videoUrl = video.url_video, // Pasamos la URL completa del video
+                                videoUrl = video.url_video,
                                 title = video.titulo,
                                 description = video.descripcion,
                                 onFullscreenClick = { url ->
-                                    // Este es el callback que inicia la actividad de fullscreen
-                                    val intent = Intent(context, FullscreenActivity::class.java)
-                                    intent.putExtra("VIDEO_URL", url)
-                                    context.startActivity(intent)
+                                    if (isYouTubeUrl(url)) {
+                                        val intent = Intent(context, FullscreenActivity::class.java)
+                                        intent.putExtra("VIDEO_URL", url)
+                                        context.startActivity(intent)
+                                    } else if (isGoogleDriveUrl(url)) {
+
+                                        val intent = Intent(context, FullscreenVideoActivity::class.java)
+                                        intent.putExtra("VIDEO_URL", url)
+                                        context.startActivity(intent)
+                                    }
                                 },
                                 isVisible = isVisible // Pasamos si el video es visible
                             )
@@ -487,13 +631,14 @@ fun CarruselDeNoticias(
     }
 }
 
+
 @Composable
 fun VideoCard(
     videoUrl: String,
     title: String,
     description: String,
-    onFullscreenClick: (String) -> Unit, // Este callback se utilizará para activar el fullscreen
-    isVisible: Boolean // Nuevo parámetro para controlar si el video está visible
+    onFullscreenClick: (String) -> Unit, // Callback para pantalla completa
+    isVisible: Boolean // Controlar si el video está visible
 ) {
     var expanded by remember { mutableStateOf(false) }
     val maxHeight = if (expanded) Int.MAX_VALUE.dp else 428.dp
@@ -503,7 +648,7 @@ fun VideoCard(
             .fillMaxWidth()
             .padding(top = 8.dp, start = 16.dp, end = 16.dp, bottom = 16.dp)
             .heightIn(min = 428.dp, max = maxHeight)
-            .clip(RoundedCornerShape(16.dp)), // Aplicamos bordes redondeados a la tarjeta completa
+            .clip(RoundedCornerShape(16.dp)), // Aplicamos bordes redondeados a la tarjeta
         colors = CardDefaults.cardColors(containerColor = Color(0xFFf0eee9)),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         shape = RoundedCornerShape(16.dp) // Bordes redondeados para la tarjeta
@@ -511,35 +656,46 @@ fun VideoCard(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 16.dp) // Eliminamos padding vertical
+                .padding(horizontal = 16.dp, vertical = 16.dp)
         ) {
             // Cuadro del video y el botón en el mismo Box
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(276.dp)
+                    .height(275.dp)
                     .padding(bottom = 16.dp)
-                    .clip(RoundedCornerShape(16.dp)), // Aplicamos bordes redondeados al video también
             ) {
-                // Video alineado en la parte superior
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .align(Alignment.TopCenter) // Alinea el video en la parte superior
-                        .clip(RoundedCornerShape(16.dp)) // Redondeamos las esquinas del video
+                Box(modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.TopCenter)
+                    .clip(RoundedCornerShape(16.dp))
                 ) {
-                    YouTubePlayerWithLifecycle(videoUrl = videoUrl, isVisible = isVisible) // Reproduce el video
+
+                    if(isYouTubeUrl(videoUrl))  {
+                        YouTubePlayerWithLifecycle(videoUrl = videoUrl, isVisible = isVisible)
+                    }
+
+                    else if (isGoogleDriveUrl(videoUrl)) {
+                        GoogleDriveVideoPlayer(videoUrl = videoUrl, isVisible = isVisible)
+                    }
+
+                    else {
+                        Text("URL no compatible", color = Color.Red)
+                    }
+
                 }
 
-                // Botón de "Pantalla Completa" alineado en la parte inferior
+                // Botón para pantalla completa
                 Button(
                     onClick = { onFullscreenClick(videoUrl) },
-                    colors = ButtonDefaults.buttonColors(Color(0xFF0B1F8C)), // Color de fondo del botón
+                    colors = ButtonDefaults.buttonColors(Color(0xFF0B1F8C)),
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(36.dp)
-                        .align(Alignment.BottomCenter) // Alinea el botón en la parte inferior
-                        .clip(RoundedCornerShape(16.dp)) // Redondeamos también el botón
+                        .align(Alignment.BottomCenter)
+                        .clip(RoundedCornerShape(16.dp))
+                        .zIndex(1f) // Elevar el botón por encima del PlayerView
+
                 ) {
                     Row(
                         horizontalArrangement = Arrangement.Center,
@@ -555,7 +711,7 @@ fun VideoCard(
                 }
             }
 
-            Spacer(modifier = Modifier.height(8.dp)) // Espacio después del botón
+            Spacer(modifier = Modifier.height(8.dp))
 
             // Mostrar el título
             Text(
@@ -589,8 +745,6 @@ fun VideoCard(
         }
     }
 }
-
-
 
 
 
