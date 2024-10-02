@@ -72,7 +72,7 @@ fun Pantalla9(navController: NavController) {
                 .fillMaxWidth()
                 .padding(top = 16.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color.Blue,
+                containerColor = Color(0xFF002366),
                 contentColor = Color.White
             )
         ) {

@@ -61,7 +61,7 @@ fun Pantalla3(navController: NavController) {
             modifier = Modifier
                 .fillMaxWidth()
                 .offset(y = (-48).dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color.Blue)
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF002366))
         ) {
             Text(text = "Iniciar Sesión")
         }

@@ -31,8 +31,14 @@ fun Pantalla6(navController: NavController) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        IconButton(onClick = { navController.popBackStack() }) {
-            Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Volver")
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Start
+        ) {
+            IconButton(onClick = { navController.popBackStack() }) {
+                Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Volver")
+            }
+            Spacer(Modifier.weight(1f))
         }
 
         Image(
@@ -72,7 +78,7 @@ fun Pantalla6(navController: NavController) {
                 .fillMaxWidth()
                 .padding(top = 16.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color.Blue,
+                containerColor = Color(0xFF002366),
                 contentColor = Color.White
             )
         ) {

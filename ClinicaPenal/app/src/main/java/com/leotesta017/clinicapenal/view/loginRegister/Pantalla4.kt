@@ -122,7 +122,7 @@ fun Pantalla4(navController: NavController) {
             Checkbox(
                 checked = terminosAceptados,
                 onCheckedChange = { terminosAceptados = it },
-                colors = CheckboxDefaults.colors(checkedColor = Color.Blue)
+                colors = CheckboxDefaults.colors(checkedColor = Color(0xFF002366))
             )
             Text(
                 text = "Acepto los ",
@@ -131,7 +131,7 @@ fun Pantalla4(navController: NavController) {
             Text(
                 text = "términos y condiciones",
                 style = MaterialTheme.typography.bodyLarge.copy(
-                    color = Color.Blue,
+                    color = Color(0xFF002366),
                     textDecoration = TextDecoration.Underline
                 ),
                 modifier = Modifier.clickable {
@@ -183,7 +183,7 @@ fun Pantalla4(navController: NavController) {
             },
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color.Blue,
+                containerColor = Color(0xFF002366),
                 contentColor = Color.White
             )
         ) {
@@ -198,7 +198,7 @@ fun Pantalla4(navController: NavController) {
         ) {
             Text(
                 text = "Soy Clínica Penal",
-                style = MaterialTheme.typography.bodyLarge.copy(color = Color.Blue),
+                style = MaterialTheme.typography.bodyLarge.copy(color = Color(0xFF002366)),
                 modifier = Modifier.clickable { navController.navigate("pantalla6") }
             )
         }

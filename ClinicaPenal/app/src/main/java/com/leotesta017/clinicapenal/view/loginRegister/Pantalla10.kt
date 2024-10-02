@@ -28,6 +28,7 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Pantalla10(navController: NavController) {
     var nombre by remember { mutableStateOf("") }
@@ -39,10 +40,8 @@ fun Pantalla10(navController: NavController) {
     var contrasenaVisible by remember { mutableStateOf(false) }
     var mensajeError by remember { mutableStateOf("") }
 
-    // Validación del correo
     val correoValido = correo.endsWith("@gmail.com") || correo.endsWith("@outlook.com") || correo.endsWith("@tec.mx")
 
-    // Validación de la contraseña
     val contrasenaValida = contrasena.isNotBlank() &&
             contrasena == repetirContrasena &&
             !contrasena.contains(' ') && !contrasena.contains('.')
@@ -53,8 +52,14 @@ fun Pantalla10(navController: NavController) {
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        IconButton(onClick = { navController.popBackStack() }) {
-            Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Volver")
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 8.dp)
+        ) {
+            IconButton(onClick = { navController.popBackStack() }) {
+                Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Volver")
+            }
         }
 
         Image(
@@ -83,8 +88,13 @@ fun Pantalla10(navController: NavController) {
             value = correo,
             onValueChange = { correo = it },
             label = { Text("Correo") },
-            isError = !correoValido,
-            modifier = Modifier.fillMaxWidth()
+            isError = correo.isNotEmpty() && !correoValido,
+            modifier = Modifier.fillMaxWidth(),
+            colors = TextFieldDefaults.outlinedTextFieldColors(
+                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                unfocusedBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                errorBorderColor = Color.Red
+            )
         )
 
         OutlinedTextField(
@@ -116,7 +126,7 @@ fun Pantalla10(navController: NavController) {
                 checked = terminosAceptados,
                 onCheckedChange = { terminosAceptados = it },
                 colors = CheckboxDefaults.colors(
-                    checkedColor = Color.Blue // Color de la palomita cuando está marcada
+                    checkedColor = Color(0xFF002366)
                 )
             )
             Text(
@@ -127,7 +137,7 @@ fun Pantalla10(navController: NavController) {
                 text = "términos y condiciones",
                 style = MaterialTheme.typography.bodyLarge.copy(
                     color = Color.Blue,
-                    textDecoration = TextDecoration.Underline // Subraya el texto
+                    textDecoration = TextDecoration.Underline
                 ),
                 modifier = Modifier.clickable {
                     val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.minecraft.net/es-es/terms/r2"))
@@ -147,18 +157,16 @@ fun Pantalla10(navController: NavController) {
         Button(
             onClick = {
                 if (nombre.isNotEmpty() && apellidos.isNotEmpty() && correoValido && contrasenaValida && terminosAceptados) {
-                    // Crear el usuario en Firebase Authentication
                     Firebase.auth.createUserWithEmailAndPassword(correo, contrasena)
                         .addOnCompleteListener { task ->
                             if (task.isSuccessful) {
-                                // Guardar el tipo de usuario en Firestore
                                 val userId = task.result?.user?.uid
                                 val db = Firebase.firestore
                                 val user = hashMapOf(
                                     "nombre" to nombre,
                                     "apellidos" to apellidos,
                                     "correo" to correo,
-                                    "tipo" to "colaborador" // Especificar que es un usuario colaborador
+                                    "tipo" to "colaborador"
                                 )
                                 userId?.let {
                                     db.collection("usuarios").document(it)
@@ -180,14 +188,15 @@ fun Pantalla10(navController: NavController) {
             },
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color.Blue, // Color personalizado
-                contentColor = Color.White // Texto negro
+                containerColor = Color(0xFF002366),
+                contentColor = Color.White
             )
         ) {
             Text(text = "Crear Cuenta")
         }
     }
 }
+
 
 @Preview(showBackground = true)
 @Composable

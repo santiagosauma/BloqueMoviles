@@ -62,7 +62,7 @@ fun IntroScreen(
 
         Button(
             onClick = onNextClick,
-            colors = ButtonDefaults.buttonColors(containerColor = Color.Blue)
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF002366))
         ) {
             Text(text = "Siguiente", color = MaterialTheme.colorScheme.onPrimary)
         }
@@ -76,7 +76,7 @@ fun CircleIndicator(isActive: Boolean) {
             .size(8.dp)
             .clip(CircleShape)
             .background(
-                color = if (isActive) Color.Blue else Color.Gray
+                color = if (isActive) Color(0xFF002366) else Color.Gray
             )
     )
 }

@@ -154,7 +154,7 @@ fun Pantalla5(navController: NavController) {
             },
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color.Blue,
+                containerColor = Color(0xFF002366),
                 contentColor = Color.White
             )
         ) {

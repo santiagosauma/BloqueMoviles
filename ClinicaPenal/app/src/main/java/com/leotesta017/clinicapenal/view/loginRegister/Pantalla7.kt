@@ -50,7 +50,7 @@ fun Pantalla7(navController: NavController) {
         Button(
             onClick = { navController.navigate("pantalla9") },
             modifier = Modifier.fillMaxWidth(),
-            colors = ButtonDefaults.buttonColors(containerColor = Color.Blue)
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF303665))
         ) {
             Text(text = "Colaborador")
         }
