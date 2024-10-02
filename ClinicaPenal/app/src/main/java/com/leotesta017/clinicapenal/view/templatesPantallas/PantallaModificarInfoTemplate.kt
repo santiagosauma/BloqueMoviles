@@ -1,9 +1,7 @@
-
 package com.leotesta017.clinicapenal.view.templatesPantallas
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -40,15 +38,13 @@ import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.RoundedButton
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.TextEditor
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.TopBar
 
-
-
 @Composable
 fun PantallaModificarInformacionTemplate(
     navController: NavController?,
     titulo: String,
     textDescripcion: String,
     bottomBar: @Composable () -> Unit,
-    content: @Composable (PaddingValues, String, (String) -> Unit) -> Unit
+    content: @Composable (String, (String) -> Unit) -> Unit
 ) {
     var currentTextStyle by remember { mutableStateOf(TextStyle.Default) }
     var textContent by remember { mutableStateOf(textDescripcion) }
@@ -57,7 +53,6 @@ fun PantallaModificarInformacionTemplate(
         topBar = {
             Column {
                 TopBar()
-
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
@@ -91,13 +86,10 @@ fun PantallaModificarInformacionTemplate(
                 item {
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    content(paddingValues, textContent) { newText ->
-                        textContent = newText
-                    }
+                    content(textContent) { newText -> textContent = newText }
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // Colocamos los botones de estilo arriba del editor
                     ApplyStyleButtons(
                         onApplyBold = {
                             currentTextStyle = currentTextStyle.copy(
@@ -109,12 +101,9 @@ fun PantallaModificarInformacionTemplate(
                                 fontStyle = if (currentTextStyle.fontStyle == FontStyle.Italic) FontStyle.Normal else FontStyle.Italic
                             )
                         },
-                        onApplyUnderline = {
-                            // Aquí puedes manejar el subrayado de manera personalizada si es necesario
-                        }
+                        onApplyUnderline = {}
                     )
 
-                    // Editor de texto más grande y scrollable
                     TextEditor(
                         initialText = textContent,
                         onTextChange = { newText -> textContent = newText },
@@ -126,8 +115,6 @@ fun PantallaModificarInformacionTemplate(
     )
 }
 
-
-
 @Composable
 fun ModificarInfoTemplate(
     navController: NavController?,
@@ -138,13 +125,13 @@ fun ModificarInfoTemplate(
     contenido: String,
     urlimagen: String,
     bottomBarContent: @Composable () -> Unit,
-    onSaveClick: (String, String, String, String) -> Unit, // Incluye `textContent`
+    onSaveClick: (String, String, String, String) -> Unit,
     onCancelClick: () -> Unit
 ) {
     var nombre by remember { mutableStateOf(initialName) }
     var descripcion by remember { mutableStateOf(initialDescription) }
     var url_imagen by remember { mutableStateOf(urlimagen) }
-    var textContent by remember { mutableStateOf(contenido) } // Manejamos `textContent`
+    var textContent by remember { mutableStateOf(contenido) }
 
     PantallaModificarInformacionTemplate(
         navController = navController,
@@ -157,10 +144,6 @@ fun ModificarInfoTemplate(
                     .padding(horizontal = 16.dp, vertical = 16.dp),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                var isSaving by remember {
-                    mutableStateOf(false)
-                }
-
                 RoundedButton(
                     icon = Icons.Default.Save,
                     label = "Guardar",
@@ -178,7 +161,7 @@ fun ModificarInfoTemplate(
             }
             bottomBarContent()
         },
-        content = { paddingValues, textDescripcion, onTextChange ->
+        content = { textDescripcion, onTextChange ->
             OutlinedTextField(
                 value = nombre,
                 onValueChange = { nombre = it },
@@ -214,6 +197,3 @@ fun ModificarInfoTemplate(
         }
     )
 }
-
-
-

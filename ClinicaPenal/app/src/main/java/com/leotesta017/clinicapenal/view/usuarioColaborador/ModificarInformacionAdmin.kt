@@ -1,4 +1,3 @@
-
 package com.leotesta017.clinicapenal.view.usuarioColaborador
 
 import androidx.compose.foundation.layout.Column
@@ -13,18 +12,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.leotesta017.clinicapenal.model.Categoria
-import com.leotesta017.clinicapenal.model.Servicio
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.AdminBarraNav
 import com.leotesta017.clinicapenal.view.templatesPantallas.ModificarInfoTemplate
 import com.leotesta017.clinicapenal.viewmodel.CategoryViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-
 
 @Composable
 fun ModificarInfoAdmin(
@@ -35,49 +31,47 @@ fun ModificarInfoAdmin(
     urlimagen: String,
     viewModel: CategoryViewModel = viewModel()
 ) {
-    // Suponiendo que obtenemos "nombre" basado en el `id`
     val nombre = titulo
 
     LaunchedEffect(id) {
         viewModel.fetchContenidoById(id)
     }
 
-    // Obtener el contenido del servicio desde el ViewModel
     val contenido by viewModel.contenido.collectAsState()
-
-    // Aquí puedes manejar cualquier error si lo necesitas
     val error by viewModel.error.collectAsState()
 
+    // Formateamos el contenido de forma más controlada para no romper los pares de negritas
+    val formattedContent = contenido
+        .replace("-", "\n-") // Aseguramos que las listas comiencen en una nueva línea
+        .replace(Regex("\\*\\*(.*?)\\*\\*"), "\n**$1**\n") // Colocamos las negritas completas en líneas separadas
+        .replace(Regex("(?<=\\*)\\*\\*(?!\\*)"), "") // Aseguramos que no haya salto entre pares de asteriscos
+        .replace(Regex("(?<!\\*)\\*\\*(?=\\w)"), "\n**") // Aseguramos que una nueva sección de negritas comience en una nueva línea
+        .trim() // Quitamos cualquier espacio en blanco innecesario al final o al inicio
 
-    //FUNCIONES PARA EL PROCESAMIENTO MARKDOWN DEL CONTENIDO CON UN GET EN BASE AL ID
     when {
         contenido.isEmpty() && error == null -> {
             Column(modifier = Modifier.fillMaxSize()) {
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
             }
-
         }
-
         error != null -> {
             Text(text = error ?: "Error desconocido", color = Color.Red)
         }
-
-        contenido.isNotEmpty() ->{
+        contenido.isNotEmpty() -> {
             ModificarInfoTemplate(
                 navController = navController,
                 titulo = "Modificar Categoria",
                 initialName = nombre,
                 initialDescription = descripcion,
                 id = id,
-                contenido = contenido,
+                contenido = formattedContent,
                 urlimagen = urlimagen,
-
                 bottomBarContent = {
                     AdminBarraNav(navController = navController, modifier = Modifier.fillMaxWidth())
                 },
-                onSaveClick = { nombre,descripcion,url_imagen,textContent ->
+                onSaveClick = { nombre, descripcion, url_imagen, textContent ->
                     CoroutineScope(Dispatchers.IO).launch {
-                        var modCategoria = Categoria(
+                        val modCategoria = Categoria(
                             id = id,
                             titulo = nombre,
                             descripcion = descripcion,
@@ -87,24 +81,8 @@ fun ModificarInfoAdmin(
                         viewModel.updateCategoria(modCategoria)
                     }
                 },
-                onCancelClick = {
-                    // Lógica para cancelar
-                }
+                onCancelClick = {}
             )
         }
     }
-}
-
-
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewModificarInfoAdmin() {
-    ModificarInfoAdmin(
-        navController = null,
-        id = "456",
-        titulo = "Modificar Información",
-        descripcion = "Descripción de la información",
-        urlimagen =  ""
-    )
 }
