@@ -94,7 +94,10 @@ fun GoogleDriveVideoPlayer(
                     @Deprecated("Deprecated in Java")
                     override fun onPositionDiscontinuity(reason: Int) {
                         super.onPositionDiscontinuity(reason)
-                        cache.updateVideoPosition(formattedUrl, exoPlayer?.currentPosition ?: 0)
+
+                        if (reason == Player.DISCONTINUITY_REASON_SEEK) {
+                            cache.updateVideoPosition(formattedUrl, exoPlayer?.currentPosition ?: 0)
+                        }
                     }
                 })
             }
