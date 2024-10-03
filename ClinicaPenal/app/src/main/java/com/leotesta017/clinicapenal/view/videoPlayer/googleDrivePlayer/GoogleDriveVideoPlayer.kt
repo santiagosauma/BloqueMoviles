@@ -47,7 +47,6 @@ fun GoogleDriveVideoPlayer(
     val formattedUrl = formatGoogleDriveUrl(videoUrl) ?: videoUrl
 
     val cache = MediaCacheSingleton.mediaFileCache
-    val cachedMediaItem = cache.getOrCreateMediaItem(formattedUrl)
 
     var isBuffering by remember { mutableStateOf(true) }
     var exoPlayer: ExoPlayer? by remember { mutableStateOf(null) }
@@ -66,6 +65,7 @@ fun GoogleDriveVideoPlayer(
 
     DisposableEffect(lifecycleOwner, isVisible) {
         if (isVisible) {
+            val cachedMediaItem = cache.getOrCreateMediaItem(formattedUrl)
             exoPlayer?.release()
             exoPlayer = ExoPlayer.Builder(context).build().apply {
                 setMediaItem(cachedMediaItem.mediaItem)

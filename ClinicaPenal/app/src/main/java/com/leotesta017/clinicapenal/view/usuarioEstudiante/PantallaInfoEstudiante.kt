@@ -17,18 +17,31 @@ import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.EstudiantesBarraN
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.LabelCategoriaConBoton
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.MyTextNoticias
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.PantallasExtra
+import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.SearchBarPantallaInfo
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.ServicesSection
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.SpacedItem
 
 //VIEW MODEL
-import com.leotesta017.clinicapenal.viewmodel.CategoryViewModel
-import com.leotesta017.clinicapenal.viewmodel.ServicioViewModel
 import com.leotesta017.clinicapenal.viewmodel.VideoViewModel
 
 @Composable
 fun PantallaInfoEstudiante(navController: NavController?) {
     PantallaInfoGenerica(
         navController = navController,
+        searchBar = { categorias, servicios, errorCategoria, errorServicio, onSearchStarted ->
+            SearchBarPantallaInfo(
+                searchText = "",
+                onSearchTextChange = {},
+                categorias = categorias,
+                servicios = servicios,
+                errorCategoria = errorCategoria,
+                errorServicio = errorServicio,
+                navController = navController,
+                routeCategoria = "modificar-info",
+                routeServicio = "modificar_servicios_info",
+                onSearchStarted = onSearchStarted
+            )
+        },
 
         //SECCION DE NOTICIAS
         noticias = {
@@ -43,7 +56,7 @@ fun PantallaInfoEstudiante(navController: NavController?) {
         },
 
         //SECCION DE INFORMACION LEGAL
-        informacionLegal = {
+        informacionLegal = { categorias, error ->
             LabelCategoriaConBoton(
                 label = "Información Legal",
                 navController = navController,
@@ -52,26 +65,29 @@ fun PantallaInfoEstudiante(navController: NavController?) {
             )
 
             CategoriesSection(
-                    navController = navController,
-                    viewModel = CategoryViewModel(),
-                    route = "modificar-info"
+                navController = navController,
+                route = "modificar-info",
+                categories = categorias,
+                error =  error
             )
 
         },
 
         //SECCION DE SERVICIOS
-        servicios = {
+        servicios = { servicios,error ->
             LabelCategoriaConBoton(
                 label = "Servicios",
                 navController = navController,
                 modifier = Modifier.padding(0.dp),
                 navigateroute = "agregar-servicio-estudiante"
+
             )
 
             ServicesSection(
-                    navController = navController,
-                    viewModel = ServicioViewModel(),
-                    route = "modificar_servicios_info"
+                navController = navController,
+                route = "modificar_servicios_info",
+                servicios = servicios,
+                error = error
             )
 
         },

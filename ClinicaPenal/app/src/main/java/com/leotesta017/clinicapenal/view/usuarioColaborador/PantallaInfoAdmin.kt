@@ -16,30 +16,44 @@ import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.CarruselDeNoticia
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.CategoriesSection
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.LabelCategoriaConBoton
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.PantallasExtra
+import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.SearchBarPantallaInfo
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.ServicesSection
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.SpacedItem
 
 //VIEWMODEL
-import com.leotesta017.clinicapenal.viewmodel.CategoryViewModel
-import com.leotesta017.clinicapenal.viewmodel.ServicioViewModel
 import com.leotesta017.clinicapenal.viewmodel.VideoViewModel
 
 @Composable
 fun PantallaInfoAdmin(navController: NavController?) {
     PantallaInfoGenerica(
         navController = navController,
+        searchBar = { categorias, servicios, errorCategoria, errorServicio, onSearchStarted ->
+            SearchBarPantallaInfo(
+                searchText = "",
+                onSearchTextChange = {},
+                categorias = categorias,
+                servicios = servicios,
+                errorCategoria = errorCategoria,
+                errorServicio = errorServicio,
+                navController = navController,
+                routeCategoria = "modificar-info",
+                routeServicio = "modificar_servicios_info",
+                onSearchStarted = onSearchStarted
+            )
+        },
+
         noticias = {
             LabelCategoriaConBoton(
                 label = "Noticias",
                 navController = navController,
                 modifier = Modifier.padding(0.dp),
-                navigateroute = "modificar-info"
+                navigateroute = "modificar-info",
             )
             SpacedItem(spacing = 16) {
                 CarruselDeNoticias(viewModel = VideoViewModel())
             }
         },
-        informacionLegal = {
+        informacionLegal = { categorias,error ->
             LabelCategoriaConBoton(
                 label = "Información Legal",
                 navController = navController,
@@ -48,13 +62,14 @@ fun PantallaInfoAdmin(navController: NavController?) {
             )
 
             CategoriesSection(
-                    navController = navController,
-                    viewModel = CategoryViewModel(),
-                    route = "modificar-info"
+                navController = navController,
+                route = "modificar-info",
+                categories = categorias,
+                error = error
             )
 
         },
-        servicios = {
+        servicios = { servicios,error ->
             LabelCategoriaConBoton(
                 label = "Servicios",
                 navController = navController,
@@ -63,10 +78,11 @@ fun PantallaInfoAdmin(navController: NavController?) {
             )
 
             ServicesSection(
-                    navController = navController,
-                    viewModel = ServicioViewModel(),
-                    route = "modificar_servicios_info"
-                )
+                navController = navController,
+                route = "modificar_servicios_info",
+                servicios = servicios,
+                error = error
+            )
 
         },
         pantallasExtra = {

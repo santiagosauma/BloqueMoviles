@@ -1,5 +1,3 @@
-@file:Suppress("DEPRECATION", "UNUSED_EXPRESSION")
-
 package com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral
 
 //VIEW MODEL
@@ -40,6 +38,7 @@ import androidx.compose.material.icons.filled.FormatUnderlined
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.SearchOff
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -84,15 +83,15 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import coil.compose.AsyncImage
 import com.leotesta017.clinicapenal.model.CasosRepresentacion
+import com.leotesta017.clinicapenal.model.Categoria
 import com.leotesta017.clinicapenal.model.Notificacion
+import com.leotesta017.clinicapenal.model.Servicio
 import com.leotesta017.clinicapenal.model.SolicitudAdmin
 import com.leotesta017.clinicapenal.model.SolicitudGeneral
 import com.leotesta017.clinicapenal.view.videoPlayer.googleDrivePlayer.GoogleDriveVideoPlayer
 import com.leotesta017.clinicapenal.view.videoPlayer.youtubeVideoPlayer.YouTubePlayerWithLifecycle
 import com.leotesta017.clinicapenal.view.videoPlayer.fullscreenActivities.FullscreenActivity
 import com.leotesta017.clinicapenal.view.videoPlayer.fullscreenActivities.FullscreenVideoActivity
-import com.leotesta017.clinicapenal.viewmodel.CategoryViewModel
-import com.leotesta017.clinicapenal.viewmodel.ServicioViewModel
 import com.leotesta017.clinicapenal.viewmodel.VideoViewModel
 
 // ========================================
@@ -116,7 +115,8 @@ fun TopBar() {
 }
 
 @Composable
-fun SearchBar(searchText: String)
+fun SearchBar(searchText: String
+)
 {
     OutlinedTextField(
         value = searchText,
@@ -132,6 +132,113 @@ fun SearchBar(searchText: String)
         singleLine = true
     )
 }
+
+@Composable
+fun SearchBarPantallaInfo(
+    searchText: String,
+    onSearchTextChange: (String) -> Unit,
+    categorias: List<Categoria>? = null,
+    servicios: List<Servicio>? = null,
+    errorCategoria: String? = "",
+    errorServicio: String? = "",
+    navController: NavController?,
+    routeCategoria: String,
+    routeServicio: String,
+    onSearchStarted: (Boolean) -> Unit
+) {
+    var search by remember { mutableStateOf(searchText) }
+
+    OutlinedTextField(
+        value = search,
+        onValueChange = {
+            search = it
+            onSearchTextChange(it)
+            onSearchStarted(it.isNotBlank())
+        },
+        label = { Text("Buscar...") },
+        leadingIcon = {
+            Icon(imageVector = Icons.Default.Search, contentDescription = "Search Icon")
+        },
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
+        textStyle = TextStyle(fontSize = 18.sp, color = Color.Black),
+        singleLine = true
+    )
+
+    var resServicio = false
+    var resCategoria = false
+
+
+    if (search.isNotBlank() && !categorias.isNullOrEmpty()) {
+        val filteredCategorias = categorias.filter { it.titulo.contains(search, ignoreCase = true) }
+        if (filteredCategorias.isNotEmpty()) {
+            filteredCategorias.forEach { categoria ->
+                CategoryItem(
+                    title = categoria.titulo,
+                    description = categoria.descripcion,
+                    imageUrl = categoria.url_imagen,
+                    navController = navController,
+                    route = routeCategoria,
+                    categoriaId = categoria.id
+                )
+            }
+        }
+        else{
+            resCategoria = true
+        }
+    }
+
+    // Mostrar servicios que coinciden con la búsqueda
+    if (search.isNotBlank() && !servicios.isNullOrEmpty()) {
+        val filteredServicios = servicios.filter { it.titulo.contains(search, ignoreCase = true) }
+        if (filteredServicios.isNotEmpty()) {
+            filteredServicios.forEach { servicio ->
+                ServiceItem(
+                    title = servicio.titulo,
+                    description = servicio.descripcion,
+                    imageUrl = servicio.url_imagen,
+                    navController = navController,
+                    route = routeServicio,
+                    servicioId = servicio.id
+                )
+            }
+        }
+        else{
+            resServicio = true
+        }
+    }
+    SpacedItem(spacing = 32) {
+
+    }
+    if (search.isNotBlank() && resServicio && resCategoria) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(start = 16.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.SearchOff, // Cambia por el ícono que prefieras
+                contentDescription = "Sin resultados",
+                modifier = Modifier.size(48.dp),
+                tint = Color.Gray
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            LabelCategoria(
+                label = "No se encontró información relacionada",
+                modifier = Modifier.padding(start = 8.dp)
+            )
+        }
+    }
+
+    if (!errorCategoria.isNullOrEmpty()) {
+        Text(text = errorCategoria, color = Color.Red)
+    }
+
+    if (!errorServicio.isNullOrEmpty()) {
+        Text(text = errorServicio, color = Color.Red)
+    }
+}
+
 
 
 @Composable
@@ -356,6 +463,7 @@ fun CarruselDeNoticias(
     val videos by viewModel.videos.collectAsState()
     val error by viewModel.error.collectAsState()
 
+
     // Filtrar los videos en base al tipo de pantalla
     val filteredVideos = if (tipoPantalla == "estudiante") {
         videos.filter { it.tipo == "estudiante" }
@@ -414,7 +522,7 @@ fun CarruselDeNoticias(
                                         context.startActivity(intent)
                                     }
                                 },
-                                isVisible = isVisible,// Pasamos si el video es visible
+                                isVisible = isVisible,
                             )
                         }
                     }
@@ -554,37 +662,37 @@ fun VideoCard(
 @Composable
 fun CategoriesSection(
     navController: NavController?,
-    viewModel: CategoryViewModel = viewModel(),
-    route: String
+    route: String,
+    categories: List<Categoria>,
+    error: String?
 ) {
-    val categories by viewModel.categorias.collectAsState()
-    val error by viewModel.error.collectAsState()
+    val loading = categories.isEmpty() && error == null
 
-    Column(
-        modifier = Modifier.padding(4.dp)
-    ) {
-        when {
-            categories.isEmpty() && error == null -> {
-                CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+    Column(modifier = Modifier.padding(4.dp))
+    {
+        if (categories.isNotEmpty()) {
+            categories.forEach { category ->
+                CategoryItem(
+                    title = category.titulo,
+                    description = category.descripcion,
+                    imageUrl = category.url_imagen,
+                    navController = navController,
+                    route = route,
+                    categoriaId = category.id
+                )
             }
-            error != null -> {
-                Text(text = error ?: "Error desconocido", color = Color.Red)
-            }
-            categories.isNotEmpty() -> {
-                categories.forEach { category ->
-                    CategoryItem(
-                        title = category.titulo,
-                        description = category.descripcion,
-                        imageUrl = category.url_imagen, // Pasamos la URL de la imagen
-                        navController = navController,
-                        route = route,
-                        categoriaId = category.id // Pasar el ID de la categoría
-                    )
-                }
-            }
-            else -> {
-                Text(text = "No hay categorías disponibles", color = Color.Gray)
-            }
+        }
+
+        else if (error != null) {
+            Text(text = error, color = Color.Red)
+        }
+
+        if (loading) {
+            CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+        }
+
+        if (!loading && categories.isEmpty()) {
+            Text(text = "No hay categorías disponibles", color = Color.Gray)
         }
     }
 }
@@ -605,60 +713,56 @@ fun CategoryItem(
             .padding(16.dp)
             .clickable {
                 val encodedUrlImagen = Uri.encode(imageUrl)
-                navController?.navigate("$route/$title/$description/$categoriaId/$encodedUrlImagen") // Navegar con el ID de la categoría
+                navController?.navigate("$route/$title/$description/$categoriaId/$encodedUrlImagen")
             },
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFf0eee9)), // Color de fondo personalizado para la tarjeta
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp), // Elevación estándar para sombra
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFf0eee9)),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         shape = RoundedCornerShape(16.dp) // Bordes redondeados
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp) // Espaciado interno de la tarjeta
+                .padding(16.dp)
         ) {
-            // Imagen destacada en la parte superior con fondo gris
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(12.dp))
             ) {
                 AsyncImage(
-                    model = imageUrl, // Imagen de prueba
+                    model = imageUrl,
                     contentDescription = null,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(180.dp) // Imagen más grande
-                        .clip(RoundedCornerShape(8.dp)), // Bordes redondeados para la imagen
+                        .height(180.dp)
+                        .clip(RoundedCornerShape(8.dp)),
                     contentScale = ContentScale.Crop
                 )
             }
 
-            Spacer(modifier = Modifier.height(16.dp)) // Espaciado entre la imagen y el contenido
+            Spacer(modifier = Modifier.height(16.dp))
 
-            // Contenido del título y la descripción
             Row(
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 Column(
                 )
                 {
-                    // Título de la tarjeta
                     Text(
                         text = title,
-                        fontSize = 18.sp, // Tamaño de texto para títulos
+                        fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSurface // Color según el tema
+                        color = MaterialTheme.colorScheme.onSurface
                     )
 
-                    Spacer(modifier = Modifier.height(4.dp)) // Espacio reducido entre el título y descripción
+                    Spacer(modifier = Modifier.height(4.dp))
 
-                    // Descripción de la tarjeta
                     Text(
                         text = description,
-                        fontSize = 14.sp, // Tamaño de texto para contenido secundario
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f), // Color secundario con opacidad
-                        maxLines = 2, // Limitar a dos líneas
-                        overflow = TextOverflow.Ellipsis // Cortar el texto si es necesario
+                        fontSize = 14.sp,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
             }
@@ -666,40 +770,41 @@ fun CategoryItem(
     }
 }
 
-
 //FUNCIONES PARA ITEMS DE SERVICIO
 @Composable
 fun ServicesSection(
     navController: NavController?,
-    viewModel: ServicioViewModel = viewModel(),
-    route: String
+    route: String,
+    servicios: List<Servicio>,
+    error: String?
 ) {
-    val servicios by viewModel.servicios.collectAsState()
-    val error by viewModel.error.collectAsState()
+    val loading = servicios.isEmpty() && error == null
 
-    Column(modifier = Modifier.padding(4.dp)) {
-        when {
-            servicios.isEmpty() && error == null -> {
-                CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+    Column(modifier = Modifier.padding(4.dp))
+    {
+        if (servicios.isNotEmpty()) {
+            servicios.forEach { servicio ->
+                ServiceItem(
+                    title = servicio.titulo,
+                    description = servicio.descripcion,
+                    imageUrl = servicio.url_imagen,
+                    navController = navController,
+                    route = route,
+                    servicioId = servicio.id
+                )
             }
-            error != null -> {
-                Text(text = error ?: "Error desconocido", color = Color.Red)
-            }
-            servicios.isNotEmpty() -> {
-                servicios.forEach { servicio ->
-                    ServiceItem(
-                        title = servicio.titulo,
-                        description = servicio.descripcion,
-                        imageUrl = servicio.url_imagen,
-                        navController = navController,
-                        route = route,
-                        servicioId = servicio.id // Pasar el ID del servicio
-                    )
-                }
-            }
-            else -> {
-                Text(text = "No hay servicios disponibles", color = Color.Gray)
-            }
+        }
+
+        else if (error != null) {
+            Text(text = error, color = Color.Red)
+        }
+
+        if (loading) {
+            CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+        }
+
+        if (!loading && servicios.isEmpty()) {
+            Text(text = "No hay servicios disponibles", color = Color.Gray)
         }
     }
 }
@@ -1353,7 +1458,7 @@ fun TextEditor(
             .border(1.dp, Color.Gray, RoundedCornerShape(8.dp))
             .padding(8.dp)
             .fillMaxWidth()
-            .height(300.dp) // Ajusta la altura según tus necesidades
+            .height(300.dp)
             .verticalScroll(rememberScrollState())
     ) {
         BasicTextField(
@@ -1406,7 +1511,9 @@ fun preprocesarMarkdown(markdown: String): String {
 
 @Composable
 fun CustomMarkdownText(content: String) {
-    Column(modifier = Modifier.fillMaxWidth().padding(vertical = 0.dp)) {
+    Column(modifier = Modifier
+        .fillMaxWidth()
+        .padding(vertical = 0.dp)) {
         val lines = content.split("\n")
         for (line in lines) {
             when {

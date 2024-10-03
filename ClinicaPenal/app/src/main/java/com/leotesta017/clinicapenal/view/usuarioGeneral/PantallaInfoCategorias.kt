@@ -19,17 +19,31 @@ import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.LabelCategoria
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.MyTextNoticias
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.ServicesSection
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.PantallasExtra
+import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.SearchBarPantallaInfo
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.SpacedItem
 
 //FUNCIONES VIEW MODEL
-import com.leotesta017.clinicapenal.viewmodel.CategoryViewModel
-import com.leotesta017.clinicapenal.viewmodel.ServicioViewModel
 import com.leotesta017.clinicapenal.viewmodel.VideoViewModel
 
 @Composable
 fun PantallaInfoCategorias(navController: NavController? ) {
     PantallaInfoGenerica(
         navController = navController,
+
+        searchBar = { categorias, servicios, errorCategoria, errorServicio, onSearchStarted  ->
+            SearchBarPantallaInfo(
+                searchText = "",
+                onSearchTextChange = {},
+                categorias = categorias,
+                servicios = servicios,
+                errorCategoria = errorCategoria,
+                errorServicio = errorServicio,
+                navController = navController,
+                routeCategoria = "detalle_info",
+                routeServicio = "servicios_info",
+                onSearchStarted = onSearchStarted
+            )
+        },
 
         noticias = {
             SpacedItem(spacing = 16) {
@@ -42,30 +56,32 @@ fun PantallaInfoCategorias(navController: NavController? ) {
             }
         },
 
-        informacionLegal = {
+        informacionLegal = { categorias, error ->
             LabelCategoria(
                 label = "Información Legal",
                 modifier = Modifier.padding(start = 16.dp)
             )
 
             CategoriesSection(
-                    navController = navController,
-                    viewModel = CategoryViewModel(),
-                    route = "detalle_info"
+                navController = navController,
+                route = "detalle_info",
+                categories = categorias,
+                error = error
             )
 
         },
 
-        servicios = {
+        servicios = { servicios, error ->
             LabelCategoria(
                 label = "Servicios",
                 modifier = Modifier.padding(start = 16.dp)
             )
 
             ServicesSection(
-                    navController = navController,
-                    viewModel = ServicioViewModel(),
-                    route = "servicios_info"
+                navController = navController,
+                route = "servicios_info",
+                servicios = servicios,
+                error = error
             )
 
         },
