@@ -32,14 +32,15 @@
 
         <!-- Declaración de FullscreenActivity, esta debe estar separada -->
         <activity
-            android:name=".view.Activities.FullscreenActivity"
-            android:screenOrientation="landscape"
+            android:name=".view.videoPlayer.fullscreenActivities.FullscreenActivity"
+            android:screenOrientation="sensorLandscape"
             android:theme="@style/Theme.AppCompat.NoActionBar"
             android:exported="false"
             android:configChanges="orientation|screenSize"
             tools:ignore="DiscouragedApi,MissingClass" /> <!-- Puedes definir el valor de `exported` según tus necesidades -->
         <activity
-            android:name=".view.Activities.FullscreenVideoActivity"
+            android:name=".view.videoPlayer.fullscreenActivities.FullscreenVideoActivity"
+            android:screenOrientation="sensorLandscape"
             android:theme="@style/Theme.AppCompat.NoActionBar"
             android:exported="false"
             android:configChanges="orientation|screenSize"

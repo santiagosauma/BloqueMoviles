@@ -1,15 +1,10 @@
-@file:Suppress("DEPRECATION")
+@file:Suppress("DEPRECATION", "UNUSED_EXPRESSION")
 
 package com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral
 
 //VIEW MODEL
-
-import android.content.Context
 import android.content.Intent
-import android.content.res.Configuration
 import android.net.Uri
-import android.view.ViewGroup
-import android.widget.FrameLayout
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -20,7 +15,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -61,7 +55,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -74,10 +67,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
@@ -88,38 +78,22 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.zIndex
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import coil.compose.AsyncImage
-import com.google.android.exoplayer2.ExoPlayer
-import com.google.android.exoplayer2.MediaItem
-import com.google.android.exoplayer2.PlaybackException
-import com.google.android.exoplayer2.Player
-import com.google.android.exoplayer2.source.ClippingMediaSource
-import com.google.android.exoplayer2.source.ConcatenatingMediaSource
-import com.google.android.exoplayer2.source.ProgressiveMediaSource
-import com.google.android.exoplayer2.ui.PlayerView
-import com.google.android.exoplayer2.upstream.DefaultHttpDataSource
 import com.leotesta017.clinicapenal.model.CasosRepresentacion
 import com.leotesta017.clinicapenal.model.Notificacion
 import com.leotesta017.clinicapenal.model.SolicitudAdmin
 import com.leotesta017.clinicapenal.model.SolicitudGeneral
-import com.leotesta017.clinicapenal.view.Activities.FullscreenActivity
-import com.leotesta017.clinicapenal.view.Activities.FullscreenVideoActivity
-import com.leotesta017.clinicapenal.view.Activities.extractVideoIdFromUrl
-import com.leotesta017.clinicapenal.view.Activities.formatGoogleDriveUrl
+import com.leotesta017.clinicapenal.view.videoPlayer.googleDrivePlayer.GoogleDriveVideoPlayer
+import com.leotesta017.clinicapenal.view.videoPlayer.YouTubePlayerWithLifecycle
+import com.leotesta017.clinicapenal.view.videoPlayer.fullscreenActivities.FullscreenActivity
+import com.leotesta017.clinicapenal.view.videoPlayer.fullscreenActivities.FullscreenVideoActivity
 import com.leotesta017.clinicapenal.viewmodel.CategoryViewModel
 import com.leotesta017.clinicapenal.viewmodel.ServicioViewModel
 import com.leotesta017.clinicapenal.viewmodel.VideoViewModel
-import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
-import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener
-import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
-
 
 // ========================================
 // ☰ SECCIÓN: Barras de Navegación/Visuales
@@ -363,185 +337,6 @@ fun MyTextNoticias(text: String)
     )
 }
 
-
-@Composable
-fun GoogleDriveVideoPlayer(videoUrl: String, isVisible: Boolean) {
-    val lifecycleOwner = LocalLifecycleOwner.current
-    val context = LocalContext.current
-    val formattedUrl = formatGoogleDriveUrl(videoUrl) ?: videoUrl
-
-    // Estado para gestionar si el video está cargando
-    var isBuffering by remember { mutableStateOf(true) }
-    var exoPlayer: ExoPlayer? by remember { mutableStateOf(null) }
-
-    DisposableEffect(lifecycleOwner, isVisible) {
-        if (isVisible) {
-            exoPlayer = ExoPlayer.Builder(context).build().apply {
-                val mediaItem = MediaItem.fromUri(Uri.parse(formattedUrl))
-                setMediaItem(mediaItem)
-                prepare()
-
-                // Listener para gestionar el buffering y el estado del player
-                addListener(object : Player.Listener {
-                    override fun onPlaybackStateChanged(state: Int) {
-                        when (state) {
-                            Player.STATE_BUFFERING -> isBuffering = true
-                            Player.STATE_READY -> isBuffering = false
-                        }
-                    }
-                })
-            }
-        }
-
-        val lifecycle = lifecycleOwner.lifecycle
-        val observer = LifecycleEventObserver { _, event ->
-            when (event) {
-                Lifecycle.Event.ON_PAUSE -> {
-                    exoPlayer?.playWhenReady = false
-                }
-                Lifecycle.Event.ON_DESTROY -> {
-                    exoPlayer?.release()
-                    exoPlayer = null
-                }
-                else -> Unit
-            }
-        }
-
-        lifecycle.addObserver(observer)
-
-        onDispose {
-            lifecycle.removeObserver(observer)
-            exoPlayer?.release()
-            exoPlayer = null
-        }
-    }
-
-    // Obtener la orientación actual
-    val configuration = LocalConfiguration.current
-    val screenWidthDp = configuration.screenWidthDp.dp
-    val screenHeightDp = configuration.screenHeightDp.dp
-
-    // Ajuste de altura dependiendo de la orientación
-    val videoHeight = if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-        screenHeightDp
-    } else {
-        screenWidthDp * 9 / 16 // En vertical, mantener la proporción 16:9
-    }
-
-    // Obtenemos el contexto de densidad
-    val density = LocalDensity.current
-
-    // Usamos FrameLayout para asegurar que los controles se superponen sin afectar el área del video
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(videoHeight) // Proporción adecuada 16:9
-    ) {
-        exoPlayer?.let { player ->
-            AndroidView(factory = { context ->
-                FrameLayout(context).apply {
-                    // Crear el PlayerView dentro del FrameLayout
-                    val playerView = PlayerView(context).apply {
-                        this.player = player
-                        useController = true // Mantener los controles visibles
-                        controllerShowTimeoutMs = 3000 // Mantener controles visibles por 3 segundos
-                        layoutParams = FrameLayout.LayoutParams(
-                            FrameLayout.LayoutParams.MATCH_PARENT,
-                            FrameLayout.LayoutParams.MATCH_PARENT
-                        )
-                    }
-                    this.addView(playerView) // Añadir el PlayerView al FrameLayout
-                }
-            }, update = { view ->
-                // Ajustar el tamaño del PlayerView dependiendo de la orientación
-                view.layoutParams = view.layoutParams.apply {
-                    width = ViewGroup.LayoutParams.MATCH_PARENT
-                    height = with(density) { videoHeight.roundToPx() }
-                }
-            },
-                modifier = Modifier
-                    .fillMaxHeight()
-            )
-        }
-
-        // Mostrar un CircularProgressIndicator mientras se esté cargando el video
-        if (isBuffering) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.5f)), // Fondo semitransparente
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator(color = Color.White)
-            }
-        }
-    }
-}
-
-
-    @Composable
-fun YouTubePlayerWithLifecycle(videoUrl: String, isVisible: Boolean) {
-    val lifecycleOwner = LocalLifecycleOwner.current
-    val videoId = extractVideoIdFromUrl(videoUrl)
-    var youTubePlayerInstance: YouTubePlayer? = null
-
-    val density = LocalDensity.current
-    val screenWidthDp = LocalConfiguration.current.screenWidthDp.dp
-
-    if (videoId != null) {
-        AndroidView(factory = { context ->
-            val youTubePlayerView = YouTubePlayerView(context).apply {
-                layoutParams = ViewGroup.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-                )
-                addYouTubePlayerListener(object : AbstractYouTubePlayerListener() {
-                    override fun onReady(youTubePlayer: YouTubePlayer) {
-                        youTubePlayerInstance = youTubePlayer
-                        youTubePlayer.cueVideo(videoId, 0f)
-                    }
-                })
-            }
-
-            lifecycleOwner.lifecycle.addObserver(youTubePlayerView)
-            youTubePlayerView
-        }, update = { view ->
-            // Convertir Dp a Px usando el contexto de densidad
-            view.layoutParams = view.layoutParams.apply {
-                width = ViewGroup.LayoutParams.MATCH_PARENT
-                height = with(density) { (screenWidthDp * 9 / 16).toPx().toInt() }
-            }
-        })
-
-        DisposableEffect(lifecycleOwner, isVisible) {
-            val observer = LifecycleEventObserver { _, event ->
-                when (event) {
-                    Lifecycle.Event.ON_PAUSE -> {
-                        youTubePlayerInstance?.pause()
-                    }
-                    Lifecycle.Event.ON_DESTROY -> {
-                        youTubePlayerInstance?.pause()
-                    }
-                    else -> Unit
-                }
-            }
-
-            lifecycleOwner.lifecycle.addObserver(observer)
-
-            if (!isVisible) {
-                youTubePlayerInstance?.pause()
-            }
-
-            onDispose {
-                lifecycleOwner.lifecycle.removeObserver(observer)
-            }
-        }
-    } else {
-        Text("Invalid YouTube URL", color = Color.Red)
-    }
-}
-
-
 fun isYouTubeUrl(videoUrl: String): Boolean {
     return videoUrl.contains("youtube") || videoUrl.contains("youtu.be")
 }
@@ -556,7 +351,7 @@ fun isGoogleDriveUrl(videoUrl: String): Boolean {
 fun CarruselDeNoticias(
     tipoPantalla: String? = null,
     viewModel: VideoViewModel = viewModel(),
-    contentText: @Composable (() -> Unit)? = null
+    contentText: @Composable (() -> Unit)? = null,
 ) {
     val videos by viewModel.videos.collectAsState()
     val error by viewModel.error.collectAsState()
@@ -619,7 +414,7 @@ fun CarruselDeNoticias(
                                         context.startActivity(intent)
                                     }
                                 },
-                                isVisible = isVisible // Pasamos si el video es visible
+                                isVisible = isVisible,// Pasamos si el video es visible
                             )
                         }
                     }
@@ -638,7 +433,7 @@ fun VideoCard(
     title: String,
     description: String,
     onFullscreenClick: (String) -> Unit, // Callback para pantalla completa
-    isVisible: Boolean // Controlar si el video está visible
+    isVisible: Boolean, // Controlar si el video está visible
 ) {
     var expanded by remember { mutableStateOf(false) }
     val maxHeight = if (expanded) Int.MAX_VALUE.dp else 428.dp
@@ -672,13 +467,19 @@ fun VideoCard(
                 ) {
 
                     if(isYouTubeUrl(videoUrl))  {
-                        YouTubePlayerWithLifecycle(videoUrl = videoUrl, isVisible = isVisible)
+                        YouTubePlayerWithLifecycle(
+                            videoUrl = videoUrl,
+                            isVisible = isVisible,
+                            onControllerVisibilityChanged = {false})
                     }
 
                     else if (isGoogleDriveUrl(videoUrl)) {
-                        GoogleDriveVideoPlayer(videoUrl = videoUrl, isVisible = isVisible)
+                        GoogleDriveVideoPlayer(
+                            videoUrl = videoUrl,
+                            isVisible = isVisible,
+                            onControllerVisibilityChanged = {false}
+                           )
                     }
-
                     else {
                         Text("URL no compatible", color = Color.Red)
                     }
@@ -789,7 +590,6 @@ fun CategoriesSection(
 }
 
 
-
 @Composable
 fun CategoryItem(
     title: String,
@@ -865,8 +665,6 @@ fun CategoryItem(
         }
     }
 }
-
-
 
 
 //FUNCIONES PARA ITEMS DE SERVICIO

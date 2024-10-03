@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 
@@ -16,6 +15,7 @@ import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.CarruselDeNoticia
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.CategoriesSection
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.EstudiantesBarraNav
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.LabelCategoriaConBoton
+import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.MyTextNoticias
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.PantallasExtra
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.ServicesSection
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.SpacedItem
@@ -32,14 +32,13 @@ fun PantallaInfoEstudiante(navController: NavController?) {
 
         //SECCION DE NOTICIAS
         noticias = {
-            LabelCategoriaConBoton(
-                label = "Noticias",
-                navController = navController,
-                modifier = Modifier.padding(0.dp),
-                navigateroute = "modificar-info"
-            )
             SpacedItem(spacing = 16) {
-                CarruselDeNoticias(viewModel = VideoViewModel())
+                CarruselDeNoticias(
+                    viewModel = VideoViewModel(),
+                    contentText = {
+                        MyTextNoticias(text = "Noticias")
+                    }
+                )
             }
         },
 
@@ -102,8 +101,4 @@ fun PantallaInfoEstudiante(navController: NavController?) {
     )
 }
 
-@Preview(showBackground = true)
-@Composable
-fun PreviewPantallaInfoEstudiante() {
-    PantallaInfoEstudiante(navController = null)
-}
+

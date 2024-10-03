@@ -1,6 +1,6 @@
 @file:Suppress("DEPRECATION")
 
-package com.leotesta017.clinicapenal.view.Activities
+package com.leotesta017.clinicapenal.view.videoPlayer.fullscreenActivities
 
 import android.app.Activity
 import android.net.Uri
@@ -11,19 +11,24 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
-import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.YouTubePlayerWithLifecycle
+import com.leotesta017.clinicapenal.view.videoPlayer.YouTubePlayerWithLifecycle
 
 class FullscreenActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -61,6 +66,8 @@ fun FullscreenVideoScreen(videoUrl: String) {
     val lifecycleOwner = LocalLifecycleOwner.current
     val videoId = extractVideoIdFromUrl(videoUrl) // Extrae el videoId del URL
 
+    var isIconVisible by remember { mutableStateOf(false) }
+
     // Almacenamos el contexto actual en una variable para usarlo luego
     val activity = LocalContext.current as? Activity
 
@@ -69,19 +76,27 @@ fun FullscreenVideoScreen(videoUrl: String) {
         contentAlignment = Alignment.Center
     ) {
         if (videoId != null) {
-            YouTubePlayerWithLifecycle(videoUrl = videoUrl,isVisible = true)
+            YouTubePlayerWithLifecycle(videoUrl = videoUrl,isVisible = true,
+                onControllerVisibilityChanged = { isVisible -> isVisible.also { isIconVisible = it } })
         } else {
             Text("Invalid YouTube URL", color = Color.Red)
         }
 
-        // Botón de "Salir de pantalla completa" en la esquina superior izquierda
-        IconButton(
-            onClick = { activity?.finish() },
-            modifier = Modifier
-                .align(Alignment.TopStart)
-                .padding(16.dp)
-        ) {
-            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Salir de pantalla completa", tint = Color.White)
+
+        if (isIconVisible) {
+            IconButton(
+                onClick = { activity?.finish() },
+                modifier = Modifier
+                    .align(Alignment.CenterStart)
+                    .padding(16.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.ArrowBack,
+                    contentDescription = "Salir de pantalla completa",
+                    tint = Color.White,
+                    modifier = Modifier.size(48.dp)
+                )
+            }
         }
     }
 }
