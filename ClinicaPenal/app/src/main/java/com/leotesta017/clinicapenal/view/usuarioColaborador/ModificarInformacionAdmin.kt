@@ -50,7 +50,7 @@ fun ModificarInfoCategoriaAdmin(
 
     val snackbarHostState = remember { SnackbarHostState() }
     var snackbarMessage by remember { mutableStateOf("") }
-    var showDiscardDialog by remember { mutableStateOf(false) } // Estado para controlar el diálogo
+    var showDiscardDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(id) {
         viewModel.fetchContenidoById(id)
@@ -61,7 +61,7 @@ fun ModificarInfoCategoriaAdmin(
 
     val formattedContent = contenido
         .replace("-", "\n-")
-        .replace(Regex("\\*\\*(.*?)\\*\\*"), "\n**$1**\n") // Colocar las negritas en nuevas líneas
+        .replace(Regex("\\*\\*(.*?)\\*\\*"), "\n**$1**\n")
 
     Box(modifier = Modifier.fillMaxSize()) {
         when {
