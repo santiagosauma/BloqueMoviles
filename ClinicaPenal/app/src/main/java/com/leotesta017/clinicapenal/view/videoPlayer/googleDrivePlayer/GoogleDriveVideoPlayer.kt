@@ -3,7 +3,6 @@
 package com.leotesta017.clinicapenal.view.videoPlayer.googleDrivePlayer
 
 import android.content.res.Configuration
-import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
@@ -48,6 +47,7 @@ fun GoogleDriveVideoPlayer(
     val formattedUrl = formatGoogleDriveUrl(videoUrl) ?: videoUrl
 
     val cache = MediaCacheSingleton.mediaFileCache
+    val cachedMediaItem = cache.getOrCreateMediaItem(formattedUrl)
 
     var isBuffering by remember { mutableStateOf(true) }
     var exoPlayer: ExoPlayer? by remember { mutableStateOf(null) }
@@ -65,33 +65,36 @@ fun GoogleDriveVideoPlayer(
     val density = LocalDensity.current
 
     DisposableEffect(lifecycleOwner, isVisible) {
-        val mediaItem = cache.getOrCreateMediaItem(formattedUrl)
-
         if (isVisible) {
-            Log.d("GoogleDriveVideoPlayer", "Initializing ExoPlayer for URL: $formattedUrl")
             exoPlayer?.release()
             exoPlayer = ExoPlayer.Builder(context).build().apply {
-                setMediaItem(mediaItem)
+                setMediaItem(cachedMediaItem.mediaItem)
                 prepare()
+
+                seekTo(cachedMediaItem.videoPosition)
 
                 addListener(object : Player.Listener {
                     override fun onPlaybackStateChanged(state: Int) {
                         when (state) {
                             Player.STATE_BUFFERING -> {
                                 isBuffering = true
-                                Log.d("GoogleDriveVideoPlayer", "Buffering for URL: $formattedUrl")
                             }
                             Player.STATE_READY -> {
                                 isBuffering = false
-                                Log.d("GoogleDriveVideoPlayer", "Video ready for URL: $formattedUrl")
                             }
                             Player.STATE_ENDED -> {
-                                Log.d("GoogleDriveVideoPlayer", "Playback ended for URL: $formattedUrl")
+                                cache.updateVideoPosition(formattedUrl, exoPlayer?.currentPosition ?: 0)
                             }
+
                             Player.STATE_IDLE -> {
-                                Log.d("GoogleDriveVideoPlayer", "Player idle for URL: $formattedUrl")
                             }
                         }
+                    }
+
+                    @Deprecated("Deprecated in Java")
+                    override fun onPositionDiscontinuity(reason: Int) {
+                        super.onPositionDiscontinuity(reason)
+                        cache.updateVideoPosition(formattedUrl, exoPlayer?.currentPosition ?: 0)
                     }
                 })
             }
@@ -102,12 +105,11 @@ fun GoogleDriveVideoPlayer(
             when (event) {
                 Lifecycle.Event.ON_PAUSE -> {
                     exoPlayer?.playWhenReady = false
-                    Log.d("GoogleDriveVideoPlayer", "Video paused for URL: $formattedUrl")
+                    cache.updateVideoPosition(formattedUrl, exoPlayer?.currentPosition ?: 0)
                 }
                 Lifecycle.Event.ON_DESTROY -> {
                     exoPlayer?.release()
                     exoPlayer = null
-                    Log.d("GoogleDriveVideoPlayer", "ExoPlayer released for URL: $formattedUrl")
                 }
                 else -> Unit
             }
@@ -116,10 +118,11 @@ fun GoogleDriveVideoPlayer(
         lifecycle.addObserver(observer)
 
         onDispose {
+            cache.updateVideoPosition(formattedUrl, exoPlayer?.currentPosition ?: 0)
             lifecycle.removeObserver(observer)
             exoPlayer?.release()
             exoPlayer = null
-            Log.d("GoogleDriveVideoPlayer", "ExoPlayer disposed for URL: $formattedUrl")
+
         }
     }
 
@@ -169,3 +172,4 @@ fun GoogleDriveVideoPlayer(
         }
     }
 }
+

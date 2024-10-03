@@ -1,4 +1,4 @@
-package com.leotesta017.clinicapenal.view.videoPlayer
+package com.leotesta017.clinicapenal.view.videoPlayer.youtubeVideoPlayer
 
 import android.annotation.SuppressLint
 import android.view.GestureDetector
@@ -16,6 +16,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import com.leotesta017.clinicapenal.view.videoPlayer.fullscreenActivities.extractVideoIdFromUrl
+import com.leotesta017.clinicapenal.view.videoPlayer.mediaFileCache.YoutubeMediaCacheSingleton
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
@@ -23,8 +24,11 @@ import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTube
 
 @SuppressLint("ClickableViewAccessibility")
 @Composable
-fun YouTubePlayerWithLifecycle(videoUrl: String, isVisible: Boolean,
-                               onControllerVisibilityChanged: (Boolean) -> Boolean) {
+fun YouTubePlayerWithLifecycle(
+    videoUrl: String,
+    isVisible: Boolean,
+    onControllerVisibilityChanged: (Boolean) -> Boolean
+) {
     val lifecycleOwner = LocalLifecycleOwner.current
     val videoId = extractVideoIdFromUrl(videoUrl)
     var youTubePlayerInstance: YouTubePlayer? = null
@@ -32,15 +36,17 @@ fun YouTubePlayerWithLifecycle(videoUrl: String, isVisible: Boolean,
     val density = LocalDensity.current
     val screenWidthDp = LocalConfiguration.current.screenWidthDp.dp
 
+    val YoutubeCache = YoutubeMediaCacheSingleton.youtubeCache
+
+    // Recuperar la posición guardada desde el cache
+    val savedPosition = YoutubeCache.getPosition(videoUrl) ?: 0f
+
     if (videoId != null) {
         AndroidView(factory = { context ->
             val gestureDetector = GestureDetector(
                 context,
-                object : GestureDetector.SimpleOnGestureListener()
-                {
-
-                    override fun onSingleTapConfirmed(e: MotionEvent): Boolean
-                    {
+                object : GestureDetector.SimpleOnGestureListener() {
+                    override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
                         onControllerVisibilityChanged(true)
                         return true
                     }
@@ -61,7 +67,12 @@ fun YouTubePlayerWithLifecycle(videoUrl: String, isVisible: Boolean,
                 addYouTubePlayerListener(object : AbstractYouTubePlayerListener() {
                     override fun onReady(youTubePlayer: YouTubePlayer) {
                         youTubePlayerInstance = youTubePlayer
-                        youTubePlayer.cueVideo(videoId, 0f)
+                        youTubePlayer.cueVideo(videoId, savedPosition) // Reproducir desde la posición guardada
+                    }
+
+                    override fun onCurrentSecond(youTubePlayer: YouTubePlayer, second: Float) {
+                        // Guardar la posición actual del video en el cache
+                        YoutubeCache.savePosition(videoUrl, second)
                     }
                 })
             }

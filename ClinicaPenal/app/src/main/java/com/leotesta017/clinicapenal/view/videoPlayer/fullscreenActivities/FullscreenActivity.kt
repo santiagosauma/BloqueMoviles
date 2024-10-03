@@ -28,7 +28,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
-import com.leotesta017.clinicapenal.view.videoPlayer.YouTubePlayerWithLifecycle
+import com.leotesta017.clinicapenal.view.videoPlayer.youtubeVideoPlayer.YouTubePlayerWithLifecycle
 
 class FullscreenActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

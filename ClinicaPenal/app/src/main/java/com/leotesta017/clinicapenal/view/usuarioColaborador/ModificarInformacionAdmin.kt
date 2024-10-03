@@ -20,6 +20,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.leotesta017.clinicapenal.model.Categoria
@@ -31,7 +32,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @Composable
-fun ModificarInfoAdmin(
+fun ModificarInfoCategoriaAdmin(
     navController: NavController?,
     id: String,
     titulo: String,
@@ -50,6 +51,10 @@ fun ModificarInfoAdmin(
     }
 
     val contenido by viewModel.contenido.collectAsState()
+/*<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes*/
     val error by viewModel.error.collectAsState()
 
     val formattedContent = contenido
@@ -119,3 +124,19 @@ fun ModificarInfoAdmin(
         }
     }
 }
+/*<<<<<<< Updated upstream
+=======*/
+
+@Preview(showBackground = true)
+@Composable
+fun PreviewModificarInfoAdmin() {
+    ModificarInfoCategoriaAdmin(
+        navController = null,
+        id = "456",
+        titulo = "Modificar Información",
+        descripcion = "Descripción de la información",
+        urlimagen =  ""
+    )
+}
+/*>>>>>>> Stashed changes
+*/

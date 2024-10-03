@@ -3,63 +3,54 @@
 package com.leotesta017.clinicapenal.view.videoPlayer.mediaFileCache
 
 import android.net.Uri
-import android.util.Log
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.util.MimeTypes
 
 @Suppress("DEPRECATION")
-class MediaFileCache(private val maxSize: Int) : LinkedHashMap<String, MediaItem>(16, 0.75f, true) {
+class MediaFileCache(private val maxSize: Int) : LinkedHashMap<String, CacheMediaItem>(16, 0.75f, true) {
 
-    // Sobrescribir para controlar el tamaño del caché
-    override fun removeEldestEntry(eldest: MutableMap.MutableEntry<String, MediaItem>?): Boolean {
-        val shouldRemove = size > maxSize
-        if (shouldRemove) {
-            Log.d("MediaFileCache", "Removing eldest entry: ${eldest?.key}")
-        }
-        return shouldRemove
+    // Controlar el tamaño del caché
+    override fun removeEldestEntry(eldest: MutableMap.MutableEntry<String, CacheMediaItem>?): Boolean {
+        return size > maxSize
     }
 
-    fun getOrCreateMediaItem(videoUrl: String): MediaItem {
+    // Obtener o crear un nuevo MediaItem
+    fun getOrCreateMediaItem(videoUrl: String): CacheMediaItem {
         return if (containsKey(videoUrl)) {
-            // Si ya está en el caché, devolverlo
-            Log.d("MediaFileCache", "Cache hit for URL: $videoUrl")
-            get(videoUrl)!!
+            get(videoUrl)!! // Si ya está en el caché, devolverlo
         } else {
-            // Si no está en el caché, crear un nuevo MediaItem
-            Log.d("MediaFileCache", "Cache miss for URL: $videoUrl. Creating new MediaItem.")
+            // Crear un nuevo MediaItem y añadirlo al caché
             val mediaItem = MediaItem.Builder()
                 .setUri(Uri.parse(videoUrl))
                 .setMimeType(MimeTypes.VIDEO_MP4)
                 .build()
 
-            // Añadirlo al caché
-            put(videoUrl, mediaItem)
+            val cachedMediaItem = CacheMediaItem(mediaItem)
+            put(videoUrl, cachedMediaItem)
 
-            // Si el tamaño excede el máximo, eliminar el más antiguo
+            // Si el tamaño del caché excede el máximo, eliminar el más antiguo
             if (size > maxSize) {
-                val oldestEntry = entries.iterator().next()
-                Log.d("MediaFileCache", "Cache size exceeded. Removing oldest entry: ${oldestEntry.key}")
-                remove(oldestEntry.key)
+                remove(entries.iterator().next().key)
             }
 
-            // Devolver el nuevo MediaItem
-            return mediaItem
+            cachedMediaItem
         }
     }
 
-    // Liberar un MediaItem
-    fun releaseMediaItem(videoUrl: String) {
+    // Método para actualizar la posición del video en el caché
+    fun updateVideoPosition(videoUrl: String, position: Long) {
         if (containsKey(videoUrl)) {
-            Log.d("MediaFileCache", "Releasing MediaItem for URL: $videoUrl")
-            remove(videoUrl)
-        } else {
-            Log.d("MediaFileCache", "No MediaItem to release for URL: $videoUrl")
+            get(videoUrl)?.videoPosition = position
         }
+    }
+
+    // Liberar un MediaItem del caché
+    fun releaseMediaItem(videoUrl: String) {
+        remove(videoUrl)
     }
 
     // Limpiar todo el caché
     fun clearCache() {
-        Log.d("MediaFileCache", "Clearing the entire cache")
         clear()
     }
 }

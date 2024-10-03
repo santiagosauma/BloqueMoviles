@@ -21,7 +21,6 @@ import com.leotesta017.clinicapenal.view.usuarioColaborador.AgregarServiciosInfo
 import com.leotesta017.clinicapenal.view.usuarioColaborador.ComentarioScreen
 import com.leotesta017.clinicapenal.view.usuarioColaborador.GeneralSolicitudAdmin
 import com.leotesta017.clinicapenal.view.usuarioColaborador.JuriBotAdmin
-import com.leotesta017.clinicapenal.view.usuarioColaborador.ModificarInfoAdmin
 import com.leotesta017.clinicapenal.view.usuarioColaborador.ModificarServiciosInfoAdmin
 import com.leotesta017.clinicapenal.view.usuarioColaborador.PantallaInfoAdmin
 import com.leotesta017.clinicapenal.view.usuarioColaborador.PantallaInfoClinicaAdmin
@@ -31,6 +30,7 @@ import com.leotesta017.clinicapenal.view.usuarioEstudiante.DetalleCasoEstudiante
 import com.leotesta017.clinicapenal.view.usuarioEstudiante.GenerarSolicitudEstudiante
 import com.leotesta017.clinicapenal.view.usuarioEstudiante.InformacionClinicaEstudiante
 import com.leotesta017.clinicapenal.view.usuarioEstudiante.PantallaInfoEstudiante
+import com.leotesta017.clinicapenal.view.usuarioColaborador.ModificarInfoCategoriaAdmin
 import com.leotesta017.clinicapenal.view.usuarioGeneral.DetalleInfo
 import com.leotesta017.clinicapenal.view.usuarioGeneral.PantallaInfoCategorias
 import com.leotesta017.clinicapenal.view.usuarioGeneral.ReviewComentarios
@@ -39,6 +39,7 @@ import com.leotesta017.clinicapenal.view.usuarioGeneral.ServiciosInfo
 import com.leotesta017.clinicapenal.view.usuarioGeneral.Solicitud
 
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -50,6 +51,9 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MyApp() {
     val navController = rememberNavController()
+
+
+
     NavHost(navController, startDestination = "intro1") {
 
         /*=======================================================================================*/
@@ -156,7 +160,7 @@ fun MyApp() {
             val descripcion = backStackEntry.arguments?.getString("descripcion") ?: ""
             val servicioId = backStackEntry.arguments?.getString("categoriaId") ?: ""
             val url_imagen = Uri.decode(backStackEntry.arguments?.getString("url_image") ?: "")
-            ModificarInfoAdmin(
+            ModificarInfoCategoriaAdmin(
                 navController = navController,
                 id = servicioId,
                 titulo = titulo,
