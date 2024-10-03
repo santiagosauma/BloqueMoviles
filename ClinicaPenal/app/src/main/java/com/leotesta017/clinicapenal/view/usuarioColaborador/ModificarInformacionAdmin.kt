@@ -110,7 +110,6 @@ fun ModificarInfoCategoriaAdmin(
                         }
                     },
                     onCancelClick = {
-                        // Mostrar el diálogo de confirmación
                         showDiscardDialog = true
                     }
                 )
