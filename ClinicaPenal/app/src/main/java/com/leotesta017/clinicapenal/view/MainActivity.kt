@@ -1,6 +1,6 @@
 package com.leotesta017.clinicapenal.view
 
-import JuriBotScreen
+import com.leotesta017.clinicapenal.view.usuarioGeneral.JuriBotScreen
 import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity

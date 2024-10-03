@@ -161,7 +161,45 @@ fun Pantalla4(navController: NavController) {
                                     "nombre" to nombre,
                                     "apellidos" to apellidos,
                                     "correo" to correo,
-                                    "tipo" to "general"
+                                    "tipo" to "general",
+                                    "cases" to listOf(
+                                        hashMapOf(
+                                            "case_id" to "101",
+                                            "state" to "Activa",
+                                            "situation" to "",
+                                            "place" to "",
+                                            "is_represented" to "",
+                                            "lawyerAssigned" to "",
+                                            "studentAssigned" to ""
+                                        )
+                                    ),
+                                    "appointment" to listOf(
+                                        hashMapOf(
+                                            "appointment_id" to 0,
+                                            "day" to 0,
+                                            "hour" to 0,
+                                            "is_available" to "",
+                                            "is_completed" to "",
+                                            "is_suspended" to "",
+                                            "valoration" to 0
+                                        )
+                                    ),
+                                    "extraInfo" to listOf(
+                                        hashMapOf(
+                                            "crime" to "",
+                                            "prosecutor" to "",
+                                            "ine" to ""
+                                        )
+                                    ),
+                                    "comments" to listOf(
+                                        hashMapOf(
+                                            "comentario_id" to 0,
+                                            "fecha" to 0,
+                                            "important" to "",
+                                            "representation" to "",
+                                            "contenido" to ""
+                                        )
+                                    )
                                 )
                                 userId?.let {
                                     db.collection("usuarios").document(it)
@@ -204,6 +242,7 @@ fun Pantalla4(navController: NavController) {
         }
     }
 }
+
 
 @Preview(showBackground = true)
 @Composable
