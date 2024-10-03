@@ -31,6 +31,11 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
+import androidx.compose.runtime.*
+
 @Composable
 fun ModificarInfoCategoriaAdmin(
     navController: NavController?,
@@ -45,16 +50,13 @@ fun ModificarInfoCategoriaAdmin(
 
     val snackbarHostState = remember { SnackbarHostState() }
     var snackbarMessage by remember { mutableStateOf("") }
+    var showDiscardDialog by remember { mutableStateOf(false) } // Estado para controlar el diálogo
 
     LaunchedEffect(id) {
         viewModel.fetchContenidoById(id)
     }
 
     val contenido by viewModel.contenido.collectAsState()
-/*<<<<<<< Updated upstream
-=======
-
->>>>>>> Stashed changes*/
     val error by viewModel.error.collectAsState()
 
     val formattedContent = contenido
@@ -107,7 +109,10 @@ fun ModificarInfoCategoriaAdmin(
                             }
                         }
                     },
-                    onCancelClick = {}
+                    onCancelClick = {
+                        // Mostrar el diálogo de confirmación
+                        showDiscardDialog = true
+                    }
                 )
             }
         }
@@ -122,22 +127,26 @@ fun ModificarInfoCategoriaAdmin(
                 contentColor = Color.White
             )
         }
+
+        if (showDiscardDialog) {
+            AlertDialog(
+                onDismissRequest = { showDiscardDialog = false },
+                title = { Text("Descartar cambios") },
+                text = { Text("¿Estás seguro de que deseas descartar los cambios?") },
+                confirmButton = {
+                    Button(onClick = {
+                        showDiscardDialog = false
+                        navController?.popBackStack()
+                    }) {
+                        Text("Sí")
+                    }
+                },
+                dismissButton = {
+                    Button(onClick = { showDiscardDialog = false }) {
+                        Text("No")
+                    }
+                }
+            )
+        }
     }
 }
-
-/*<<<<<<< Updated upstream
-=======*/
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewModificarInfoAdmin() {
-    ModificarInfoCategoriaAdmin(
-        navController = null,
-        id = "456",
-        titulo = "Modificar Información",
-        descripcion = "Descripción de la información",
-        urlimagen =  ""
-    )
-}
-/*>>>>>>> Stashed changes
-*/

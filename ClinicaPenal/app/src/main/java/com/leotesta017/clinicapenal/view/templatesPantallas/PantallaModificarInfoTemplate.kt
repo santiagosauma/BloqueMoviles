@@ -31,6 +31,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.ApplyStyleButtons
@@ -63,11 +64,6 @@ fun PantallaModificarInformacionTemplate(
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
                     }
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = titulo,
-                        style = MaterialTheme.typography.headlineSmall.copy(color = Color.Black),
-                        modifier = Modifier.weight(1f)
-                    )
                 }
             }
         },
@@ -103,7 +99,6 @@ fun PantallaModificarInformacionTemplate(
                         },
                         onApplyUnderline = {}
                     )
-
                     TextEditor(
                         initialText = textContent,
                         onTextChange = { newText -> textContent = newText },
@@ -196,18 +191,53 @@ fun ModificarInfoTemplate(
             )
 
             Spacer(modifier = Modifier.height(5.dp))
+        }
+    )
+}
 
-            // Input para el contenido
-            OutlinedTextField(
-                value = textContent,
-                onValueChange = { newText -> textContent = newText },
-                label = { Text("Contenido") },
+@Preview(showBackground = true)
+@Composable
+fun PreviewPantallaModificarInformacionTemplate() {
+    PantallaModificarInformacionTemplate(
+        navController = null, // En el preview, no necesitamos NavController
+        titulo = "Modificar Información",
+        textDescripcion = "Descripción de ejemplo",
+        bottomBar = {
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 8.dp),
-                minLines = 6,
-                maxLines = Int.MAX_VALUE
-            )
+                    .padding(horizontal = 16.dp, vertical = 16.dp),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                RoundedButton(
+                    icon = Icons.Default.Save,
+                    label = "Guardar",
+                    onClick = { /* Acción simulada de guardar */ }
+                )
+                RoundedButton(
+                    icon = Icons.Default.Delete,
+                    label = "Cancelar",
+                    onClick = { /* Acción simulada de cancelar */ }
+                )
+            }
+        },
+        content = { textDescripcion, onTextChange ->
+            Column {
+                OutlinedTextField(
+                    value = "Nombre de ejemplo",
+                    onValueChange = { },
+                    label = { Text("Nombre") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+
+                OutlinedTextField(
+                    value = textDescripcion,
+                    onValueChange = onTextChange,
+                    label = { Text("Descripción") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
         }
     )
 }
