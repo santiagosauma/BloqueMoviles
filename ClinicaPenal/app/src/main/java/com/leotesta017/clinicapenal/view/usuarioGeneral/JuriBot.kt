@@ -1,8 +1,9 @@
-import android.os.Build
+package com.leotesta017.clinicapenal.view.usuarioGeneral
+
+
 import android.text.method.LinkMovementMethod
 import android.text.util.Linkify
 import android.widget.TextView
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
