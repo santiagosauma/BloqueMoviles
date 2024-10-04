@@ -6,7 +6,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
@@ -25,8 +25,10 @@ import androidx.navigation.compose.rememberNavController
 import com.leotesta017.clinicapenal.R
 import com.leotesta017.clinicapenal.view.theme.ClinicaPenalTheme
 import com.google.firebase.auth.ktx.auth
-import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import com.leotesta017.clinicapenal.viewmodel.viewmodelUsuario.UsuarioViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
+
 
 @Composable
 fun Pantalla4(navController: NavController) {
@@ -53,7 +55,7 @@ fun Pantalla4(navController: NavController) {
             onClick = { navController.popBackStack() },
             modifier = Modifier.align(Alignment.Start)
         ) {
-            Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Volver")
+            Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -149,67 +151,33 @@ fun Pantalla4(navController: NavController) {
             )
         }
 
+        val viewModel: UsuarioViewModel = viewModel()
+        val userId by viewModel.userId.collectAsState()
+        val mensajeErrorCrearUsuario by viewModel.error.collectAsState()
+
+        // Utilizar LaunchedEffect para observar los flujos de StateFlow
+        LaunchedEffect(userId) {
+            userId?.let {
+                navController.navigate("pantalla5")
+            }
+        }
+
+        LaunchedEffect(mensajeErrorCrearUsuario) {
+            mensajeErrorCrearUsuario?.let {
+                mensajeError = it
+            }
+        }
+
         Button(
             onClick = {
                 if (nombre.isNotEmpty() && apellidos.isNotEmpty() && correoValido && contrasenaValida && terminosAceptados) {
                     Firebase.auth.createUserWithEmailAndPassword(correo, contrasena)
                         .addOnCompleteListener { task ->
                             if (task.isSuccessful) {
-                                val userId = task.result?.user?.uid
-                                val db = Firebase.firestore
-                                val user = hashMapOf(
-                                    "nombre" to nombre,
-                                    "apellidos" to apellidos,
-                                    "correo" to correo,
-                                    "tipo" to "general",
-                                    "cases" to listOf(
-                                        hashMapOf(
-                                            "case_id" to "101",
-                                            "state" to "Activa",
-                                            "situation" to "",
-                                            "place" to "",
-                                            "is_represented" to "",
-                                            "lawyerAssigned" to "",
-                                            "studentAssigned" to ""
-                                        )
-                                    ),
-                                    "appointment" to listOf(
-                                        hashMapOf(
-                                            "appointment_id" to 0,
-                                            "day" to 0,
-                                            "hour" to 0,
-                                            "is_available" to "",
-                                            "is_completed" to "",
-                                            "is_suspended" to "",
-                                            "valoration" to 0
-                                        )
-                                    ),
-                                    "extraInfo" to listOf(
-                                        hashMapOf(
-                                            "crime" to "",
-                                            "prosecutor" to "",
-                                            "ine" to ""
-                                        )
-                                    ),
-                                    "comments" to listOf(
-                                        hashMapOf(
-                                            "comentario_id" to 0,
-                                            "fecha" to 0,
-                                            "important" to "",
-                                            "representation" to "",
-                                            "contenido" to ""
-                                        )
-                                    )
-                                )
-                                userId?.let {
-                                    db.collection("usuarios").document(it)
-                                        .set(user)
-                                        .addOnSuccessListener {
-                                            navController.navigate("pantalla5")
-                                        }
-                                        .addOnFailureListener { e ->
-                                            mensajeError = "Error al guardar la cuenta: ${e.message}"
-                                        }
+                                val newuserId = task.result?.user?.uid
+                                newuserId?.let {
+                                    // Llamamos al ViewModel para crear el usuario en Firestore
+                                    viewModel.createUsuario(it, nombre, apellidos, correo, "general")
                                 }
                             } else {
                                 mensajeError = "Error al crear la cuenta: ${task.exception?.message}"
@@ -242,7 +210,6 @@ fun Pantalla4(navController: NavController) {
         }
     }
 }
-
 
 @Preview(showBackground = true)
 @Composable

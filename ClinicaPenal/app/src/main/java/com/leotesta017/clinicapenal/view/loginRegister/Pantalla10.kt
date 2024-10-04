@@ -20,6 +20,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.leotesta017.clinicapenal.R
@@ -27,6 +28,7 @@ import com.leotesta017.clinicapenal.view.theme.ClinicaPenalTheme
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import com.leotesta017.clinicapenal.viewmodel.viewmodelUsuario.UsuarioViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -154,29 +156,33 @@ fun Pantalla10(navController: NavController) {
             )
         }
 
+        val viewModel: UsuarioViewModel = viewModel()
+        val userId by viewModel.userId.collectAsState()
+        val mensajeErrorCrearUsuario by viewModel.error.collectAsState()
+
+        // Utilizar LaunchedEffect para observar los flujos de StateFlow
+        LaunchedEffect(userId) {
+            userId?.let {
+                navController.navigate("pantalla5")
+            }
+        }
+
+        LaunchedEffect(mensajeErrorCrearUsuario) {
+            mensajeErrorCrearUsuario?.let {
+                mensajeError = it
+            }
+        }
+
         Button(
             onClick = {
                 if (nombre.isNotEmpty() && apellidos.isNotEmpty() && correoValido && contrasenaValida && terminosAceptados) {
                     Firebase.auth.createUserWithEmailAndPassword(correo, contrasena)
                         .addOnCompleteListener { task ->
                             if (task.isSuccessful) {
-                                val userId = task.result?.user?.uid
-                                val db = Firebase.firestore
-                                val user = hashMapOf(
-                                    "nombre" to nombre,
-                                    "apellidos" to apellidos,
-                                    "correo" to correo,
-                                    "tipo" to "colaborador"
-                                )
-                                userId?.let {
-                                    db.collection("usuarios").document(it)
-                                        .set(user)
-                                        .addOnSuccessListener {
-                                            navController.navigate("pantalla5")
-                                        }
-                                        .addOnFailureListener { e ->
-                                            mensajeError = "Error al guardar la cuenta: ${e.message}"
-                                        }
+                                val newuserId = task.result?.user?.uid
+                                newuserId?.let {
+                                    // Llamamos al ViewModel para crear el usuario en Firestore
+                                    viewModel.createUsuario(it, nombre, apellidos, correo, "colaborador")
                                 }
                             } else {
                                 mensajeError = "Error al crear la cuenta: ${task.exception?.message}"
@@ -196,7 +202,6 @@ fun Pantalla10(navController: NavController) {
         }
     }
 }
-
 
 @Preview(showBackground = true)
 @Composable
