@@ -7,9 +7,6 @@ data class Usuario(
     val correo: String = "",
     val tipo: String ="",
 
-    //INFORMACION ASOCIADA A CADA USUARIO
-    val listAppointments: List<String> = emptyList(),
-    val listComments: List<String> = emptyList(),
-    val listCases: List<String> = emptyList(),
-    val listExtraInfo: List<String> = emptyList()
+    //INFORMACION ASOCIADA A CADA USUARIO DE LOS CASOS
+    val listCases: List<String> = emptyList()
 )

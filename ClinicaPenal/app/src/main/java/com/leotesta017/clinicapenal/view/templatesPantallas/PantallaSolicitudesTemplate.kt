@@ -19,7 +19,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.SearchBar
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.TopBar
-
 @Composable
 fun GenerarSolicitudPantallaTemplatenavController(
     navController: NavController?,

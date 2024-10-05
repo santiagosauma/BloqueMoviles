@@ -34,12 +34,12 @@ class AppointmentViewModel : ViewModel() {
         }
     }
 
-    // Método para agregar una nueva cita y actualizar al usuario
-    fun addNewAppointment(appointment: Appointment, userId: String) {
+    // Método para agregar una nueva cita y actualizar el caso
+    fun addNewAppointment(appointment: Appointment, caseId: String) {
         viewModelScope.launch {
-            val success = repository.addAppointment(appointment, userId)
+            val success = repository.addAppointmentToCase(appointment, caseId)
             if (!success) {
-                _error.value = "Error al agregar la cita"
+                _error.value = "Error al agregar la cita al caso"
             }
         }
     }

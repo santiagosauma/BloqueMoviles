@@ -34,22 +34,22 @@ class CaseViewModel : ViewModel() {
         }
     }
 
-    // Asignar abogado o estudiante al caso
-    fun assignUserToCase(caseId: String, userId: String, role: String) {
-        viewModelScope.launch {
-            val success = repository.assignUserToCase(caseId, userId, role)
-            if (!success) {
-                _error.value = "Error al asignar $role: Verifique el tipo de usuario o el ID"
-            }
-        }
-    }
-
     // Agregar un nuevo caso
     fun addNewCase(case: Case, userId: String) {
         viewModelScope.launch {
             val success = repository.addCase(case, userId)
             if (!success) {
                 _error.value = "Error al agregar el caso"
+            }
+        }
+    }
+
+    // Asignar abogado o estudiante al caso
+    fun assignUserToCase(caseId: String, userId: String, role: String) {
+        viewModelScope.launch {
+            val success = repository.assignUserToCase(caseId, userId, role)
+            if (!success) {
+                _error.value = "Error al asignar $role: Verifique el tipo de usuario o el ID"
             }
         }
     }

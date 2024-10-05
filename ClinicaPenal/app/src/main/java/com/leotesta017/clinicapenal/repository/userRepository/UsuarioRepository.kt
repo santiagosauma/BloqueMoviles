@@ -5,6 +5,7 @@ import com.google.firebase.ktx.Firebase
 import com.leotesta017.clinicapenal.model.modelUsuario.Usuario
 import kotlinx.coroutines.tasks.await
 
+@Suppress("UNCHECKED_CAST")
 class UsuarioRepository {
 
     private val firestore = Firebase.firestore
@@ -47,22 +48,80 @@ class UsuarioRepository {
         }
     }
 
+    suspend fun getUserTypeById(id: String): String
+    {
+        return try
+        {
+            val document = firestore.collection("usuarios")
+                .document(id)
+                .get()
+                .await()
+
+            if (document.exists())
+            {
+                document.getString("tipo") ?: ""  // Obtener el nombre directamente del documento
+            }
+            else
+            {
+                ""  // Retorna una cadena vacía si el documento no existe
+            }
+        }
+        catch (e: Exception)
+        {
+            ""  // Retorna una cadena vacía en caso de error
+        }
+    }
+
+    suspend fun getUserCasesById(id: String): List<String>
+    {
+        return try
+        {
+            val document = firestore.collection("usuarios")
+                .document(id)
+                .get()
+                .await()
+
+            if (document.exists())
+            {
+                document.get("listCases") as? List<String> ?:  emptyList<String>()  // Obtener el nombre directamente del documento
+            }
+            else
+            {
+                emptyList<String>()  // Retorna una cadena vacía si el documento no existe
+            }
+        }
+        catch (e: Exception)
+        {
+            emptyList<String>()  // Retorna una cadena vacía en caso de error
+        }
+    }
+
 
     // Método para crear un nuevo usuario (PUT) en Firestore
-    suspend fun createUser(id: String, nombre: String, apellidos: String, correo: String, tipo: String): Boolean {
+    suspend fun createUser(id: String, nombre: String, apellidos: String,
+                           correo: String, tipo: String): Boolean
+    {
         return try {
             // Crear el objeto Usuario con los parámetros proporcionados
-            val user = Usuario(id = id, nombre = nombre, apellidos = apellidos, correo = correo, tipo = tipo)
+            val user = Usuario(
+                id = id,
+                nombre = nombre,
+                apellidos = apellidos,
+                correo = correo,
+                tipo = tipo
+            )
 
             // Guardar el objeto Usuario en Firestore
             firestore.collection("usuarios")
                 .document(id)
                 .set(user)
-                .await()  // Esperar a que la operación de Firestore se complete
+                .await()
 
-            true  // Se crea el usuario con éxito
-        } catch (e: Exception) {
-            false  // Error al crear el usuario
+            true
+        }
+        catch (e: Exception)
+        {
+            false
         }
     }
 }

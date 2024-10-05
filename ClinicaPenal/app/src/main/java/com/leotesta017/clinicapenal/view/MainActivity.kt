@@ -87,7 +87,9 @@ fun MyApp() {
         /*=======================================================================================*/
         // PANTALLAS DE USUARIO GENERAL
         /*=======================================================================================*/
-        composable("pantallainfocategoriasgeneral") { PantallaInfoCategorias (navController) }
+        composable("pantallainfocategoriasgeneral") { PantallaInfoCategorias (navController)}
+
+
         composable("pantallainformacionclinica") { PantallaInfoClinica(navController) }
         composable("solicitud") { GeneralSolicitud(navController) }
         composable("ReviewComentarios") { ReviewComentarios(navController) }
@@ -145,8 +147,7 @@ fun MyApp() {
         /*=======================================================================================*/
         // PANTALLAS DE ADMIN
         /*=======================================================================================*/
-        composable("pantallainfoadmin") { PantallaInfoAdmin(navController)}
-
+        composable("pantallainfoadmin") { PantallaInfoAdmin(navController) }
         composable(
             route = "modificar-info/{titulo}/{descripcion}/{categoriaId}/{url_image}",
             arguments = listOf(

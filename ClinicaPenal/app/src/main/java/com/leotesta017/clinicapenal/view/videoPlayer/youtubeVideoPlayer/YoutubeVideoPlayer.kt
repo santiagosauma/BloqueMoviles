@@ -94,6 +94,7 @@ fun YouTubePlayerWithLifecycle(
                     }
                     Lifecycle.Event.ON_DESTROY -> {
                         youTubePlayerInstance?.pause()
+                        youTubePlayerInstance = null
                     }
                     else -> Unit
                 }

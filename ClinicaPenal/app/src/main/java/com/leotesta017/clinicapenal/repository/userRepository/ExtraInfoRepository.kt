@@ -28,17 +28,17 @@ class ExtraInfoRepository {
         }
     }
 
-    // Agregar nueva información extra y actualizar la lista de extraInfo del usuario
-    suspend fun addExtraInfo(extraInfo: ExtraInfo, userId: String): Boolean {
+    // Agregar nueva información extra y actualizar la lista de extraInfo del caso
+    suspend fun addExtraInfoToCase(extraInfo: ExtraInfo, caseId: String): Boolean {
         return try {
             val extraInfoRef = firestore.collection("extraInfo").document(extraInfo.extraInfo_id)
 
             // Primero, agregar la información extra a la colección "extraInfo"
             extraInfoRef.set(extraInfo).await()
 
-            // Luego, actualizar la lista de información extra del usuario
-            val userRef = firestore.collection("usuarios").document(userId)
-            userRef.update("listExtraInfo", FieldValue.arrayUnion(extraInfo.extraInfo_id)).await()
+            // Luego, actualizar la lista de información extra del caso
+            val caseRef = firestore.collection("cases").document(caseId)
+            caseRef.update("listExtraInfo", FieldValue.arrayUnion(extraInfo.extraInfo_id)).await()
 
             true
         } catch (e: Exception) {

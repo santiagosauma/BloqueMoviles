@@ -34,12 +34,12 @@ class ComentarioViewModel : ViewModel() {
         }
     }
 
-    // Agregar un nuevo comentario
-    fun addNewComentario(comentario: Comentario, userId: String) {
+    // Agregar un nuevo comentario a un caso
+    fun addNewComentarioToCase(comentario: Comentario, caseId: String) {
         viewModelScope.launch {
-            val success = repository.addComentario(comentario, userId)
+            val success = repository.addComentarioToCase(comentario, caseId)
             if (!success) {
-                _error.value = "Error al agregar el comentario"
+                _error.value = "Error al agregar el comentario al caso"
             }
         }
     }

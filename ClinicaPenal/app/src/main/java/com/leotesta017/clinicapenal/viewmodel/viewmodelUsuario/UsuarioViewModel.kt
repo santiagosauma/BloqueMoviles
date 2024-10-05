@@ -8,7 +8,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class UsuarioViewModel : ViewModel() {
+class UsuarioViewModel : ViewModel()
+{
 
     private val repository = UsuarioRepository()
 
@@ -28,44 +29,73 @@ class UsuarioViewModel : ViewModel() {
     val error: StateFlow<String?> = _error
 
     // Obtener información del usuario
-    fun fetchUsuario(id: String) {
+    fun fetchUsuario(id: String)
+    {
         viewModelScope.launch {
-            try {
+            try
+            {
                 val currentUsuario = repository.getUserInfo(id)
                 _usuario.value = currentUsuario
-            } catch (e: Exception) {
+            }
+            catch (e: Exception)
+            {
                 _error.value = "Error al cargar datos del usuario: ${e.message}"
             }
         }
     }
 
     // Crear un nuevo usuario en Firestore
-    fun createUsuario(id: String, nombre: String, apellidos: String, correo: String, tipo: String) {
-        viewModelScope.launch {
+    fun createUsuario(id: String, nombre: String, apellidos: String,
+                      correo: String, tipo: String)
+    {
+        viewModelScope.launch{
             val success = repository.createUser(id, nombre, apellidos, correo, tipo)
-            if (success) {
-                _userId.value = id  // Actualizar el userId en caso de éxito
-            } else {
+            if (success)
+            {
+                _userId.value = id
+            }
+            else
+            {
                 _error.value = "Error al crear el usuario"
             }
         }
     }
 
-    fun fetchUserNameAndType(id: String) {
+    fun fetchUserNameAndType(id: String)
+    {
         viewModelScope.launch {
-            try {
+            try
+            {
                 val (name, type) = repository.getUserNameById(id)
-                if (name != null && type != null) {
+                if (name != null && type != null)
+                {
                     _userName.value = name
                     _userType.value = type
-                } else {
+                }
+                else
+                {
                     _error.value = "Usuario no encontrado"
                 }
-            } catch (e: Exception) {
+            }
+            catch (e: Exception)
+            {
                 _error.value = "Error al obtener los datos del usuario: ${e.message}"
             }
         }
     }
 
-
+    fun fetchUserType(id: String)
+    {
+        viewModelScope.launch {
+            try
+            {
+                val type = repository.getUserTypeById(id)  // Solo obtener el tipo de usuario
+                _userType.value = type ?: "Tipo de usuario no encontrado"
+            }
+            catch (e: Exception)
+            {
+                _error.value = "Error al obtener el tipo del usuario: ${e.message}"
+            }
+        }
+    }
 }

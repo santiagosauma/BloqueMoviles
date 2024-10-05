@@ -3,6 +3,8 @@ package com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral
 //VIEW MODEL
 import android.content.Intent
 import android.net.Uri
+import android.util.Log
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -20,6 +22,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
@@ -54,6 +57,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -66,6 +70,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
@@ -82,17 +87,22 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import coil.compose.AsyncImage
+import com.google.firebase.firestore.auth.User
 import com.leotesta017.clinicapenal.model.CasosRepresentacion
 import com.leotesta017.clinicapenal.model.Categoria
 import com.leotesta017.clinicapenal.model.Notificacion
 import com.leotesta017.clinicapenal.model.Servicio
 import com.leotesta017.clinicapenal.model.SolicitudAdmin
 import com.leotesta017.clinicapenal.model.SolicitudGeneral
+import com.leotesta017.clinicapenal.model.modelUsuario.UserIdData
 import com.leotesta017.clinicapenal.view.videoPlayer.googleDrivePlayer.GoogleDriveVideoPlayer
 import com.leotesta017.clinicapenal.view.videoPlayer.youtubeVideoPlayer.YouTubePlayerWithLifecycle
 import com.leotesta017.clinicapenal.view.videoPlayer.fullscreenActivities.FullscreenActivity
 import com.leotesta017.clinicapenal.view.videoPlayer.fullscreenActivities.FullscreenVideoActivity
 import com.leotesta017.clinicapenal.viewmodel.VideoViewModel
+import com.leotesta017.clinicapenal.viewmodel.viewmodelUsuario.AppointmentViewModel
+import com.leotesta017.clinicapenal.viewmodel.viewmodelUsuario.CaseViewModel
+import com.leotesta017.clinicapenal.viewmodel.viewmodelUsuario.UsuarioViewModel
 
 // ========================================
 // ☰ SECCIÓN: Barras de Navegación/Visuales
@@ -458,17 +468,28 @@ fun isGoogleDriveUrl(videoUrl: String): Boolean {
 fun CarruselDeNoticias(
     tipoPantalla: String? = null,
     viewModel: VideoViewModel = viewModel(),
+    userModel: UsuarioViewModel = viewModel(),
     contentText: @Composable (() -> Unit)? = null,
 ) {
     val videos by viewModel.videos.collectAsState()
     val error by viewModel.error.collectAsState()
 
 
-    // Filtrar los videos en base al tipo de pantalla
-    val filteredVideos = if (tipoPantalla == "estudiante") {
-        videos.filter { it.tipo == "estudiante" }
-    } else {
-        videos.filter { it.tipo != "estudiante" }
+    val tipousuario by userModel.userType.collectAsState()
+
+    LaunchedEffect(Unit) {
+        val userid = UserIdData.userId
+        if (userid != null) {
+            userModel.fetchUserType(userid)
+
+        }
+    }
+
+    val filteredVideos = when (tipousuario){
+        "estudiante" -> videos.filter { it.tipo == "estudiante" }
+        "general" -> videos.filter { it.tipo == "general" }
+        "colaborador" -> videos.filter { it.tipo == "estudiante" || it.tipo == "general" }
+        else -> emptyList()
     }
 
     val totalPages = filteredVideos.size
@@ -485,9 +506,12 @@ fun CarruselDeNoticias(
     ) {
         contentText?.invoke()
 
-        if (error != null) {
+        if (error != null)
+        {
             Text(text = error ?: "Error desconocido", color = Color.Red)
-        } else {
+        }
+        else
+        {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -560,18 +584,21 @@ fun VideoCard(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 16.dp)
+                .animateContentSize()
         ) {
             // Cuadro del video y el botón en el mismo Box
             Box(
                 modifier = Modifier
+                    .background(Color.Black)
                     .fillMaxWidth()
-                    .height(275.dp)
-                    .padding(bottom = 16.dp)
+                    .height((LocalConfiguration.current.screenWidthDp * 10 / 16).dp)
+                    .padding(bottom = 4.dp)
+                    .clip(RoundedCornerShape(20.dp))
             ) {
                 Box(modifier = Modifier
                     .fillMaxWidth()
                     .align(Alignment.TopCenter)
-                    .clip(RoundedCornerShape(16.dp))
+                    .padding(bottom = 40.dp)
                 ) {
 
                     if(isYouTubeUrl(videoUrl))  {
@@ -602,7 +629,6 @@ fun VideoCard(
                         .fillMaxWidth()
                         .height(36.dp)
                         .align(Alignment.BottomCenter)
-                        .clip(RoundedCornerShape(16.dp))
                         .zIndex(1f) // Elevar el botón por encima del PlayerView
 
                 ) {
@@ -620,7 +646,7 @@ fun VideoCard(
                 }
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             // Mostrar el título
             Text(
@@ -640,6 +666,7 @@ fun VideoCard(
                 modifier = Modifier
                     .clickable { expanded = !expanded }
                     .padding(top = 4.dp)
+                    .animateContentSize()
             )
 
             // Texto "Ver más" o "Ver menos" para controlar la expansión
@@ -818,7 +845,7 @@ fun ServiceItem(
     navController: NavController?,
     imageUrl: String,
     route: String,
-    servicioId: String // Este ID es necesario para cargar la pantalla de detalles
+    servicioId: String
 ) {
     Card(
         modifier = Modifier
@@ -826,60 +853,57 @@ fun ServiceItem(
             .padding(16.dp)
             .clickable {
                 val encodedUrlImagen = Uri.encode(imageUrl)
-                navController?.navigate("$route/$title/$description/$servicioId/$encodedUrlImagen") // Navegar con el ID de la categoría
+                navController?.navigate("$route/$title/$description/$servicioId/$encodedUrlImagen")
             },
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFf0eee9)), // Color de fondo personalizado para la tarjeta
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp), // Elevación estándar para sombra
-        shape = RoundedCornerShape(16.dp) // Bordes redondeados
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFf0eee9)),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        shape = RoundedCornerShape(16.dp)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp) // Espaciado interno de la tarjeta
+                .padding(16.dp)
         ) {
-            // Imagen destacada en la parte superior con fondo gris
+
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(12.dp))
             ) {
                 AsyncImage(
-                    model = imageUrl, // Imagen de prueba
+                    model = imageUrl,
                     contentDescription = null,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(180.dp) // Imagen más grande
-                        .clip(RoundedCornerShape(8.dp)), // Bordes redondeados para la imagen
+                        .height(180.dp)
+                        .clip(RoundedCornerShape(8.dp)),
                     contentScale = ContentScale.Crop
                 )
             }
 
-            Spacer(modifier = Modifier.height(16.dp)) // Espaciado entre la imagen y el contenido
+            Spacer(modifier = Modifier.height(16.dp))
 
-            // Contenido del título y la descripción
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 Column(
                 )
                 {
-                    // Título de la tarjeta
                     Text(
                         text = title,
-                        fontSize = 18.sp, // Tamaño de texto para títulos
+                        fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSurface // Color según el tema
+                        color = MaterialTheme.colorScheme.onSurface
                     )
 
-                    Spacer(modifier = Modifier.height(4.dp)) // Espacio reducido entre el título y descripción
-
-                    // Descripción de la tarjeta
+                    Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         text = description,
-                        fontSize = 14.sp, // Tamaño de texto para contenido secundario
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f), // Color secundario con opacidad
-                        maxLines = 2, // Limitar a dos líneas
-                        overflow = TextOverflow.Ellipsis // Cortar el texto si es necesario
+                        fontSize = 14.sp,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
             }
@@ -1142,6 +1166,25 @@ fun Calendarios(title: String, events: List<Pair<String, String>>) {
 
 
 //FUNCIONES PARA PANTALLA DE MOSTRAR SOLICITUDES
+@Composable
+fun CasesGetInfo(){
+    val userId = UserIdData.userId
+    val usuarioViewModel: UsuarioViewModel = viewModel()
+    val caseViewModel: CaseViewModel = viewModel()
+    val appointmentViewModel: AppointmentViewModel = viewModel()
+
+    if (userId != null)
+    {
+        usuarioViewModel.fetchUsuario(userId)
+    }
+
+
+}
+
+
+
+
+
 @Composable
 fun ItemTemplate(
     id: String,

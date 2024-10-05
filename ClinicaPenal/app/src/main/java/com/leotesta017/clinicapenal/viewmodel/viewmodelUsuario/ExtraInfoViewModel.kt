@@ -34,12 +34,12 @@ class ExtraInfoViewModel : ViewModel() {
         }
     }
 
-    // Agregar nueva información extra
-    fun addNewExtraInfo(extraInfo: ExtraInfo, userId: String) {
+    // Agregar nueva información extra a un caso
+    fun addNewExtraInfoToCase(extraInfo: ExtraInfo, caseId: String) {
         viewModelScope.launch {
-            val success = repository.addExtraInfo(extraInfo, userId)
+            val success = repository.addExtraInfoToCase(extraInfo, caseId)
             if (!success) {
-                _error.value = "Error al agregar la información extra"
+                _error.value = "Error al agregar la información extra al caso"
             }
         }
     }

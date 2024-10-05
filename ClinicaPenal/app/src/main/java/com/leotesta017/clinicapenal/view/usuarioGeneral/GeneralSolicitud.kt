@@ -16,7 +16,6 @@ import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.SolicitudGeneralI
 import com.leotesta017.clinicapenal.view.templatesPantallas.GenerarSolicitudPantallaTemplatenavController
 import com.leotesta017.clinicapenal.view.theme.ClinicaPenalTheme
 
-
 @Composable
 fun GeneralSolicitud(
     navController: NavController?
@@ -29,7 +28,6 @@ fun GeneralSolicitud(
             estado = "Finalizado",
             estadoColor = Color.Green
         ),
-        // Otras solicitudes...
     )
 
     val notificaciones = listOf(
@@ -39,7 +37,6 @@ fun GeneralSolicitud(
             detalle = "Puede dejar su valoración en el Caso en el Histórico de Solicitudes",
             isImportant = true
         ),
-        // Otras notificaciones...
     )
 
     GenerarSolicitudPantallaTemplatenavController(

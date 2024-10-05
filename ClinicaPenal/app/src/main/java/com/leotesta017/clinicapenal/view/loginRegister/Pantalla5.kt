@@ -29,6 +29,7 @@ import androidx.navigation.compose.rememberNavController
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.leotesta017.clinicapenal.R
+import com.leotesta017.clinicapenal.model.modelUsuario.UserIdData
 import com.leotesta017.clinicapenal.view.theme.ClinicaPenalTheme
 
 @Composable
@@ -99,20 +100,26 @@ fun Pantalla5(navController: NavController) {
                     navController.context.startActivity(intent)
                 }
         )
-
         Button(
             onClick = {
-                if (correo.isNotEmpty() && contrasena.isNotEmpty()) {
+                if (correo.isNotEmpty() && contrasena.isNotEmpty())
+                {
                     auth.signInWithEmailAndPassword(correo, contrasena)
                         .addOnCompleteListener { task ->
                             if (task.isSuccessful) {
                                 val uid = auth.currentUser?.uid
-                                if (uid != null) {
+                                if (uid != null)
+                                {
+                                    UserIdData.userId = uid
                                     db.collection("usuarios").document(uid).get()
+
                                         .addOnSuccessListener { document ->
-                                            if (document != null && document.exists()) {
+                                            if (document != null && document.exists())
+                                            {
                                                 val tipoUsuario = document.getString("tipo")
-                                                when (tipoUsuario) {
+
+                                                when (tipoUsuario)
+                                                {
                                                     "general" -> navController.navigate("pantallainfocategoriasgeneral")
                                                     "estudiante" -> navController.navigate("pantallainfoestudiante")
                                                     "colaborador" -> navController.navigate("pantallainfoadmin")
@@ -120,16 +127,21 @@ fun Pantalla5(navController: NavController) {
                                                         mensajeError = "Error al obtener el tipo de usuario."
                                                     }
                                                 }
-                                            } else {
+                                            }
+                                            else
+                                            {
                                                 mensajeError = "Error: Correo inexistente."
                                             }
                                         }
-                                        .addOnFailureListener {
+                                        .addOnFailureListener{
                                             mensajeError = "Error al conectarse a la base de datos."
                                         }
                                 }
-                            } else {
-                                when (task.exception?.message) {
+                            }
+                            else
+                            {
+                                when (task.exception?.message)
+                                {
                                     "The email address is badly formatted." -> {
                                         mensajeError = "Error: Por favor sea serio."
                                     }
@@ -148,7 +160,9 @@ fun Pantalla5(navController: NavController) {
                         .addOnFailureListener {
                             mensajeError = "Error: Correo o contraseña incorrectos."
                         }
-                } else {
+                }
+                else
+                {
                     mensajeError = "Por favor complete los campos."
                 }
             },

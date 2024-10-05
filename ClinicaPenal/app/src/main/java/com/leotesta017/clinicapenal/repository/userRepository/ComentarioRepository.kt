@@ -28,17 +28,17 @@ class ComentarioRepository {
         }
     }
 
-    // Agregar un nuevo comentario y actualizar la lista de comentarios del usuario
-    suspend fun addComentario(comentario: Comentario, userId: String): Boolean {
+    // Agregar un nuevo comentario y actualizar la lista de comentarios del caso
+    suspend fun addComentarioToCase(comentario: Comentario, caseId: String): Boolean {
         return try {
             val comentarioRef = firestore.collection("comments").document(comentario.comentario_id)
 
             // Primero, agregar el comentario a la colección "comments"
             comentarioRef.set(comentario).await()
 
-            // Luego, actualizar la lista de comentarios del usuario
-            val userRef = firestore.collection("usuarios").document(userId)
-            userRef.update("listComments", FieldValue.arrayUnion(comentario.comentario_id)).await()
+            // Luego, actualizar la lista de comentarios del caso
+            val caseRef = firestore.collection("cases").document(caseId)
+            caseRef.update("listComents", FieldValue.arrayUnion(comentario.comentario_id)).await()
 
             true
         } catch (e: Exception) {
@@ -59,3 +59,4 @@ class ComentarioRepository {
         }
     }
 }
+

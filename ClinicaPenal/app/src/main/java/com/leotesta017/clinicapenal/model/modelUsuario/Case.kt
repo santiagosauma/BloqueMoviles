@@ -1,11 +1,15 @@
 package com.leotesta017.clinicapenal.model.modelUsuario
 
 data class Case (
-    val case_id: String = "",  // ID del caso
+    val case_id: String = "",
     val is_represented: Boolean = false,
-    val lawyerAssigned: String = "",  // ID del abogado asignado
+    val lawyerAssigned: String = "",
     val place: String = "",
     val situation: String = "",
     val state: String = "",
-    val studentAssigned: String = ""  // ID del estudiante asignado
+    val studentAssigned: String = "",
+
+    val listAppointments: List<String> = emptyList(),
+    val listExtraInfo: List<String> = emptyList(),
+    val listComents: List<String> = emptyList()
 )

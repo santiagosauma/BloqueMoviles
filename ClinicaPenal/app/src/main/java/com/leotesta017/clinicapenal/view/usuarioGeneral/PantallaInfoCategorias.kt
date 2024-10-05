@@ -26,7 +26,7 @@ import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.SpacedItem
 import com.leotesta017.clinicapenal.viewmodel.VideoViewModel
 
 @Composable
-fun PantallaInfoCategorias(navController: NavController? ) {
+fun PantallaInfoCategorias(navController: NavController?) {
     PantallaInfoGenerica(
         navController = navController,
 

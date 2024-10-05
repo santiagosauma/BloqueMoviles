@@ -28,8 +28,8 @@ class AppointmentRepository {
         }
     }
 
-    // Método para agregar una nueva cita y actualizar el usuario
-    suspend fun addAppointment(appointment: Appointment, userId: String): Boolean {
+    // Método para agregar una nueva cita y actualizar el caso (en lugar de usuario)
+    suspend fun addAppointmentToCase(appointment: Appointment, caseId: String): Boolean {
         return try {
             val appointmentRef = firestore.collection("appointments")
                 .document(appointment.appointment_id)
@@ -37,9 +37,9 @@ class AppointmentRepository {
             // Primero, agregar la cita
             appointmentRef.set(appointment).await()
 
-            // Ahora, actualizar la lista de citas del usuario
-            val userRef = firestore.collection("usuarios").document(userId)
-            userRef.update("listAppointments", FieldValue.arrayUnion(appointment.appointment_id))
+            // Ahora, actualizar la lista de citas del caso
+            val caseRef = firestore.collection("cases").document(caseId)
+            caseRef.update("listAppointments", FieldValue.arrayUnion(appointment.appointment_id))
                 .await()
 
             true
@@ -49,11 +49,11 @@ class AppointmentRepository {
     }
 
     // Método para actualizar una cita existente
-    suspend fun updateAppointment(id: String, appointment: Map<String, Any>): Boolean {
+    suspend fun updateAppointment(id: String, appointmentData: Map<String, Any>): Boolean {
         return try {
             firestore.collection("appointments")
                 .document(id)
-                .update(appointment)
+                .update(appointmentData)
                 .await()
             true
         } catch (e: Exception) {
@@ -61,3 +61,4 @@ class AppointmentRepository {
         }
     }
 }
+
