@@ -1,5 +1,6 @@
 package com.leotesta017.clinicapenal.repository.userRepository
 
+import android.util.Log
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -13,13 +14,14 @@ class CaseRepository {
     // Obtener un caso por su ID
     suspend fun getCaseById(id: String): Case? {
         return try {
-            val document = firestore.collection("cases")
-                .document(id)
-                .get()
-                .await()
+            val document = firestore.collection("cases").document(id).get().await()
 
             if (document.exists()) {
-                document.toObject(Case::class.java)
+                val case = document.toObject(Case::class.java)
+
+                Log.d("FirestoreDebug", "Case ID: $id, isRepresented: ${case?.isRepresented}")
+
+                case
             } else {
                 null
             }
@@ -80,4 +82,43 @@ class CaseRepository {
             false
         }
     }
+
+    // Eliminar un caso y todos los elementos asociados (appointments, comments, extraInfo)
+    suspend fun deleteCase(caseId: String): Boolean {
+        return try {
+            // Obtener el caso para acceder a las listas de appointments, comments y extraInfo
+            val caseSnapshot = firestore.collection("cases").document(caseId).get().await()
+
+            if (caseSnapshot.exists()) {
+                val case = caseSnapshot.toObject(Case::class.java)
+                case?.let {
+                    // Eliminar todos los appointments asociados
+                    it.listAppointments.forEach { appointmentId ->
+                        firestore.collection("appointments").document(appointmentId).delete().await()
+                    }
+
+                    // Eliminar todos los comentarios asociados
+                    it.listComents.forEach { commentId ->
+                        firestore.collection("comments").document(commentId).delete().await()
+                    }
+
+                    // Eliminar toda la extraInfo asociada
+                    it.listExtraInfo.forEach { extraInfoId ->
+                        firestore.collection("extraInfo").document(extraInfoId).delete().await()
+                    }
+
+                    // Finalmente, eliminar el caso
+                    firestore.collection("cases").document(caseId).delete().await()
+
+                    true // Operación exitosa
+                } ?: false // Caso no encontrado
+            } else {
+                false // El caso no existe
+            }
+        } catch (e: Exception) {
+            false // Error al eliminar el caso
+        }
+    }
+
+
 }

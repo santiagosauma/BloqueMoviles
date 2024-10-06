@@ -10,10 +10,13 @@ import kotlinx.coroutines.launch
 
 class CaseViewModel : ViewModel() {
 
-    private val repository = CaseRepository()
+    val repository = CaseRepository()
 
     private val _case = MutableStateFlow<Case?>(null)
     val case: StateFlow<Case?> = _case
+
+    private val _caseDeleted = MutableStateFlow<Boolean>(false)
+    val caseDeleted: StateFlow<Boolean> = _caseDeleted
 
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error
@@ -63,4 +66,15 @@ class CaseViewModel : ViewModel() {
             }
         }
     }
+
+    // Función para eliminar un caso y sus elementos asociados
+    fun deleteCase(caseId: String) {
+        viewModelScope.launch {
+            val success = repository.deleteCase(caseId)
+            if (!success) {
+                _error.value = "Error al eliminar el caso o elementos asociados."  // Indicar que el caso ha sido eliminado con éxito
+            }
+        }
+    }
+
 }

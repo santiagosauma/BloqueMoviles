@@ -2,6 +2,7 @@ package com.leotesta017.clinicapenal.viewmodel.viewmodelUsuario
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.leotesta017.clinicapenal.model.modelUsuario.Case
 import com.leotesta017.clinicapenal.model.modelUsuario.Usuario
 import com.leotesta017.clinicapenal.repository.userRepository.UsuarioRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,12 +13,16 @@ class UsuarioViewModel : ViewModel()
 {
 
     private val repository = UsuarioRepository()
+    private val caseViewModel = CaseViewModel()
 
     private val _usuario = MutableStateFlow<Usuario>(Usuario())
     val usuario: StateFlow<Usuario> = _usuario
 
     private val _userId = MutableStateFlow<String?>(null)
     val userId: StateFlow<String?> = _userId
+
+    private val _userCases = MutableStateFlow<List<Case>>(emptyList())  // Cambiamos a lista de Case
+    val userCases: StateFlow<List<Case>> = _userCases
 
     private val _userName = MutableStateFlow<String?>(null)
     val userName: StateFlow<String?> = _userName
@@ -95,6 +100,36 @@ class UsuarioViewModel : ViewModel()
             catch (e: Exception)
             {
                 _error.value = "Error al obtener el tipo del usuario: ${e.message}"
+            }
+        }
+    }
+
+
+    // Obtener los casos completos de un usuario
+    fun fetchUserCasesWithDetails(userId: String) {
+        viewModelScope.launch {
+            try {
+                // Obtener los IDs de casos del usuario
+                val caseIds = repository.getUserCasesById(userId)
+
+                // Crear una lista para almacenar los casos
+                val cases = mutableListOf<Case>()
+
+                // Iterar sobre los IDs de casos y obtener la información completa de cada caso
+                caseIds.forEach { caseId ->
+                    val case = caseViewModel.repository.getCaseById(caseId) // Obtener caso por ID
+                    if (case != null) {
+                        cases.add(case)
+                    } else {
+                        _error.value = "Error al obtener información del caso con ID: $caseId"
+                    }
+                }
+
+                // Actualizar la lista de casos completos en el MutableStateFlow
+                _userCases.value = cases
+
+            } catch (e: Exception) {
+                _error.value = "Error al obtener los casos completos: ${e.message}"
             }
         }
     }

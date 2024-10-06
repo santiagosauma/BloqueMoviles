@@ -19,18 +19,18 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.SearchBar
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.TopBar
+
 @Composable
-fun GenerarSolicitudPantallaTemplatenavController(
+fun <T> GenerarSolicitudPantallaTemplatenavController(
     navController: NavController?,
     titulo1: String,
-    items1: List<Any>,
-    itemComposable1: @Composable (Any) -> Unit,
+    items1: List<T>, // Cambiamos Any por Case
+    itemComposable1: @Composable (T) -> Unit, // Cambiamos Any por Case
     titulo2: String,
-    items2: List<Any>,
-    itemComposable2: @Composable (Any) -> Unit,
+    items2: List<T>, // Cambiamos Any por Case
+    itemComposable2: @Composable (T) -> Unit, // Cambiamos Any por Case
     barraNavComposable: @Composable () -> Unit
-)
-{
+) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -59,8 +59,9 @@ fun GenerarSolicitudPantallaTemplatenavController(
                 Spacer(modifier = Modifier.height(10.dp))
             }
 
-            items(items1) { item ->
-                itemComposable1(item)
+            // Recorremos la lista de items1, que ahora es de tipo Case
+            items(items1) { caseItem ->
+                itemComposable1(caseItem) // Llamamos al composable con un Case, no Any
                 Spacer(modifier = Modifier.height(4.dp))
             }
 
@@ -75,8 +76,9 @@ fun GenerarSolicitudPantallaTemplatenavController(
                 Spacer(modifier = Modifier.height(16.dp))
             }
 
-            items(items2) { item ->
-                itemComposable2(item)
+            // Recorremos la lista de items2, que ahora es de tipo Case
+            items(items2) { caseItem ->
+                itemComposable2(caseItem) // Llamamos al composable con un Case, no Any
                 Spacer(modifier = Modifier.height(8.dp))
             }
         }

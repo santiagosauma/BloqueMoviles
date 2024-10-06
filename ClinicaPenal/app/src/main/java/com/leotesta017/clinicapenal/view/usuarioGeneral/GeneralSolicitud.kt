@@ -4,60 +4,54 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.leotesta017.clinicapenal.model.Notificacion
-import com.leotesta017.clinicapenal.model.SolicitudGeneral
+import com.leotesta017.clinicapenal.model.modelUsuario.Case
+import com.leotesta017.clinicapenal.model.modelUsuario.UserIdData
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.BarraNav
-import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.NotificacionItem
-import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.SolicitudGeneralItem
+import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.CaseItemTemplate
 import com.leotesta017.clinicapenal.view.templatesPantallas.GenerarSolicitudPantallaTemplatenavController
 import com.leotesta017.clinicapenal.view.theme.ClinicaPenalTheme
+import com.leotesta017.clinicapenal.viewmodel.viewmodelUsuario.UsuarioViewModel
+
+
 
 @Composable
-fun GeneralSolicitud(
-    navController: NavController?
-) {
-    val solicitudes = listOf(
-        SolicitudGeneral(
-            id = "ID123",
-            fechaRealizada = "19/06/2024 - Cita Realizada",
-            proximaCita = "12/08/2024 - Próxima Cita (16:30)",
-            estado = "Finalizado",
-            estadoColor = Color.Green
-        ),
-    )
+fun GeneralSolicitud(navController: NavController?) {
+    val usuarioViewModel: UsuarioViewModel = viewModel()
 
-    val notificaciones = listOf(
-        Notificacion(
-            fecha = "01/09/24",
-            titulo = "Finalizado: Caso ID123",
-            detalle = "Puede dejar su valoración en el Caso en el Histórico de Solicitudes",
-            isImportant = true
-        ),
-    )
+    val userId = UserIdData.userId ?: return
 
+    LaunchedEffect(userId) {
+        usuarioViewModel.fetchUserCasesWithDetails(userId)
+    }
+
+    // Observamos el estado de los casos y mostramos la información
+
+    val userCases by usuarioViewModel.userCases.collectAsState()
+
+    // Mostramos un mensaje de error si existe
+    val error by usuarioViewModel.error.collectAsState()
+
+
+
+    // Llamamos la función template para generar la pantalla
     GenerarSolicitudPantallaTemplatenavController(
         navController = navController,
-        titulo1 = "Historial de Solicitudes",
-        items1 = solicitudes,
-        itemComposable1 = { solicitud ->
-            SolicitudGeneralItem(
-                solicitud = solicitud as SolicitudGeneral,
-                navController = navController,
-                valorarRoute = "ReviewComentarios"
+        titulo1 = "Historial de Casos", // Cambio de título
+        items1 = userCases,  // Lista completa de casos ordenados
+        itemComposable1 = { caso ->
+            CaseItemTemplate(
+                case = caso,
+                onDelete = { },
+                confirmDeleteText = "¿Estás seguro de que deseas eliminar este caso?"
             )
         },
-        titulo2 = "Notificaciones",
-        items2 = notificaciones,
-        itemComposable2 = { notificacion ->
-            NotificacionItem(
-                notificacion = notificacion as Notificacion,
-                navController = navController
-            )
-        },
+        titulo2 = "Notificaciones", // Notificaciones vacías por ahora
+        items2 = emptyList(),  // Lista vacía de notificaciones
+        itemComposable2 = { },
         barraNavComposable = {
             Box(modifier = Modifier.fillMaxSize()) {
                 BarraNav(

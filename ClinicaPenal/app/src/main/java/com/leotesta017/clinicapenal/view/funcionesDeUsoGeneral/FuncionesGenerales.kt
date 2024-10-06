@@ -3,7 +3,6 @@ package com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral
 //VIEW MODEL
 import android.content.Intent
 import android.net.Uri
-import android.util.Log
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -22,7 +21,6 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
@@ -87,13 +85,14 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import coil.compose.AsyncImage
-import com.google.firebase.firestore.auth.User
 import com.leotesta017.clinicapenal.model.CasosRepresentacion
 import com.leotesta017.clinicapenal.model.Categoria
 import com.leotesta017.clinicapenal.model.Notificacion
 import com.leotesta017.clinicapenal.model.Servicio
 import com.leotesta017.clinicapenal.model.SolicitudAdmin
 import com.leotesta017.clinicapenal.model.SolicitudGeneral
+import com.leotesta017.clinicapenal.model.modelUsuario.Appointment
+import com.leotesta017.clinicapenal.model.modelUsuario.Case
 import com.leotesta017.clinicapenal.model.modelUsuario.UserIdData
 import com.leotesta017.clinicapenal.view.videoPlayer.googleDrivePlayer.GoogleDriveVideoPlayer
 import com.leotesta017.clinicapenal.view.videoPlayer.youtubeVideoPlayer.YouTubePlayerWithLifecycle
@@ -466,7 +465,6 @@ fun isGoogleDriveUrl(videoUrl: String): Boolean {
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun CarruselDeNoticias(
-    tipoPantalla: String? = null,
     viewModel: VideoViewModel = viewModel(),
     userModel: UsuarioViewModel = viewModel(),
     contentText: @Composable (() -> Unit)? = null,
@@ -1167,33 +1165,8 @@ fun Calendarios(title: String, events: List<Pair<String, String>>) {
 
 //FUNCIONES PARA PANTALLA DE MOSTRAR SOLICITUDES
 @Composable
-fun CasesGetInfo(){
-    val userId = UserIdData.userId
-    val usuarioViewModel: UsuarioViewModel = viewModel()
-    val caseViewModel: CaseViewModel = viewModel()
-    val appointmentViewModel: AppointmentViewModel = viewModel()
-
-    if (userId != null)
-    {
-        usuarioViewModel.fetchUsuario(userId)
-    }
-
-
-}
-
-
-
-
-
-@Composable
-fun ItemTemplate(
-    id: String,
-    titulo: String,
-    detalles: List<String>,
-    estado: String,
-    estadoColor: Color,
-    navController: NavController?,
-    navRoute: String,
+fun CaseItemTemplate(
+    case: Case,
     onDelete: (String) -> Unit,
     confirmDeleteText: String
 ) {
@@ -1205,10 +1178,7 @@ fun ItemTemplate(
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp)
             .clip(RoundedCornerShape(16.dp))
-            .shadow(1.dp)
-            .clickable {
-                navController?.navigate(navRoute)
-            },
+            .shadow(1.dp),
         colors = CardDefaults.cardColors(
             containerColor = Color(0xFFE4E4E4)
         )
@@ -1219,58 +1189,33 @@ fun ItemTemplate(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.Top
             ) {
-                 Column(modifier = Modifier.weight(1f)) {
+                Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = titulo,
+                        text = "Caso: ${case.case_id}",
                         fontWeight = FontWeight.Bold,
                         fontSize = 14.5.sp
                     )
-                    detalles.forEach { detalle ->
-                        Text(
-                            text = detalle,
-                            fontSize = 14.5.sp
-                        )
-                    }
+                    Text(text = "Lugar: ${case.place}", fontSize = 14.sp)
+                    Text(text = "Estado: ${case.state}", fontSize = 14.sp)
                 }
-                Column(
-                    horizontalAlignment = Alignment.End,
-                    verticalArrangement = Arrangement.SpaceBetween,
+                IconButton(onClick = { expanded = !expanded }) {
+                    Icon(
+                        imageVector = Icons.Default.MoreVert,
+                        contentDescription = "Más opciones",
+                        tint = Color.Black
+                    )
+                }
+                DropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false }
                 ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.End,
-                    ) {
-                        Text(
-                            text = estado,
-                            color = Color.Black,
-                            fontSize = 14.5.sp
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Box(
-                            modifier = Modifier
-                                .size(12.dp)
-                                .background(estadoColor, shape = CircleShape)
-                        )
-                    }
-                    IconButton(onClick = { expanded = !expanded }) {
-                        Icon(
-                            imageVector = Icons.Default.MoreVert,
-                            contentDescription = "Más opciones",
-                            tint = Color.Black
-                        )
-                    }
-                    DropdownMenu(
-                        expanded = expanded,
-                        onDismissRequest = { expanded = false }
-                    ) {
-                        DropdownMenuItem(
-                            onClick = {
-                                expanded = false
-                                showDialog = true
-                            },
-                            text = { Text("Eliminar") }
-                        )
-                    }
+                    DropdownMenuItem(
+                        onClick = {
+                            expanded = false
+                            showDialog = true
+                        },
+                        text = { Text("Eliminar") }
+                    )
                 }
             }
         }
@@ -1281,7 +1226,7 @@ fun ItemTemplate(
             onDismissRequest = { showDialog = false },
             confirmButton = {
                 TextButton(onClick = {
-                    onDelete(id)
+                    onDelete(case.case_id)
                     showDialog = false
                 }) {
                     Text("Eliminar")
@@ -1298,195 +1243,7 @@ fun ItemTemplate(
     }
 }
 
-@Composable
-fun SolicitudAdminItem(
-    solicitud: SolicitudAdmin,
-    navController: NavController?,
-    onDelete: (String) -> Unit,
-    route: String
-) {
-    ItemTemplate(
-        id = solicitud.id,
-        titulo = "${solicitud.id} - ${solicitud.titulo}",
-        detalles = listOf(solicitud.fechaRealizada, solicitud.nombreUsuario),
-        estado = solicitud.estado,
-        estadoColor = solicitud.estadoColor,
-        navController = navController,
-        navRoute = route,
-        onDelete = onDelete,
-        confirmDeleteText = "¿Está seguro de que desea eliminar esta solicitud?"
-    )
-}
-
-@Composable
-fun CasoRepresentacionItem(
-    casosRepresentacion: CasosRepresentacion,
-    navController: NavController?,
-    onDelete: (String) -> Unit,
-    route: String
-) {
-    ItemTemplate(
-        id = casosRepresentacion.id,
-        titulo = "Caso: ${casosRepresentacion.id} - ${casosRepresentacion.tipo}",
-        detalles = listOf("Fecha: ${casosRepresentacion.fechaRealizada}", "Usuario Asignado: ${casosRepresentacion.usuarioAsignado}"),
-        estado = casosRepresentacion.estado,
-        estadoColor = casosRepresentacion.estadoColor,
-        navController = navController,
-        navRoute = route,
-        onDelete = onDelete,
-        confirmDeleteText = "¿Está seguro de que desea eliminar este caso de representación?"
-    )
-}
-
-
-@Composable
-fun GeneralItemTemplate(
-    title: String,
-    details: List<String>,
-    estado: String? = null,
-    estadoColor: Color? = null,
-    isImportant: Boolean = false,
-    icon: ImageVector? = null,  // Hacemos el ícono opcional
-    extraAction: (@Composable () -> Unit)? = null,
-    navController: NavController? = null,
-    linkText: String? = null,
-    linkRoute: String? = null
-) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp)
-            .clip(RoundedCornerShape(16.dp))
-            .border(
-                1.dp,
-                if (isImportant) Color(0xFF303665) else Color.Transparent,
-                RoundedCornerShape(16.dp)
-            )
-            .shadow(1.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFE4E4E4))
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            // Solo mostrar el ícono si no es nulo
-            icon?.let {
-                Icon(
-                    imageVector = it,
-                    contentDescription = "Icono",
-                    tint = Color.Black,
-                    modifier = Modifier.size(40.dp)
-                )
-                Spacer(modifier = Modifier.width(16.dp))
-            }
-
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = title,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp,
-                    color = Color.Black
-                )
-                details.forEach { detail ->
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = detail,
-                        fontSize = 14.sp,
-                        color = Color.Gray
-                    )
-                }
-                estado?.let {
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = it,
-                        color = estadoColor ?: Color.Black,
-                        fontSize = 14.sp
-                    )
-                }
-                linkText?.let {
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = it,
-                        fontSize = 14.sp,
-                        color = Color(0xFF303665),
-                        modifier = Modifier.clickable { linkRoute?.let { navController?.navigate(it) } }
-                    )
-                }
-            }
-
-            extraAction?.invoke() // Aquí se muestra el menú extra si se proporciona
-        }
-    }
-}
-
-
-
-
-@Composable
-fun SolicitudGeneralItem(
-    solicitud: SolicitudGeneral,
-    navController: NavController?,
-    valorarRoute: String
-) {
-    GeneralItemTemplate(
-        title = "Caso ${solicitud.id}",
-        details = listOf(solicitud.fechaRealizada, solicitud.proximaCita),
-        estado = solicitud.estado,
-        estadoColor = solicitud.estadoColor,
-        navController = navController,
-        extraAction = {
-            if (solicitud.estado == "Finalizado") {
-                var expanded by remember { mutableStateOf(false) }
-
-                IconButton(onClick = { expanded = !expanded }) {
-                    Icon(
-                        imageVector = Icons.Default.MoreVert,
-                        contentDescription = "Más opciones",
-                        tint = Color.Black
-                    )
-                }
-
-                DropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false }
-                ) {
-                    DropdownMenuItem(
-                        onClick = {
-                            expanded = false
-                            navController?.navigate(route = valorarRoute)
-                        },
-                        text = { Text("Valorar") }
-                    )
-                }
-            }
-        }
-    )
-}
-
-
-@Composable
-fun NotificacionItem(
-    notificacion: Notificacion,
-    navController: NavController?
-) {
-    GeneralItemTemplate(
-        title = notificacion.titulo,
-        details = listOf(notificacion.fecha, notificacion.detalle),
-        isImportant = notificacion.isImportant,
-        icon = Icons.Default.Notifications,
-        linkText = notificacion.enlace,
-        linkRoute = notificacion.rutaEnlace,
-        navController = navController
-    )
-}
-
-
 // FUNCIONES PARA PANTALLAS MODIFICAR INFO/SERVICIOS ADMIN
-
-
-
 @Composable
 fun TextEditor(
     initialText: String = "",
