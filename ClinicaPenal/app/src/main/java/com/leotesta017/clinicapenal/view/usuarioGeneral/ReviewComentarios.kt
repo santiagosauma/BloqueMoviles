@@ -27,7 +27,7 @@ import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.TopBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ReviewComentarios(navController: NavController?) {
+fun ReviewComentarios(navController: NavController?, case_id: String) {
     var comentario by remember { mutableStateOf(TextFieldValue("Inserte comentario...")) }
     var rating by remember { mutableStateOf(0) }
     var hasClicked by remember { mutableStateOf(false) }
@@ -141,6 +141,6 @@ fun ReviewComentarios(navController: NavController?) {
 @Composable
 fun ReviewComentariosPreview() {
     ClinicaPenalTheme {
-        ReviewComentarios(navController = rememberNavController())
+        ReviewComentarios(navController = rememberNavController(), case_id = "1")
     }
 }

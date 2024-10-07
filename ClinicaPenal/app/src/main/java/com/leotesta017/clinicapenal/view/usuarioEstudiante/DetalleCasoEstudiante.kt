@@ -22,7 +22,7 @@ import com.leotesta017.clinicapenal.view.usuarioColaborador.ClienteInfo
 import com.leotesta017.clinicapenal.view.usuarioColaborador.DropdownMenuExample
 
 @Composable
-fun DetalleCasoEstudiante(navController: NavController?) {
+fun DetalleCasoEstudiante(navController: NavController?, case_id: String) {
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -40,7 +40,7 @@ fun DetalleCasoEstudiante(navController: NavController?) {
                     modifier = Modifier
                         .padding(16.dp)
                         .clickable {
-                            navController?.navigate("generarsolicitudestudiante")
+                            navController?.popBackStack()
                         }
                 ) {
                     Icon(
@@ -155,5 +155,5 @@ fun DetalleCasoEstudiante(navController: NavController?) {
 @Preview(showBackground = true)
 @Composable
 fun PreviewDetalleCasoEstudiante() {
-    DetalleCasoEstudiante(navController = null)
+    DetalleCasoEstudiante(navController = null, case_id = "1")
 }

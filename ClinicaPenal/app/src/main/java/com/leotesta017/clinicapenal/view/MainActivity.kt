@@ -92,7 +92,19 @@ fun MyApp() {
 
         composable("pantallainformacionclinica") { PantallaInfoClinica(navController) }
         composable("solicitud") { GeneralSolicitud(navController) }
-        composable("ReviewComentarios") { ReviewComentarios(navController) }
+        composable(
+            route = "ReviewComentarios/{case_id}",
+            arguments = listOf(
+                navArgument("case_id"){type = NavType.StringType}
+            )
+        ) { backStackEntry ->
+
+            val case_id = backStackEntry.arguments?.getString("case_id") ?: ""
+            ReviewComentarios(
+                navController = navController,
+                case_id = case_id
+            )
+        }
         composable("crearsolicitud") { Solicitud(navController) }
 
         composable(
@@ -195,7 +207,20 @@ fun MyApp() {
         composable("agregar-info-admin") { AgregarInfoAdmin(navController) }
         composable("agregar_servicios_info-admin") { AgregarServiciosInfoAdmin(navController) }
         composable("generalsolicitudadmin") { GeneralSolicitudAdmin(navController)}
-        composable("actualizarcasos") {ActualizarCasos(navController)}
+        composable(
+            route = "actualizarcasos/{case_id}",
+            arguments = listOf(
+                navArgument("case_id"){type = NavType.StringType}
+            )
+        ) { backStackEntry ->
+
+            val case_id = backStackEntry.arguments?.getString("case_id") ?: ""
+
+            ActualizarCasos(
+                navController = navController,
+                case_id = case_id
+            )
+        }
         composable("infoclinicaadmin") { PantallaInfoClinicaAdmin(navController) }
         composable("agendar") { Agendar(navController) }
         composable("comentar") { ComentarioScreen(navController) }
@@ -219,7 +244,19 @@ fun MyApp() {
         composable("informacionestudiate"){ InformacionClinicaEstudiante(navController) }
 
         //PANTALLA DE VISTA DETALLADA DEL CASO
-        composable("detallecasoestudiante") { DetalleCasoEstudiante(navController) }
+        composable(
+            route = "detallecasoestudiante/{case_id}",
+            arguments = listOf(
+                navArgument("case_id"){type = NavType.StringType}
+            )
+        ) { backStackEntry ->
+
+            val case_id = backStackEntry.arguments?.getString("case_id") ?: ""
+
+            DetalleCasoEstudiante(
+                navController = navController,
+                case_id = case_id)
+        }
 
         //AGREGAR CATEGORIA Y SERVICIOS ESTUDIANTES
         composable("agregar-info-estudiante") { AgregarInfoEstudiante(navController)}
