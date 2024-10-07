@@ -253,20 +253,6 @@ fun ModificarInfoTemplate(
                 )
 
                 Spacer(modifier = Modifier.height(5.dp))
-
-                OutlinedTextField(
-                    value = textContent,
-                    onValueChange = {
-                        textContent = it
-                        isModified = true
-                    },
-                    label = { Text("Contenido") },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 8.dp),
-                    minLines = 6,
-                    maxLines = Int.MAX_VALUE
-                )
             }
         )
 
