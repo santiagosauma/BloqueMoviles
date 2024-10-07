@@ -1,5 +1,6 @@
 package com.leotesta017.clinicapenal.repository.userRepository
 
+import android.util.Log
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -13,20 +14,27 @@ class AppointmentRepository {
     // Método para obtener una cita por su ID
     suspend fun getAppointmentById(id: String): Appointment? {
         return try {
+            // Intentar obtener el documento de Firestore
             val document = firestore.collection("appointments")
                 .document(id)
                 .get()
                 .await()
 
+            // Verificar si el documento existe
             if (document.exists()) {
-                document.toObject(Appointment::class.java)
+                val appointment = document.toObject(Appointment::class.java)
+                Log.d("DebugAppointment", "Cita obtenida: ${appointment?.appointment_id}, Fecha: ${appointment?.fecha?.toDate()}, Confirmada: ${appointment?.confirmed}")
+                appointment
             } else {
+                Log.e("DebugAppointment", "El documento no existe: $id")
                 null
             }
         } catch (e: Exception) {
+            Log.e("DebugAppointment", "Error obteniendo cita con ID $id: ${e.message}")
             null
         }
     }
+
 
     // Método para agregar una nueva cita y actualizar el caso (en lugar de usuario)
     suspend fun addAppointmentToCase(appointment: Appointment, caseId: String): Boolean {

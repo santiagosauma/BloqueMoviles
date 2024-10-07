@@ -18,9 +18,6 @@ class CaseRepository {
 
             if (document.exists()) {
                 val case = document.toObject(Case::class.java)
-
-                Log.d("FirestoreDebug", "Case ID: $id, isRepresented: ${case?.isRepresented}")
-
                 case
             } else {
                 null

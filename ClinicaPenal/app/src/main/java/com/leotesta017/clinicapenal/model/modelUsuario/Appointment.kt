@@ -4,9 +4,8 @@ import com.google.firebase.Timestamp
 
 data class Appointment(
     val appointment_id: String = "",
-    val fecha: Timestamp,
-    val is_available: Boolean = false,
-    val is_completed: Boolean = false,
-    val is_suspended: Boolean = false,
+    val fecha: Timestamp = Timestamp.now(),
+    val asisted: Boolean = false,
+    val confirmed: Boolean = false,
     val valoration: Int = 0
 )

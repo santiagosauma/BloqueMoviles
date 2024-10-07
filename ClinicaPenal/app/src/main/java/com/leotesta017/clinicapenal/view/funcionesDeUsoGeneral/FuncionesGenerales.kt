@@ -37,7 +37,6 @@ import androidx.compose.material.icons.filled.FormatBold
 import androidx.compose.material.icons.filled.FormatItalic
 import androidx.compose.material.icons.filled.FormatUnderlined
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.SearchOff
 import androidx.compose.material3.AlertDialog
@@ -48,6 +47,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -85,12 +85,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import coil.compose.AsyncImage
-import com.leotesta017.clinicapenal.model.CasosRepresentacion
 import com.leotesta017.clinicapenal.model.Categoria
-import com.leotesta017.clinicapenal.model.Notificacion
 import com.leotesta017.clinicapenal.model.Servicio
-import com.leotesta017.clinicapenal.model.SolicitudAdmin
-import com.leotesta017.clinicapenal.model.SolicitudGeneral
 import com.leotesta017.clinicapenal.model.modelUsuario.Appointment
 import com.leotesta017.clinicapenal.model.modelUsuario.Case
 import com.leotesta017.clinicapenal.model.modelUsuario.UserIdData
@@ -99,8 +95,6 @@ import com.leotesta017.clinicapenal.view.videoPlayer.youtubeVideoPlayer.YouTubeP
 import com.leotesta017.clinicapenal.view.videoPlayer.fullscreenActivities.FullscreenActivity
 import com.leotesta017.clinicapenal.view.videoPlayer.fullscreenActivities.FullscreenVideoActivity
 import com.leotesta017.clinicapenal.viewmodel.VideoViewModel
-import com.leotesta017.clinicapenal.viewmodel.viewmodelUsuario.AppointmentViewModel
-import com.leotesta017.clinicapenal.viewmodel.viewmodelUsuario.CaseViewModel
 import com.leotesta017.clinicapenal.viewmodel.viewmodelUsuario.UsuarioViewModel
 
 // ========================================
@@ -1165,8 +1159,8 @@ fun Calendarios(title: String, events: List<Pair<String, String>>) {
 
 //FUNCIONES PARA PANTALLA DE MOSTRAR SOLICITUDES
 @Composable
-fun CaseItemTemplate(
-    case: Case,
+fun CaseUserAdminItem(
+    case: Pair<Case, List<Appointment>>,
     onDelete: (String) -> Unit,
     confirmDeleteText: String
 ) {
@@ -1184,6 +1178,7 @@ fun CaseItemTemplate(
         )
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
+            // Información del caso
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -1191,12 +1186,12 @@ fun CaseItemTemplate(
             ) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = "Caso: ${case.case_id}",
+                        text = "Caso: ${case.first.case_id}",
                         fontWeight = FontWeight.Bold,
                         fontSize = 14.5.sp
                     )
-                    Text(text = "Lugar: ${case.place}", fontSize = 14.sp)
-                    Text(text = "Estado: ${case.state}", fontSize = 14.sp)
+                    Text(text = "Lugar: ${case.first.place}", fontSize = 14.sp)
+                    Text(text = "Estado: ${case.first.state}", fontSize = 14.sp)
                 }
                 IconButton(onClick = { expanded = !expanded }) {
                     Icon(
@@ -1218,6 +1213,31 @@ fun CaseItemTemplate(
                     )
                 }
             }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Mostrar las citas asociadas al caso
+            Text(
+                text = "Citas asociadas:",
+                fontWeight = FontWeight.Bold,
+                fontSize = 14.sp,
+                modifier = Modifier.padding(top = 8.dp)
+            )
+
+            case.second.forEach { appointment ->
+                // Para cada cita mostrar la fecha y si está confirmada
+                Column(modifier = Modifier.padding(vertical = 4.dp)) {
+                    Text(
+                        text = "Fecha: ${appointment.fecha.toDate()}", // Convierte Timestamp a Date para mostrarlo
+                        fontSize = 14.sp
+                    )
+                    Text(
+                        text = "Confirmada: ${if (appointment.confirmed) "Sí" else "No"}",
+                        fontSize = 14.sp
+                    )
+                }
+                HorizontalDivider() // Separador entre citas
+            }
         }
     }
 
@@ -1226,7 +1246,7 @@ fun CaseItemTemplate(
             onDismissRequest = { showDialog = false },
             confirmButton = {
                 TextButton(onClick = {
-                    onDelete(case.case_id)
+                    onDelete(case.first.case_id)
                     showDialog = false
                 }) {
                     Text("Eliminar")
@@ -1242,6 +1262,65 @@ fun CaseItemTemplate(
         )
     }
 }
+
+@Composable
+fun CaseUserGenaralItem(
+    case: Pair<Case, List<Appointment>>,
+    navController: NavController? // Recibe el NavController para manejar la navegación
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .clip(RoundedCornerShape(16.dp))
+            .shadow(1.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color(0xFFE4E4E4)
+        )
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.Top
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = "Caso: ${case.first.case_id}",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 14.5.sp
+                    )
+                    Text(text = "Lugar: ${case.first.place}", fontSize = 14.sp)
+                    Text(text = "Estado: ${case.first.state}", fontSize = 14.sp)
+                }
+                IconButton(onClick = { expanded = !expanded }) {
+                    Icon(
+                        imageVector = Icons.Default.MoreVert,
+                        contentDescription = "Más opciones",
+                        tint = Color.Black
+                    )
+                }
+                DropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false }
+                ) {
+                    DropdownMenuItem(
+                        onClick = {
+                            expanded = false
+                            // Navegar a la pantalla de valoración con el case_id
+                            navController?.navigate("valoracion/${case.first.case_id}")
+                        },
+                        text = { Text("Valorar") }
+                    )
+                }
+            }
+        }
+    }
+}
+
+
 
 // FUNCIONES PARA PANTALLAS MODIFICAR INFO/SERVICIOS ADMIN
 @Composable

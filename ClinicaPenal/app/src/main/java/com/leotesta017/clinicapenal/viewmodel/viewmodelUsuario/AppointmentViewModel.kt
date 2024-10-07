@@ -10,7 +10,7 @@ import kotlinx.coroutines.launch
 
 class AppointmentViewModel : ViewModel() {
 
-    private val repository = AppointmentRepository()
+    val repository = AppointmentRepository()
 
     private val _appointment = MutableStateFlow<Appointment?>(null)
     val appointment: StateFlow<Appointment?> = _appointment
