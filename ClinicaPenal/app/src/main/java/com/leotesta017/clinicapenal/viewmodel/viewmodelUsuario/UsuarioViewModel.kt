@@ -1,9 +1,7 @@
 package com.leotesta017.clinicapenal.viewmodel.viewmodelUsuario
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.leotesta017.clinicapenal.model.modelUsuario.Appointment
 import com.leotesta017.clinicapenal.model.modelUsuario.Case
 import com.leotesta017.clinicapenal.model.modelUsuario.Usuario
 import com.leotesta017.clinicapenal.repository.userRepository.UsuarioRepository
@@ -24,8 +22,8 @@ class UsuarioViewModel : ViewModel()
     private val _userId = MutableStateFlow<String?>(null)
     val userId: StateFlow<String?> = _userId
 
-    private val _userCasesWithAppointments = MutableStateFlow<List<Pair<Case, List<Appointment>>>>(emptyList())  // Cambiamos a lista de Case
-    val userCasesWithAppointments: StateFlow<List<Pair<Case, List<Appointment>>>> = _userCasesWithAppointments
+    private val _userCasesWithAppointments = MutableStateFlow<List<Triple<Case,String,Boolean>>>(emptyList())  // Cambiamos a lista de Case
+    val userCasesWithAppointments: StateFlow<List<Triple<Case,String,Boolean>>> = _userCasesWithAppointments
 
     private val _userName = MutableStateFlow<String?>(null)
     val userName: StateFlow<String?> = _userName
@@ -107,46 +105,51 @@ class UsuarioViewModel : ViewModel()
         }
     }
 
-    fun fetchUserCasesWithDetailsAndAppointments(userId: String) {
+    fun fetchUserCasesWithLastAppointmentDetails(userId: String) {
         viewModelScope.launch {
             try {
                 // Obtener los IDs de casos del usuario
                 val caseIds = repository.getUserCasesById(userId)
 
-                // Crear una lista para almacenar los pares de Caso y Citas
-                val caseWithAppointmentsList = mutableListOf<Pair<Case, List<Appointment>>>()
+                // Crear una lista para almacenar los pares de Caso y la información de la última cita (fecha y confirmación)
+                val caseWithLastAppointmentDetailsList = mutableListOf<Triple<Case, String, Boolean>>() // Aquí agregamos la fecha y si está confirmada
 
                 // Iterar sobre los IDs de casos y obtener la información completa de cada caso
                 caseIds.forEach { caseId ->
                     val case = caseViewModel.repository.getCaseById(caseId) // Obtener caso por ID
                     if (case != null) {
-
                         // Aquí traemos las citas asociadas al caso
                         val appointmentIds = case.listAppointments
 
-                        // Crear una lista para almacenar las citas del caso actual
-                        val appointments = mutableListOf<Appointment>()
+                        if (appointmentIds.isNotEmpty()) {
+                            // Obtener el último appointmentId
+                            val lastAppointmentId = appointmentIds.last()
 
-                        // Obtener información de cada cita asociada al caso
-                        appointmentIds.forEach { appointmentId ->
-                            val appointment = appointmentViewModel.repository.getAppointmentById(appointmentId) // Obtener cita por ID
-                            if (appointment != null) {
-                                appointments.add(appointment)
+                            // Obtener la información de la última cita asociada al caso
+                            val lastAppointment = appointmentViewModel.repository.getAppointmentById(lastAppointmentId)
+
+                            if (lastAppointment != null) {
+                                // Agregar el par de Caso con la fecha de la última cita y si está confirmada
+                                val appointmentDate = lastAppointment.fecha.toDate().toString() // Convertimos la fecha a String
+                                val isConfirmed = lastAppointment.confirmed // Campo de confirmación
+
+                                caseWithLastAppointmentDetailsList.add(Triple(case, appointmentDate, isConfirmed))
                             } else {
+                                _error.value = "Error al obtener la última cita del caso con ID: $caseId"
                             }
+                        } else {
+                            // Si no hay citas asociadas al caso
+                            caseWithLastAppointmentDetailsList.add(Triple(case, "Sin citas", false)) // "Sin citas" y no confirmada
                         }
-                        // Agregar el par de Caso con su lista de citas a la lista de pares
-                        caseWithAppointmentsList.add(Pair(case, appointments))
                     } else {
                         _error.value = "Error al obtener información del caso con ID: $caseId"
                     }
                 }
-                // Actualizar la lista de pares de casos completos con citas en el MutableStateFlow
-                _userCasesWithAppointments.value = caseWithAppointmentsList
+                // Actualizar la lista de pares de casos completos con la fecha y confirmación de la última cita en el MutableStateFlow
+                _userCasesWithAppointments.value = caseWithLastAppointmentDetailsList
             } catch (e: Exception) {
                 _error.value = "Error al obtener los casos completos: ${e.message}"
             }
         }
     }
-
 }

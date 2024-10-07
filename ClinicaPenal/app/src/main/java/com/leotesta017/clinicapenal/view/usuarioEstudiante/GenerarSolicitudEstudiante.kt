@@ -34,17 +34,17 @@ fun GenerarSolicitudEstudiante(navController: NavController?) {
     LaunchedEffect(userId) {
         if (userId != null) {
             // Obtener casos completos con sus detalles
-            usuarioViewModel.fetchUserCasesWithDetailsAndAppointments(userId)
+            usuarioViewModel.fetchUserCasesWithLastAppointmentDetails(userId)
         }
     }
 
 // Filtrar las listas de citas y casos de representación
-    val citasList = remember { mutableStateOf<List<Pair<Case,List<Appointment>>>>(emptyList()) }
-    val representacionList = remember { mutableStateOf<List<Pair<Case,List<Appointment>>>>(emptyList()) }
+    val citasList = remember { mutableStateOf<List<Triple<Case,String,Boolean>>>(emptyList()) }
+    val representacionList = remember { mutableStateOf<List<Triple<Case,String,Boolean>>>(emptyList()) }
 
 // Separar los casos entre citas y representaciones
-    val tempCitasList = mutableListOf<Pair<Case,List<Appointment>>>()
-    val tempRepresentacionList = mutableListOf<Pair<Case,List<Appointment>>>()
+    val tempCitasList = mutableListOf<Triple<Case,String,Boolean>>()
+    val tempRepresentacionList = mutableListOf<Triple<Case,String,Boolean>>()
 
     // Llenar las listas temporales
     casesList.forEach { caseDetails ->
@@ -71,7 +71,9 @@ fun GenerarSolicitudEstudiante(navController: NavController?) {
             CaseUserAdminItem(
                 case = cita, // Pasamos el item de tipo Case
                 onDelete = { },
-                confirmDeleteText = "¿Estás seguro de que deseas eliminar esta cita?"
+                confirmDeleteText = "¿Estás seguro de que deseas eliminar esta cita?",
+                navController = navController,
+                route = "detallecasoestudiante"
             )
         },
         titulo2 = "Casos Representación",
@@ -80,7 +82,9 @@ fun GenerarSolicitudEstudiante(navController: NavController?) {
             CaseUserAdminItem(
                 case = representacion, // Pasamos el item de tipo Case
                 onDelete = { },
-                confirmDeleteText = "¿Estás seguro de que deseas eliminar este caso de representación?"
+                confirmDeleteText = "¿Estás seguro de que deseas eliminar este caso de representación?",
+                navController = navController,
+                route = "detallecasoestudiante"
             )
         },
         barraNavComposable = {

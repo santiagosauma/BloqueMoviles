@@ -3,6 +3,7 @@ package com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral
 //VIEW MODEL
 import android.content.Intent
 import android.net.Uri
+import android.util.Log
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -78,6 +79,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
@@ -95,6 +97,7 @@ import com.leotesta017.clinicapenal.view.videoPlayer.youtubeVideoPlayer.YouTubeP
 import com.leotesta017.clinicapenal.view.videoPlayer.fullscreenActivities.FullscreenActivity
 import com.leotesta017.clinicapenal.view.videoPlayer.fullscreenActivities.FullscreenVideoActivity
 import com.leotesta017.clinicapenal.viewmodel.VideoViewModel
+import com.leotesta017.clinicapenal.viewmodel.viewmodelUsuario.Case_CounterViewModel
 import com.leotesta017.clinicapenal.viewmodel.viewmodelUsuario.UsuarioViewModel
 
 // ========================================
@@ -1160,12 +1163,25 @@ fun Calendarios(title: String, events: List<Pair<String, String>>) {
 //FUNCIONES PARA PANTALLA DE MOSTRAR SOLICITUDES
 @Composable
 fun CaseUserAdminItem(
-    case: Pair<Case, List<Appointment>>,
+    case: Triple<Case,String,Boolean>,
     onDelete: (String) -> Unit,
-    confirmDeleteText: String
+    confirmDeleteText: String,
+    caseCounterViewModel: Case_CounterViewModel = viewModel(),
+    navController: NavController?,
+    route: String
 ) {
+
+
     var expanded by remember { mutableStateOf(false) }
     var showDialog by remember { mutableStateOf(false) }
+
+    var caseCounter by remember { mutableStateOf<Int?>(null) }
+
+    // Ejecutamos el LaunchedEffect solo para este caseId
+    LaunchedEffect(case.first.case_id) {
+        val index = caseCounterViewModel.findOrAddCase(case.first.case_id)
+        caseCounter = index
+    }
 
     Card(
         modifier = Modifier
@@ -1186,31 +1202,40 @@ fun CaseUserAdminItem(
             ) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = "Caso: ${case.first.case_id}",
+                        text = "Caso: ID-$caseCounter",
                         fontWeight = FontWeight.Bold,
                         fontSize = 14.5.sp
                     )
                     Text(text = "Lugar: ${case.first.place}", fontSize = 14.sp)
                     Text(text = "Estado: ${case.first.state}", fontSize = 14.sp)
                 }
-                IconButton(onClick = { expanded = !expanded }) {
-                    Icon(
-                        imageVector = Icons.Default.MoreVert,
-                        contentDescription = "Más opciones",
-                        tint = Color.Black
-                    )
-                }
-                DropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false }
-                ) {
-                    DropdownMenuItem(
-                        onClick = {
-                            expanded = false
-                            showDialog = true
-                        },
-                        text = { Text("Eliminar") }
-                    )
+                Box() {
+                    IconButton(onClick = { expanded = true }) {
+                        Icon(imageVector = Icons.Default.MoreVert, contentDescription = "Más opciones")
+                    }
+
+                    DropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false },
+                        // Ajustamos la posición hacia la derecha (x: positivo) y hacia abajo (y: positivo)
+                        offset = DpOffset(x = 10.dp, y = 10.dp)
+                    ) {
+                        DropdownMenuItem(
+                            onClick = {
+                                expanded = false
+                                showDialog = true
+                            },
+                            text = { Text("Eliminar") }
+                        )
+                        // Otra opción adicional
+                        DropdownMenuItem(
+                            onClick = {
+                                expanded = false
+                                navController?.navigate("$route/${case.first.case_id}")
+                            },
+                            text = { Text("Detalles") }
+                        )
+                    }
                 }
             }
 
@@ -1218,23 +1243,27 @@ fun CaseUserAdminItem(
 
             // Mostrar las citas asociadas al caso
             Text(
-                text = "Citas asociadas:",
+                text = "Ultima cita agendada:",
                 fontWeight = FontWeight.Bold,
                 fontSize = 14.sp,
                 modifier = Modifier.padding(top = 8.dp)
             )
 
-            case.second.forEach { appointment ->
-                // Para cada cita mostrar la fecha y si está confirmada
-                Column(modifier = Modifier.padding(vertical = 4.dp)) {
+            Column(modifier = Modifier.padding(vertical = 4.dp)) {
+                // Asegurarse de que haya una cita en la lista
+                if (case.second.isNotEmpty()) {
+                    val lastAppointment = case.second  // case.second debería tener la última cita como su único elemento
+
                     Text(
-                        text = "Fecha: ${appointment.fecha.toDate()}", // Convierte Timestamp a Date para mostrarlo
+                        text = "Fecha: ${lastAppointment}", // Muestra la fecha de la última cita
                         fontSize = 14.sp
                     )
                     Text(
-                        text = "Confirmada: ${if (appointment.confirmed) "Sí" else "No"}",
+                        text = "Confirmada: ${if (case.third) "Sí" else "No"}",  // Cambia a is_confirmed si confirmación está en esa propiedad
                         fontSize = 14.sp
                     )
+                } else {
+                    Text(text = "Sin citas disponibles", fontSize = 14.sp)
                 }
                 HorizontalDivider() // Separador entre citas
             }
@@ -1246,7 +1275,7 @@ fun CaseUserAdminItem(
             onDismissRequest = { showDialog = false },
             confirmButton = {
                 TextButton(onClick = {
-                    onDelete(case.first.case_id)
+                    // Lógica de confirmación de eliminación
                     showDialog = false
                 }) {
                     Text("Eliminar")
@@ -1258,17 +1287,26 @@ fun CaseUserAdminItem(
                 }
             },
             title = { Text("Confirmar Eliminación") },
-            text = { Text(confirmDeleteText) }
+            text = { Text("¿Estás seguro de que deseas eliminar este elemento?") }
         )
     }
 }
 
 @Composable
 fun CaseUserGenaralItem(
-    case: Pair<Case, List<Appointment>>,
+    case: Triple<Case,String,Boolean>,
+    caseCounterViewModel: Case_CounterViewModel = viewModel(),
+
     navController: NavController? // Recibe el NavController para manejar la navegación
 ) {
     var expanded by remember { mutableStateOf(false) }
+    var caseCounter by remember { mutableStateOf<Int?>(null) }
+
+    // Ejecutamos el LaunchedEffect solo para este caseId
+    LaunchedEffect(case.first.case_id) {
+        val index = caseCounterViewModel.findOrAddCase(case.first.case_id)
+        caseCounter = index
+    }
 
     Card(
         modifier = Modifier
@@ -1310,7 +1348,7 @@ fun CaseUserGenaralItem(
                         onClick = {
                             expanded = false
                             // Navegar a la pantalla de valoración con el case_id
-                            navController?.navigate("valoracion/${case.first.case_id}")
+                            navController?.navigate("ReviewComentarios/${case.first.case_id}")
                         },
                         text = { Text("Valorar") }
                     )

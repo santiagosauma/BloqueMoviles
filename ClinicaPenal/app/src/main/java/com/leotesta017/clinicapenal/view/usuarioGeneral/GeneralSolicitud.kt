@@ -24,7 +24,7 @@ fun GeneralSolicitud(navController: NavController?) {
     val userId = UserIdData.userId ?: return
 
     LaunchedEffect(userId) {
-        usuarioViewModel.fetchUserCasesWithDetailsAndAppointments(userId)
+        usuarioViewModel.fetchUserCasesWithLastAppointmentDetails(userId)
     }
 
     // Observamos el estado de los casos y mostramos la información

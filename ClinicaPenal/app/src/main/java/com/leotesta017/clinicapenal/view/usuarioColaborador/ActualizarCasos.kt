@@ -20,7 +20,7 @@ import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.SectionTitle
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.TopBar
 
 @Composable
-fun ActualizarCasos(navController: NavController?) {
+fun ActualizarCasos(navController: NavController?, case_id: String) {
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -38,7 +38,7 @@ fun ActualizarCasos(navController: NavController?) {
                     modifier = Modifier
                         .padding(16.dp)
                         .clickable {
-                            navController?.navigate("generalsolicitudadmin")
+                            navController?.popBackStack()
                         }
                 ) {
                     Icon(
@@ -372,5 +372,5 @@ fun DropdownMenuExample() {
 @Preview(showBackground = true)
 @Composable
 fun PreviewActualizarCasos() {
-    ActualizarCasos(navController = null)
+    ActualizarCasos(navController = null, case_id = "1")
 }
