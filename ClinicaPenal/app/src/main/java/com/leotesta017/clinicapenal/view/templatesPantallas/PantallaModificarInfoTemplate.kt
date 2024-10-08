@@ -30,37 +30,43 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.ApplyStyleButtons
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.RoundedButton
-import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.TextEditor
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.TopBar
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.ApplyStyleButtons
 import kotlinx.coroutines.launch
 
 @Composable
 fun PantallaModificarInformacionTemplate(
     navController: NavController?,
     titulo: String,
+    textContenido: String,
+    textName: String,
     textDescripcion: String,
+    textURL: String,
+    route: String,
     bottomBar: @Composable () -> Unit,
-    content: @Composable (String, (String) -> Unit) -> Unit
+    contentText: @Composable (String, (String) -> Unit) -> Unit,
+    contentName: @Composable (String, (String) -> Unit) -> Unit,
+    contentDescripcion: @Composable (String, (String) -> Unit) -> Unit,
+    contentImage: @Composable (String, (String) -> Unit) -> Unit
 ) {
-    var currentTextStyle by remember { mutableStateOf(TextStyle.Default) }
-    var textContent by remember { mutableStateOf(textDescripcion) }
+    var textURLContent by remember { mutableStateOf(textURL) }
+    var textDescripcionContent by remember { mutableStateOf(textDescripcion) }
+    var textNameContent by remember { mutableStateOf(textName) }
+    var textContent by remember { mutableStateOf(textContenido) }
     var showDiscardDialog by remember { mutableStateOf(false) }
     var isModified by remember { mutableStateOf(false) }
     BackHandler(enabled = isModified) {
         showDiscardDialog = true
     }
+
     Scaffold(
         topBar = {
             Column {
@@ -75,7 +81,7 @@ fun PantallaModificarInformacionTemplate(
                         if (isModified) {
                             showDiscardDialog = true
                         } else {
-                            navController?.popBackStack()
+                            navController?.navigate(route = route)
                         }
                     }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
@@ -98,34 +104,25 @@ fun PantallaModificarInformacionTemplate(
             ) {
                 item {
                     Spacer(modifier = Modifier.height(16.dp))
-                    content(textContent) { newText ->
+
+                    contentName(textNameContent){ newName ->
+                        textNameContent = newName
+                        isModified = true
+                    }
+                    contentDescripcion(textDescripcionContent){newDescription ->
+                        textDescripcionContent = newDescription
+                        isModified = true
+                    }
+                    contentImage(textURLContent){newURL ->
+                        textURLContent = newURL
+                        isModified = true
+                    }
+                    contentText(textContent) { newText ->
                         textContent = newText
                         isModified = true
                     }
+
                     Spacer(modifier = Modifier.height(16.dp))
-                    ApplyStyleButtons(
-                        onApplyBold = {
-                            currentTextStyle = currentTextStyle.copy(
-                                fontWeight = if (currentTextStyle.fontWeight == FontWeight.Bold) FontWeight.Normal else FontWeight.Bold
-                            )
-                            isModified = true
-                        },
-                        onApplyItalic = {
-                            currentTextStyle = currentTextStyle.copy(
-                                fontStyle = if (currentTextStyle.fontStyle == FontStyle.Italic) FontStyle.Normal else FontStyle.Italic
-                            )
-                            isModified = true
-                        },
-                        onApplyUnderline = {}
-                    )
-                    TextEditor(
-                        initialText = textContent,
-                        onTextChange = { newText ->
-                            textContent = newText
-                            isModified = true
-                        },
-                        applyStyle = { currentTextStyle }
-                    )
                 }
             }
         }
@@ -161,6 +158,7 @@ fun ModificarInfoTemplate(
     id: String,
     contenido: String,
     urlimagen: String,
+    route: String,
     bottomBarContent: @Composable () -> Unit,
     onSaveClick: (String, String, String, String) -> Unit,
     onCancelClick: () -> Unit
@@ -173,11 +171,16 @@ fun ModificarInfoTemplate(
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
+
     Box(modifier = Modifier.fillMaxSize()) {
         PantallaModificarInformacionTemplate(
             navController = navController,
+            route = route,
             titulo = titulo,
             textDescripcion = textContent,
+            textContenido =  descripcion,
+            textName = nombre,
+            textURL = url_imagen,
             bottomBar = {
                 Row(
                     modifier = Modifier
@@ -209,13 +212,12 @@ fun ModificarInfoTemplate(
                 }
                 bottomBarContent()
             },
-            content = { textDescripcion, onTextChange ->
+            contentName = {textName, onNameChange,->
                 OutlinedTextField(
                     value = nombre,
                     onValueChange = {
                         nombre = it
-                        isModified = true
-                    },
+                        isModified = true },
                     label = { Text("Nombre") },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -223,23 +225,22 @@ fun ModificarInfoTemplate(
                 )
                 Spacer(modifier = Modifier.height(5.dp))
 
+            },
+            contentDescripcion = {textContenido,onTextContenidoChange,->
                 OutlinedTextField(
                     value = descripcion,
                     onValueChange = {
                         descripcion = it
                         isModified = true
                     },
-                    label = { Text("Descripción") },
+                    label = { Text("URL de la imagen") },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(bottom = 8.dp),
-                    minLines = 1,
-                    maxLines = Int.MAX_VALUE,
-                    textStyle = TextStyle.Default.copy(fontSize = MaterialTheme.typography.bodyLarge.fontSize)
+                        .padding(bottom = 8.dp)
                 )
-
                 Spacer(modifier = Modifier.height(5.dp))
-
+            },
+            contentImage = {textURL,onURLChange->
                 OutlinedTextField(
                     value = url_imagen,
                     onValueChange = {
@@ -251,11 +252,25 @@ fun ModificarInfoTemplate(
                         .fillMaxWidth()
                         .padding(bottom = 8.dp)
                 )
-
+                Spacer(modifier = Modifier.height(5.dp))
+            },
+            contentText = { textDescripcion, onTextChange, ->
+                OutlinedTextField(
+                    value = textContent,
+                    onValueChange = {
+                        textContent = it
+                        isModified = true
+                    },
+                    label = { Text("Contenido") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 8.dp),
+                    minLines = 6,
+                    maxLines = Int.MAX_VALUE
+                )
                 Spacer(modifier = Modifier.height(5.dp))
             }
         )
-
         SnackbarHost(
             hostState = snackbarHostState,
             modifier = Modifier.align(Alignment.BottomCenter)

@@ -33,8 +33,6 @@ import kotlinx.coroutines.launch
 
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.Text
-import androidx.compose.runtime.*
 
 @Composable
 fun ModificarInfoCategoriaAdmin(
@@ -50,7 +48,7 @@ fun ModificarInfoCategoriaAdmin(
 
     val snackbarHostState = remember { SnackbarHostState() }
     var snackbarMessage by remember { mutableStateOf("") }
-    var showDiscardDialog by remember { mutableStateOf(false) }
+    var showDiscardDialog by remember { mutableStateOf(false) } // Estado para controlar el diálogo
 
     LaunchedEffect(id) {
         viewModel.fetchContenidoById(id)
@@ -82,6 +80,7 @@ fun ModificarInfoCategoriaAdmin(
                     id = id,
                     contenido = formattedContent,
                     urlimagen = urlimagen,
+                    route = "pantallainfoadmin",
                     bottomBarContent = {
                         AdminBarraNav(navController = navController, modifier = Modifier.fillMaxWidth())
                     },

@@ -4,6 +4,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
@@ -48,6 +50,7 @@ fun ModificarServiciosInfoAdmin(
     val snackbarHostState = remember { SnackbarHostState() }
     var snackbarMessage by remember { mutableStateOf("") }
 
+
     LaunchedEffect(id) {
         viewModel.fetchContenidoById(id)
     }
@@ -81,16 +84,17 @@ fun ModificarServiciosInfoAdmin(
                     initialName = nombre,
                     initialDescription = descripcion,
                     id = id,
-                    contenido = contenido,
+                    contenido = formattedContent,
                     urlimagen = urlimagen,
+                    route = "pantallainfoadmin",
                     bottomBarContent = {
                         AdminBarraNav(
                             navController = navController,
                             modifier = Modifier.fillMaxWidth()
                         )
                     },
-                    onSaveClick = { nombre, descripcion, url_imagen, textContent ->
-                        val contentToSave = textContent
+                    onSaveClick = { nombre, descripcion, url_imagen, formattedContent ->
+                        val contentToSave = formattedContent
                             .replace("\n-", " -")
                             .replace("\n", " ")
                             .replace(Regex("\\s{2,}"), " ")
@@ -101,7 +105,7 @@ fun ModificarServiciosInfoAdmin(
                                     id = id,
                                     titulo = nombre,
                                     descripcion = descripcion,
-                                    contenido = textContent,
+                                    contenido = contentToSave,
                                     url_imagen = url_imagen
                                 )
 
@@ -116,19 +120,11 @@ fun ModificarServiciosInfoAdmin(
                             }
                         }
                     },
-                    onCancelClick = {}
+                    onCancelClick = {
+
+                    }
                 )
             }
-        }
-        SnackbarHost(
-            hostState = snackbarHostState,
-            modifier = Modifier.align(Alignment.BottomCenter)
-        ) {
-            Snackbar(
-                snackbarData = it,
-                containerColor = Color(0xFF303665),
-                contentColor = Color.White
-            )
         }
     }
 }
