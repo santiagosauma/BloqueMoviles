@@ -49,6 +49,7 @@ fun ModificarServiciosInfoAdmin(
 
     val snackbarHostState = remember { SnackbarHostState() }
     var snackbarMessage by remember { mutableStateOf("") }
+    var showDiscardDialog by remember { mutableStateOf(false) } // Estado para controlar el diálogo
 
 
     LaunchedEffect(id) {
@@ -121,10 +122,41 @@ fun ModificarServiciosInfoAdmin(
                         }
                     },
                     onCancelClick = {
-
+                        showDiscardDialog = true
                     }
                 )
             }
+        }
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier.align(Alignment.BottomCenter)
+        ) {
+            Snackbar(
+                snackbarData = it,
+                containerColor = Color(0xFF303665),
+                contentColor = Color.White
+            )
+        }
+
+        if (showDiscardDialog) {
+            AlertDialog(
+                onDismissRequest = { showDiscardDialog = false },
+                title = { Text("Descartar cambios") },
+                text = { Text("¿Estás seguro de que deseas descartar los cambios?") },
+                confirmButton = {
+                    Button(onClick = {
+                        showDiscardDialog = false
+                        navController?.popBackStack()
+                    }) {
+                        Text("Sí")
+                    }
+                },
+                dismissButton = {
+                    Button(onClick = { showDiscardDialog = false }) {
+                        Text("No")
+                    }
+                }
+            )
         }
     }
 }
