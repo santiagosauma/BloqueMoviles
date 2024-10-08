@@ -1,6 +1,7 @@
 package com.leotesta017.clinicapenal.view.usuarioColaborador
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -8,15 +9,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import com.leotesta017.clinicapenal.R
-import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.AdminBarraNav
-import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.Calendarios
-import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.RedesSociales
-import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.SeccionContacto
-import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.SeccionDirecciones
-import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.SeccionHorarios
-import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.SeccionNosotros
-import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.TopBar
+import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.*
 import com.leotesta017.clinicapenal.view.templatesPantallas.PantallaInfoTemplate
+import androidx.compose.ui.graphics.Color
 
 @Composable
 fun PantallaInfoClinicaAdmin(navController: NavController?) {
@@ -24,8 +19,7 @@ fun PantallaInfoClinicaAdmin(navController: NavController?) {
         navController = navController,
         topBar = { TopBar() },
         bottomBar = {
-            Box(modifier = Modifier.fillMaxSize())
-            {
+            Box(modifier = Modifier.fillMaxSize()) {
                 AdminBarraNav(
                     navController = navController,
                     modifier = Modifier
@@ -33,9 +27,33 @@ fun PantallaInfoClinicaAdmin(navController: NavController?) {
                         .fillMaxWidth()
                 )
             }
-
         },
         content = {
+            Calendarios(
+                title = "Calendario Eventos",
+                eventos = listOf(
+                    Evento("Lunes 12 de Agosto", "Conferencia Derecho Vehicular", "Auditorio Principal"),
+                    Evento("Viernes 18 de Agosto", "Taller Documentación Legal Civil", "Sala 2")
+                )
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Box(
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+                    .fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+                Button(
+                    onClick = {
+                        navController?.navigate("AgregarEvento")
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF002366))
+                ) {
+                    Text(text = "Añadir", color = Color.White)
+                }
+            }
+            Spacer(modifier = Modifier.height(20.dp))
             SeccionNosotros(
                 title = "Nosotros",
                 description = "Apoyamos a la comunidad con representación legal en procesos judiciales, asegurando que todos tengan acceso a la justicia."
@@ -62,24 +80,20 @@ fun PantallaInfoClinicaAdmin(navController: NavController?) {
             Spacer(modifier = Modifier.height(20.dp))
             RedesSociales(
                 title = "Redes Sociales",
-                icons = listOf(R.drawable.facebook, R.drawable.logox, R.drawable.youtube),
-                onIconClick = { /* Handle Icon Click */ }
+                icons = listOf(
+                    R.drawable.facebook,
+                    R.drawable.logox,
+                    R.drawable.youtube
+                ),
+                onIconClick = { /* Manejar clic en el icono */ }
             )
-            Spacer(modifier = Modifier.height(20.dp))
-            Calendarios(
-                title = "Calendario Eventos",
-                events = listOf(
-                    "Lunes 12 de Agosto" to "Conferencia Derecho Vehicular",
-                    "Viernes 18 de Agosto" to "Taller Documentación Legal Civil"
-                )
-            )
+            Spacer(modifier = Modifier.height(30.dp))
         }
     )
 }
 
-
 @Preview(showBackground = true)
 @Composable
-fun PantallaInfoClinicaPreview() {
+fun PantallaInfoClinicaAdminPreview() {
     PantallaInfoClinicaAdmin(navController = null)
 }

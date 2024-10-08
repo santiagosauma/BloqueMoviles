@@ -11,7 +11,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.pantallainformacion.PantallaInfoClinica
 import com.leotesta017.clinicapenal.view.loginRegister.*
 import com.leotesta017.clinicapenal.solicitud.GeneralSolicitud
 import com.leotesta017.clinicapenal.view.usuarioColaborador.ActualizarCasos
@@ -33,6 +32,7 @@ import com.leotesta017.clinicapenal.view.usuarioEstudiante.PantallaInfoEstudiant
 import com.leotesta017.clinicapenal.view.usuarioColaborador.ModificarInfoCategoriaAdmin
 import com.leotesta017.clinicapenal.view.usuarioGeneral.DetalleInfo
 import com.leotesta017.clinicapenal.view.usuarioGeneral.PantallaInfoCategorias
+import com.leotesta017.clinicapenal.view.usuarioGeneral.PantallaInfoClinica
 import com.leotesta017.clinicapenal.view.usuarioGeneral.ReviewComentarios
 import com.leotesta017.clinicapenal.view.usuarioGeneral.SegundoFormulario
 import com.leotesta017.clinicapenal.view.usuarioGeneral.ServiciosInfo

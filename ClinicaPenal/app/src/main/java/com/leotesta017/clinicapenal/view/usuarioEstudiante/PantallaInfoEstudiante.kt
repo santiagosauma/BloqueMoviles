@@ -75,7 +75,7 @@ fun PantallaInfoEstudiante(navController: NavController?) {
 
         //SECCION DE SERVICIOS
         servicios = { servicios,error ->
-            LabelCategoriaConBoton(
+            LabelCategoriaConBoton( //Cambiar aqui
                 label = "Servicios",
                 navController = navController,
                 modifier = Modifier.padding(0.dp),
