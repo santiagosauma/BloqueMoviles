@@ -27,10 +27,8 @@ fun GenerarSolicitudEstudiante(navController: NavController?) {
     val userId = UserIdData.userId
     val usuarioViewModel: UsuarioViewModel = viewModel()
 
-// Obtenemos la lista de casos completos del usuario
     val casesList by usuarioViewModel.userCasesWithAppointments.collectAsState()
 
-// Llamamos la función para obtener los casos del usuario con detalles al iniciar
     LaunchedEffect(userId) {
         if (userId != null) {
             // Obtener casos completos con sus detalles
@@ -38,27 +36,25 @@ fun GenerarSolicitudEstudiante(navController: NavController?) {
         }
     }
 
-// Filtrar las listas de citas y casos de representación
-    val citasList = remember { mutableStateOf<List<Triple<Case,String,Boolean>>>(emptyList()) }
+    val citasList by caseViewModel.unrepresentedCasesWithLastAppointment.collectAsState()
+
+    LaunchedEffect(citasList){
+        caseViewModel.fetchUnrepresentedCasesWithLastAppointment()
+    }
+
     val representacionList = remember { mutableStateOf<List<Triple<Case,String,Boolean>>>(emptyList()) }
 
-// Separar los casos entre citas y representaciones
-    val tempCitasList = mutableListOf<Triple<Case,String,Boolean>>()
     val tempRepresentacionList = mutableListOf<Triple<Case,String,Boolean>>()
 
-    // Llenar las listas temporales
     casesList.forEach { caseDetails ->
-        if (caseDetails.first.studentAssigned == userId) {
-            if (caseDetails.first.represented) {
-                tempRepresentacionList.add(caseDetails)
-            } else {
-                tempCitasList.add(caseDetails)
-            }
+        if ((caseDetails.first.studentAssigned == userId ||
+            caseDetails.first.lawyerAssigned == userId) &&
+            caseDetails.first.represented)
+        {
+            tempRepresentacionList.add(caseDetails)
         }
     }
 
-    // Asignar las listas actualizadas al estado una vez
-    citasList.value = tempCitasList
     representacionList.value = tempRepresentacionList
 
 
@@ -66,7 +62,7 @@ fun GenerarSolicitudEstudiante(navController: NavController?) {
     GenerarSolicitudPantallaTemplatenavController(
         navController = navController,
         titulo1 = "Citas",
-        items1 = citasList.value,  // Pasamos la lista de citas
+        items1 = citasList,  // Pasamos la lista de citas
         itemComposable1 = { cita ->
             CaseUserAdminItem(
                 case = cita, // Pasamos el item de tipo Case

@@ -27,6 +27,44 @@ class CaseRepository {
         }
     }
 
+    suspend fun getAllUnrepresentedCasesWithLastAppointment(appointmentRepository: AppointmentRepository): List<Triple<Case, String, Boolean>> {
+        return try {
+            val snapshot = firestore.collection("cases").get().await()
+
+            // Lista para almacenar los casos sin representación con el último Appointment
+            val unrepresentedCasesList = mutableListOf<Triple<Case, String, Boolean>>()
+
+            // Iteramos por cada caso
+            snapshot.documents.forEach { document ->
+                val case = document.toObject(Case::class.java)
+                case?.let {
+                    // Verificar si el caso no está representado
+                    if (!case.represented) {
+                        // Verificar si el caso tiene citas asociadas
+                        if (case.listAppointments.isNotEmpty()) {
+                            val lastAppointmentId = case.listAppointments.last()
+                            val lastAppointment = appointmentRepository.getAppointmentById(lastAppointmentId)
+
+                            if (lastAppointment != null) {
+                                // Convertir la fecha de la cita a String
+                                val appointmentDate = lastAppointment.fecha.toDate().toString()
+                                // Agregar el caso a la lista junto con la fecha y si está representado
+                                unrepresentedCasesList.add(Triple(case, appointmentDate, case.represented))
+                            }
+                        } else {
+                            // Si no tiene citas, agregar el caso con "Sin citas"
+                            unrepresentedCasesList.add(Triple(case, "Sin citas", case.represented))
+                        }
+                    }
+                }
+            }
+
+            unrepresentedCasesList
+        } catch (e: Exception) {
+            emptyList() // En caso de error, devolvemos una lista vacía
+        }
+    }
+
     // Agregar un nuevo caso y asignar el ID al usuario
     suspend fun addCase(case: Case, userId: String): Boolean {
         return try {
@@ -116,6 +154,4 @@ class CaseRepository {
             false // Error al eliminar el caso
         }
     }
-
-
 }

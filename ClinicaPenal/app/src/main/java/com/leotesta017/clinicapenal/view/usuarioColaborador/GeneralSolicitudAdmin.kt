@@ -10,7 +10,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.leotesta017.clinicapenal.model.modelUsuario.Appointment
 import com.leotesta017.clinicapenal.model.modelUsuario.Case
 import com.leotesta017.clinicapenal.model.modelUsuario.UserIdData
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.AdminBarraNav
@@ -27,48 +26,42 @@ fun GeneralSolicitudAdmin(navController: NavController?) {
     val userId = UserIdData.userId
     val usuarioViewModel: UsuarioViewModel = viewModel()
 
-// Obtenemos la lista de casos completos del usuario
     val casesList by usuarioViewModel.userCasesWithAppointments.collectAsState()
 
-// Llamamos la función para obtener los casos del usuario con detalles al iniciar
     LaunchedEffect(userId) {
         if (userId != null) {
-            // Obtener casos completos con sus detalles
             usuarioViewModel.fetchUserCasesWithLastAppointmentDetails(userId)
         }
     }
 
-// Filtrar las listas de citas y casos de representación
-    val citasList = remember { mutableStateOf<List<Triple<Case,String,Boolean>>>(emptyList()) }
+    val citasList by caseViewModel.unrepresentedCasesWithLastAppointment.collectAsState()
+
+    LaunchedEffect(citasList){
+        caseViewModel.fetchUnrepresentedCasesWithLastAppointment()
+    }
+
     val representacionList = remember { mutableStateOf<List<Triple<Case,String,Boolean>>>(emptyList()) }
 
-// Separar los casos entre citas y representaciones
-    val tempCitasList = mutableListOf<Triple<Case,String,Boolean>>()
     val tempRepresentacionList = mutableListOf<Triple<Case,String,Boolean>>()
 
-    // Llenar las listas temporales
     casesList.forEach { caseDetails ->
-        if (caseDetails.first.lawyerAssigned == userId) {
-            if (caseDetails.first.represented) {
-                tempRepresentacionList.add(caseDetails)
-            } else {
-                tempCitasList.add(caseDetails)
-            }
+        if ((caseDetails.first.studentAssigned == userId ||
+                    caseDetails.first.lawyerAssigned == userId) &&
+            caseDetails.first.represented)
+        {
+            tempRepresentacionList.add(caseDetails)
         }
     }
 
-    // Asignar las listas actualizadas al estado una vez
-    citasList.value = tempCitasList
     representacionList.value = tempRepresentacionList
 
-    // Llamamos a la función con las listas filtradas y los Composables adecuados
     GenerarSolicitudPantallaTemplatenavController(
         navController = navController,
         titulo1 = "Citas",
-        items1 = citasList.value,  // Pasamos la lista de citas
+        items1 = citasList,
         itemComposable1 = { cita ->
             CaseUserAdminItem(
-                case = cita, // Pasamos el item de tipo Case
+                case = cita,
                 onDelete = { id -> caseViewModel.deleteCase(id) },
                 confirmDeleteText = "¿Estás seguro de que deseas eliminar esta cita?",
                 navController = navController,
@@ -76,10 +69,10 @@ fun GeneralSolicitudAdmin(navController: NavController?) {
             )
         },
         titulo2 = "Casos Representación",
-        items2 = representacionList.value,  // Pasamos la lista de casos de representación
+        items2 = representacionList.value,
         itemComposable2 = { representacion ->
             CaseUserAdminItem(
-                case = representacion, // Pasamos el item de tipo Case
+                case = representacion,
                 onDelete = { id -> caseViewModel.deleteCase(id) },
                 confirmDeleteText = "¿Estás seguro de que deseas eliminar este caso de representación?",
                 navController = navController,
@@ -106,4 +99,3 @@ fun GeneralSolicitudAdminPreview() {
         GeneralSolicitudAdmin(navController = rememberNavController())
     }
 }
-//route = "actualizarcasos"

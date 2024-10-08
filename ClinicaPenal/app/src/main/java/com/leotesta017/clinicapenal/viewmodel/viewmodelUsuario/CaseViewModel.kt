@@ -3,6 +3,7 @@ package com.leotesta017.clinicapenal.viewmodel.viewmodelUsuario
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.leotesta017.clinicapenal.model.modelUsuario.Case
+import com.leotesta017.clinicapenal.repository.userRepository.AppointmentRepository
 import com.leotesta017.clinicapenal.repository.userRepository.CaseRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -11,9 +12,13 @@ import kotlinx.coroutines.launch
 class CaseViewModel : ViewModel() {
 
     val repository = CaseRepository()
+    val appointmentRepository = AppointmentRepository()
 
     private val _case = MutableStateFlow<Case?>(null)
     val case: StateFlow<Case?> = _case
+
+    private val _unrepresentedCasesWithLastAppointment = MutableStateFlow<List<Triple<Case, String, Boolean>>>(emptyList())
+    val unrepresentedCasesWithLastAppointment: StateFlow<List<Triple<Case, String, Boolean>>> = _unrepresentedCasesWithLastAppointment
 
     private val _caseDeleted = MutableStateFlow<Boolean>(false)
     val caseDeleted: StateFlow<Boolean> = _caseDeleted
@@ -33,6 +38,17 @@ class CaseViewModel : ViewModel() {
                 }
             } catch (e: Exception) {
                 _error.value = "Error al cargar el caso: ${e.message}"
+            }
+        }
+    }
+
+    fun fetchUnrepresentedCasesWithLastAppointment() {
+        viewModelScope.launch {
+            try {
+                val cases = repository.getAllUnrepresentedCasesWithLastAppointment(appointmentRepository)
+                _unrepresentedCasesWithLastAppointment.value = cases
+            } catch (e: Exception) {
+                _error.value = "Error al cargar los casos sin representación: ${e.message}"
             }
         }
     }
@@ -76,5 +92,7 @@ class CaseViewModel : ViewModel() {
             }
         }
     }
+
+
 
 }
