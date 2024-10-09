@@ -3,11 +3,9 @@ package com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral
 //VIEW MODEL
 import android.content.Intent
 import android.net.Uri
-import android.util.Log
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -90,8 +88,8 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import coil.compose.AsyncImage
 import com.leotesta017.clinicapenal.model.Categoria
+import com.leotesta017.clinicapenal.model.Evento
 import com.leotesta017.clinicapenal.model.Servicio
-import com.leotesta017.clinicapenal.model.modelUsuario.Appointment
 import com.leotesta017.clinicapenal.model.modelUsuario.Case
 import com.leotesta017.clinicapenal.model.modelUsuario.UserIdData
 import com.leotesta017.clinicapenal.view.videoPlayer.googleDrivePlayer.GoogleDriveVideoPlayer
@@ -101,6 +99,8 @@ import com.leotesta017.clinicapenal.view.videoPlayer.fullscreenActivities.Fullsc
 import com.leotesta017.clinicapenal.viewmodel.VideoViewModel
 import com.leotesta017.clinicapenal.viewmodel.viewmodelUsuario.Case_CounterViewModel
 import com.leotesta017.clinicapenal.viewmodel.viewmodelUsuario.UsuarioViewModel
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 // ========================================
 // ☰ SECCIÓN: Barras de Navegación/Visuales
@@ -1134,8 +1134,6 @@ val estiloCaja = Modifier
     )
     .padding(16.dp)
 
-data class Evento(val fecha: String, val titulo: String, val lugar: String)
-
 @Composable
 fun Calendarios(title: String, eventos: List<Evento>) {
     Box(
@@ -1147,19 +1145,20 @@ fun Calendarios(title: String, eventos: List<Evento>) {
             Text(
                 text = title,
                 fontSize = 17.sp,
-                fontWeight = FontWeight.Bold,
                 color = Color(0xFF002366),
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(modifier = Modifier.height(10.dp))
+            val sdf = SimpleDateFormat("dd 'de' MMMM (HH:mm)", Locale("es", "ES"))
             eventos.forEach { evento ->
+                val fechaString = sdf.format(evento.fecha)
                 Text(
                     text = buildAnnotatedString {
                         withStyle(style = SpanStyle(color = Color(0xFF002366))) {
-                            append(evento.fecha)
+                            append(fechaString)
                         }
-                        append(" - ${evento.titulo} - ${evento.lugar}")
+                        append(" : ${evento.titulo} - ${evento.lugar}")
                     },
                     fontSize = 12.sp,
                     color = Color.Black
