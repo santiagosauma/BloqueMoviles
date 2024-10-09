@@ -13,6 +13,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.leotesta017.clinicapenal.view.loginRegister.*
 import com.leotesta017.clinicapenal.solicitud.GeneralSolicitud
+import com.leotesta017.clinicapenal.view.usuarioColaborador.AccionVideo
 import com.leotesta017.clinicapenal.view.usuarioColaborador.ActualizarCasos
 import com.leotesta017.clinicapenal.view.usuarioColaborador.Agendar
 import com.leotesta017.clinicapenal.view.usuarioColaborador.AgregarEvento
@@ -263,6 +264,7 @@ fun MyApp() {
         composable("agregar-info-estudiante") { AgregarInfoEstudiante(navController)}
         composable("agregar-servicio-estudiante") { AgregarServiciosInfoEstudiante(navController) }
         composable("AgregarEvento") { AgregarEvento(navController) }
+        composable("AccionVideo") { AccionVideo(navController)}
 
     }
 }

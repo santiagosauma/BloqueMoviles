@@ -47,7 +47,7 @@ fun PantallaInfoAdmin(navController: NavController?) {
                 label = "Noticias",
                 navController = navController,
                 modifier = Modifier.padding(0.dp),
-                navigateroute = "modificar-info",
+                navigateroute = "AccionVideo",
             )
             SpacedItem(spacing = 16) {
                 CarruselDeNoticias(viewModel = VideoViewModel())

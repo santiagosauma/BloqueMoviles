@@ -25,4 +25,20 @@ class VideoRepository {
             emptyList()  // Devuelve una lista vacía en caso de error
         }
     }
+
+    // Método para agregar un nuevo video a Firestore
+    suspend fun addVideo(descripcion: String, tipo: String, titulo: String, urlVideo: String): Boolean {
+        return try {
+            val videoData = hashMapOf(
+                "descripcion" to descripcion,
+                "tipo" to tipo,
+                "titulo" to titulo,
+                "url_video" to urlVideo
+            )
+            firestore.collection("videos").add(videoData).await()
+            true
+        } catch (e: Exception) {
+            false
+        }
+    }
 }

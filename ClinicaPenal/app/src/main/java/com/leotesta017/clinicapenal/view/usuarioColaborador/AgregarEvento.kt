@@ -1,4 +1,3 @@
-// AgregarEvento.kt
 package com.leotesta017.clinicapenal.view.usuarioColaborador
 
 import androidx.compose.foundation.layout.*
@@ -9,19 +8,20 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.TextRange
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.AdminBarraNav
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.TopBar
 import com.leotesta017.clinicapenal.model.Evento
 import com.leotesta017.clinicapenal.repository.EventRepository
+import kotlinx.coroutines.delay
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlinx.coroutines.delay
 
 @Composable
 fun AgregarEvento(navController: NavController?) {
@@ -52,10 +52,9 @@ fun AgregarEvento(navController: NavController?) {
         topBar = {
             Column {
                 TopBar()
-                // Flecha de volver atrás y título de la pantalla
                 TopAppBar(
                     backgroundColor = Color.White,
-                    elevation = 4.dp
+                    elevation = 0.dp
                 ) {
                     IconButton(
                         onClick = { navController?.popBackStack() },
@@ -68,7 +67,7 @@ fun AgregarEvento(navController: NavController?) {
                         )
                     }
                     Text(
-                        text = "Agregar Contenido",
+                        text = "Agregar Evento",
                         color = Color(0xFF002366),
                         style = MaterialTheme.typography.h6,
                         modifier = Modifier
@@ -213,9 +212,7 @@ fun AgregarEvento(navController: NavController?) {
                         }
                     },
                     dismissButton = {
-                        TextButton(
-                            onClick = { showDialog = false }
-                        ) {
+                        TextButton(onClick = { showDialog = false }) {
                             Text("No")
                         }
                     }
@@ -328,4 +325,10 @@ fun guardarEvento(
     }, onError = { error ->
         onError("Error al guardar el evento: $error")
     })
+}
+
+@Preview(showBackground = true)
+@Composable
+fun AgregarEventoPreview() {
+    AgregarEvento(navController = null)
 }
