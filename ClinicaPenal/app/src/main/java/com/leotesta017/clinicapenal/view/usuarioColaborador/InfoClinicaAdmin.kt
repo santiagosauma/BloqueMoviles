@@ -24,7 +24,8 @@ fun PantallaInfoClinicaAdmin(navController: NavController?) {
 
     LaunchedEffect(Unit) {
         try {
-            eventosState = eventRepository.getEventos()
+            val eventos = eventRepository.getEventos()
+            eventosState = eventos.sortedBy { it.fecha }
         } catch (e: Exception) {
             errorMessage = "Error al cargar eventos"
         }

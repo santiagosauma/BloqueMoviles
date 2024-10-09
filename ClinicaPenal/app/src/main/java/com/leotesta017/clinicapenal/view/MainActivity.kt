@@ -15,6 +15,7 @@ import com.leotesta017.clinicapenal.view.loginRegister.*
 import com.leotesta017.clinicapenal.solicitud.GeneralSolicitud
 import com.leotesta017.clinicapenal.view.usuarioColaborador.ActualizarCasos
 import com.leotesta017.clinicapenal.view.usuarioColaborador.Agendar
+import com.leotesta017.clinicapenal.view.usuarioColaborador.AgregarEvento
 import com.leotesta017.clinicapenal.view.usuarioColaborador.AgregarInfoAdmin
 import com.leotesta017.clinicapenal.view.usuarioColaborador.AgregarServiciosInfoAdmin
 import com.leotesta017.clinicapenal.view.usuarioColaborador.ComentarioScreen
@@ -261,6 +262,7 @@ fun MyApp() {
         //AGREGAR CATEGORIA Y SERVICIOS ESTUDIANTES
         composable("agregar-info-estudiante") { AgregarInfoEstudiante(navController)}
         composable("agregar-servicio-estudiante") { AgregarServiciosInfoEstudiante(navController) }
+        composable("AgregarEvento") { AgregarEvento(navController) }
 
     }
 }

@@ -22,24 +22,22 @@ fun PantallaInfoClinica(navController: NavController?) {
 
     LaunchedEffect(Unit) {
         try {
-            eventosState = eventRepository.getEventos()
+            val eventos = eventRepository.getEventos()
+            eventosState = eventos.sortedBy { it.fecha }
         } catch (e: Exception) {
             errorMessage = "Error al cargar eventos"
         }
     }
 
     if (eventosState == null && errorMessage == null) {
-        // Show a loading indicator
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             CircularProgressIndicator()
         }
     } else if (errorMessage != null) {
-        // Show an error message
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Text(text = errorMessage!!)
         }
     } else {
-        // Data is loaded, show the content
         PantallaInfoTemplate(
             navController = navController,
             topBar = { TopBar() },

@@ -1,6 +1,5 @@
 package com.leotesta017.clinicapenal.repository
 
-import com.google.firebase.Timestamp
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.leotesta017.clinicapenal.model.Evento
@@ -14,7 +13,7 @@ class EventRepository {
         return try {
             val snapshot = firestore.collection("eventos").get().await()
             snapshot.documents.map { document ->
-                val timestamp = document.getTimestamp("fecha") ?: Timestamp.now()
+                val timestamp = document.getTimestamp("fecha") ?: com.google.firebase.Timestamp.now()
                 val fecha = timestamp.toDate()
                 Evento(
                     fecha = fecha,
@@ -25,5 +24,18 @@ class EventRepository {
         } catch (e: Exception) {
             emptyList()
         }
+    }
+
+    fun addEvento(evento: Evento, onSuccess: () -> Unit, onError: (String) -> Unit) {
+        val eventoData = hashMapOf(
+            "fecha" to evento.fecha,
+            "titulo" to evento.titulo,
+            "lugar" to evento.lugar
+        )
+
+        firestore.collection("eventos")
+            .add(eventoData)
+            .addOnSuccessListener { onSuccess() }
+            .addOnFailureListener { exception -> onError(exception.message ?: "Error desconocido") }
     }
 }
