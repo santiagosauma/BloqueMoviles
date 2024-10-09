@@ -20,7 +20,7 @@ fun ActualizarCasos(navController: NavController?, case_id: String) {
     PantallaTemplateDetalleVistaCaso(
         navController = navController,
         caseId = case_id,
-        route = "route",
+        route = "generalsolicitudadmin",
         barraNav = {
             Box(modifier = Modifier.fillMaxSize())
             {

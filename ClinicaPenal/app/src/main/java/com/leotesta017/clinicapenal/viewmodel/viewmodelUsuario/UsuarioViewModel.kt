@@ -95,8 +95,8 @@ class UsuarioViewModel : ViewModel()
         viewModelScope.launch {
             try
             {
-                val type = repository.getUserTypeById(id)  // Solo obtener el tipo de usuario
-                _userType.value = type ?: "Tipo de usuario no encontrado"
+                val type = repository.getUserTypeById(id)
+                _userType.value = type
             }
             catch (e: Exception)
             {
@@ -105,7 +105,8 @@ class UsuarioViewModel : ViewModel()
         }
     }
 
-    fun fetchUserCasesWithLastAppointmentDetails(userId: String) {
+    fun fetchUserCasesWithLastAppointmentDetails(userId: String)
+    {
         viewModelScope.launch {
             try {
                 // Obtener los IDs de casos del usuario
@@ -151,5 +152,12 @@ class UsuarioViewModel : ViewModel()
                 _error.value = "Error al obtener los casos completos: ${e.message}"
             }
         }
+    }
+
+    suspend fun fetchGeneralUserByCaseId(caseId: String): String
+    {
+        val user  = repository.getGeneralUserByCaseId(caseId)
+
+        return user?.nombre + " " + user?.apellidos
     }
 }

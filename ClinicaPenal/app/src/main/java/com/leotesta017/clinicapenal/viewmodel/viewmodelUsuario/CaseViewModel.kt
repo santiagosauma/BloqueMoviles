@@ -2,12 +2,15 @@ package com.leotesta017.clinicapenal.viewmodel.viewmodelUsuario
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.leotesta017.clinicapenal.model.modelUsuario.Appointment
 import com.leotesta017.clinicapenal.model.modelUsuario.Case
+import com.leotesta017.clinicapenal.model.modelUsuario.ExtraInfo
 import com.leotesta017.clinicapenal.repository.userRepository.AppointmentRepository
 import com.leotesta017.clinicapenal.repository.userRepository.CaseRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import org.w3c.dom.Comment
 
 class CaseViewModel : ViewModel() {
 
@@ -19,6 +22,10 @@ class CaseViewModel : ViewModel() {
 
     private val _unrepresentedCasesWithLastAppointment = MutableStateFlow<List<Triple<Case, String, Boolean>>>(emptyList())
     val unrepresentedCasesWithLastAppointment: StateFlow<List<Triple<Case, String, Boolean>>> = _unrepresentedCasesWithLastAppointment
+
+    private val _caseWithDetails = MutableStateFlow<Pair<Case, Triple<List<Appointment>, List<Comment>, List<ExtraInfo>>>?>(null)
+    val caseWithDetails: StateFlow<Pair<Case, Triple<List<Appointment>, List<Comment>, List<ExtraInfo>>>?> = _caseWithDetails
+
 
     private val _caseDeleted = MutableStateFlow<Boolean>(false)
     val caseDeleted: StateFlow<Boolean> = _caseDeleted
@@ -84,15 +91,28 @@ class CaseViewModel : ViewModel() {
     }
 
     // Función para eliminar un caso y sus elementos asociados
-    fun deleteCase(caseId: String) {
+    fun discardCase(caseId: String) {
         viewModelScope.launch {
-            val success = repository.deleteCase(caseId)
+            val success = repository.updateCaseToDiscard(caseId)
             if (!success) {
                 _error.value = "Error al eliminar el caso o elementos asociados."  // Indicar que el caso ha sido eliminado con éxito
             }
         }
     }
 
-
+    fun fetchCaseWithDetails(caseId: String) {
+        viewModelScope.launch {
+            try {
+                val result = repository.getCaseWithDetails(caseId)
+                if (result != null) {
+                    _caseWithDetails.value = result
+                } else {
+                    _error.value = "El caso no se encontró o no tiene detalles asociados"
+                }
+            } catch (e: Exception) {
+                _error.value = "Error al obtener el caso: ${e.message}"
+            }
+        }
+    }
 
 }

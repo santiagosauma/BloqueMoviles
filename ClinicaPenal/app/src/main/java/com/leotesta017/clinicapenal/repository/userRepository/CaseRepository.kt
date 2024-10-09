@@ -4,8 +4,11 @@ import android.util.Log
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import com.leotesta017.clinicapenal.model.modelUsuario.Appointment
 import com.leotesta017.clinicapenal.model.modelUsuario.Case
+import com.leotesta017.clinicapenal.model.modelUsuario.ExtraInfo
 import kotlinx.coroutines.tasks.await
+import org.w3c.dom.Comment
 
 class CaseRepository {
 
@@ -118,32 +121,65 @@ class CaseRepository {
         }
     }
 
-    // Eliminar un caso y todos los elementos asociados (appointments, comments, extraInfo)
-    suspend fun deleteCase(caseId: String): Boolean {
+    // Actualizar un caso para marcarlo como suspendido y remover de la lista de casos de los usuarios asignados
+    suspend fun updateCaseToDiscard(caseId: String): Boolean {
         return try {
-            // Obtener el caso para acceder a las listas de appointments, comments y extraInfo
+            // Obtener el caso
             val caseSnapshot = firestore.collection("cases").document(caseId).get().await()
 
             if (caseSnapshot.exists()) {
                 val case = caseSnapshot.toObject(Case::class.java)
                 case?.let {
-                    // Eliminar todos los appointments asociados
-                    it.listAppointments.forEach { appointmentId ->
-                        firestore.collection("appointments").document(appointmentId).delete().await()
+                    // Verificar si hay abogado y estudiante asignados para eliminarlos de sus listas de casos
+                    val lawyerId = it.lawyerAssigned
+                    val studentId = it.studentAssigned
+
+                    // Crear un mapa de los campos a actualizar en el caso
+                    val updates = mapOf(
+                        "lawyerAssigned" to "",      // Desasignar el abogado
+                        "studentAssigned" to "",     // Desasignar el estudiante
+                        "suspended" to true,         // Marcar el caso como suspendido
+                        "state" to "Suspendido",     // Cambiar el estado a 'Suspendido'
+                        "situation" to "Caso descartado", // Cambiar la situación a 'Caso descartado'
+                        "represented" to false,      // Marcar el caso como no representado
+                        "available" to false,        // Marcar como no disponible
+                        "completed" to true          // Marcar el caso como completado
+                    )
+
+                    // Actualizar el caso con los nuevos valores
+                    firestore.collection("cases").document(caseId).update(updates).await()
+
+                    // Eliminar el caso de la lista de casos del abogado asignado
+                    if (lawyerId.isNotEmpty()) {
+                        firestore.collection("usuarios").document(lawyerId)
+                            .update("listCases", FieldValue.arrayRemove(caseId)).await()
                     }
 
-                    // Eliminar todos los comentarios asociados
-                    it.listComents.forEach { commentId ->
-                        firestore.collection("comments").document(commentId).delete().await()
+                    // Eliminar el caso de la lista de casos del estudiante asignado
+                    if (studentId.isNotEmpty()) {
+                        firestore.collection("usuarios").document(studentId)
+                            .update("listCases", FieldValue.arrayRemove(caseId)).await()
                     }
 
-                    // Eliminar toda la extraInfo asociada
-                    it.listExtraInfo.forEach { extraInfoId ->
-                        firestore.collection("extraInfo").document(extraInfoId).delete().await()
-                    }
+                    val usersQuerySnapshot = firestore.collection("usuarios")
+                        .whereEqualTo("tipo", "general")
+                        .get()
+                        .await()
 
-                    // Finalmente, eliminar el caso
-                    firestore.collection("cases").document(caseId).delete().await()
+                    // Paso 2: Iterar sobre cada usuario para verificar su listCases
+                    for (userDocument in usersQuerySnapshot.documents) {
+                        val userId = userDocument.id
+                        val userCases = userDocument.get("listCases") as? List<String> ?: emptyList()
+
+                        // Paso 3: Verificar si el ID del caso está en la lista
+                        if (caseId in userCases) {
+                            // Paso 4: Eliminar el ID del caso de la lista
+                            firestore.collection("usuarios")
+                                .document(userId)
+                                .update("listCases", FieldValue.arrayRemove(caseId))
+                                .await()
+                        }
+                    }
 
                     true // Operación exitosa
                 } ?: false // Caso no encontrado
@@ -151,7 +187,53 @@ class CaseRepository {
                 false // El caso no existe
             }
         } catch (e: Exception) {
-            false // Error al eliminar el caso
+            false // Error al actualizar el caso
         }
     }
+
+
+    suspend fun getCaseWithDetails(caseId: String): Pair<Case, Triple<List<Appointment>, List<Comment>, List<ExtraInfo>>>? {
+        return try {
+            // Obtener el caso
+            val caseSnapshot = firestore.collection("cases").document(caseId).get().await()
+
+            if (caseSnapshot.exists()) {
+                val case = caseSnapshot.toObject(Case::class.java)
+
+                // Verificar que el caso no sea nulo
+                case?.let {
+                    // Obtener las listas de IDs de citas, comentarios y extraInfo
+                    val appointmentIds = it.listAppointments
+                    val comentIds = it.listComents
+                    val extraInfoIds = it.listExtraInfo
+
+                    // Obtener las citas (Appointments) a partir de sus IDs
+                    val appointments = appointmentIds.mapNotNull { appointmentId ->
+                        firestore.collection("appointments").document(appointmentId).get().await().toObject(Appointment::class.java)
+                    }
+
+                    // Obtener los comentarios (Comments) a partir de sus IDs
+                    val comments = comentIds.mapNotNull { commentId ->
+                        firestore.collection("coments").document(commentId).get().await().toObject(Comment::class.java)
+                    }
+
+                    // Obtener la información extra (ExtraInfo) a partir de sus IDs
+                    val extraInfoList = extraInfoIds.mapNotNull { extraInfoId ->
+                        firestore.collection("extrainfo").document(extraInfoId).get().await().toObject(ExtraInfo::class.java)
+                    }
+
+                    Pair(case, Triple(appointments, comments, extraInfoList))
+                }
+            } else {
+                null
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+
+
+
+
 }

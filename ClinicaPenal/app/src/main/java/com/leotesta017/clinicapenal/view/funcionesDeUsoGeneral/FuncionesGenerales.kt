@@ -1,3 +1,4 @@
+
 package com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral
 
 //VIEW MODEL
@@ -14,6 +15,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -47,7 +49,6 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -58,6 +59,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -66,6 +68,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
@@ -97,6 +100,7 @@ import com.leotesta017.clinicapenal.view.videoPlayer.youtubeVideoPlayer.YouTubeP
 import com.leotesta017.clinicapenal.view.videoPlayer.fullscreenActivities.FullscreenActivity
 import com.leotesta017.clinicapenal.view.videoPlayer.fullscreenActivities.FullscreenVideoActivity
 import com.leotesta017.clinicapenal.viewmodel.VideoViewModel
+import com.leotesta017.clinicapenal.viewmodel.viewmodelUsuario.CaseViewModel
 import com.leotesta017.clinicapenal.viewmodel.viewmodelUsuario.Case_CounterViewModel
 import com.leotesta017.clinicapenal.viewmodel.viewmodelUsuario.UsuarioViewModel
 import java.text.SimpleDateFormat
@@ -122,14 +126,40 @@ fun TopBar() {
     }
 }
 
+
 @Composable
-fun SearchBar(searchText: String
-)
-{
+fun SearchBarHistorialSolicitudes(
+    searchText: String,
+    onSearchTextChange: (String) -> Unit,
+    casos: List<Triple<Case, String, Boolean>>,
+    isAdmin: Boolean,
+    isUsuarioGeneral: Boolean,
+    navController: NavController?,
+    caseCounterViewModel: Case_CounterViewModel = viewModel(),
+    usuarioViewModel: UsuarioViewModel = viewModel(),
+    caseViewModel: CaseViewModel = viewModel(),
+    onSearchStarted: (Boolean) -> Unit
+) {
+    var search by remember { mutableStateOf(searchText) }
+
+    val dayTranslations = mapOf(
+        "Lunes" to "Mon",
+        "Martes" to "Tue",
+        "Miércoles" to "Wed",
+        "Jueves" to "Thu",
+        "Viernes" to "Fri",
+        "Sábado" to "Sat",
+        "Domingo" to "Sun"
+    )
+
     OutlinedTextField(
-        value = searchText,
-        onValueChange = {},
-        label = { Text("Buscar...") },
+        value = search,
+        onValueChange = {
+            search = it
+            onSearchTextChange(it)
+            onSearchStarted(it.isNotBlank())  // Indica que la búsqueda ha comenzado si no está en blanco
+        },
+        label = { Text("Buscar por número de caso o nombre del usuario...") },
         leadingIcon = {
             Icon(imageVector = Icons.Default.Search, contentDescription = "Search Icon")
         },
@@ -139,7 +169,102 @@ fun SearchBar(searchText: String
         textStyle = TextStyle(fontSize = 18.sp, color = Color.Black),
         singleLine = true
     )
+
+    val caseCounters = remember { mutableStateMapOf<String, Int?>() }
+
+    val caseUserNames = remember { mutableStateMapOf<String, String?>() }
+
+    casos.forEach { case ->
+        val caseId = case.first.case_id
+
+        // Obtener el caseCounter
+        if (caseCounters[caseId] == null) {
+            LaunchedEffect(caseId) {
+                val caseCounter = caseCounterViewModel.findOrAddCase(caseId)
+                caseCounters[caseId] = caseCounter
+            }
+        }
+
+        if (caseUserNames[caseId] == null) {
+            LaunchedEffect(caseId) {
+                val generalUserName = usuarioViewModel.fetchGeneralUserByCaseId(caseId)
+                caseUserNames[caseId] = generalUserName
+            }
+        }
+    }
+
+    if (search.isBlank()) {
+        return
+    }
+
+    val filteredCases = remember(search) {
+        val translatedSearch = dayTranslations[search.replaceFirstChar {
+            if (it.isLowerCase()) it.titlecase(
+                Locale.getDefault()
+            ) else it.toString()
+        }] ?: search
+
+        casos.filter { case ->
+            val caseCounter = caseCounters[case.first.case_id]
+            val userName = caseUserNames[case.first.case_id] ?: ""
+
+            val isCaseIdMatch = caseCounter.toString() == search
+
+            val isUserNameMatch = userName.contains(search, ignoreCase = true)
+
+            val isDateMatch = case.second.take(3).contains(translatedSearch, ignoreCase = true)
+
+            isCaseIdMatch || isUserNameMatch || isDateMatch
+        }
+    }
+
+    if (filteredCases.isNotEmpty()) {
+        filteredCases.forEach { case ->
+            if(!isUsuarioGeneral){
+                CaseUserAdminItem(
+                    case = case,
+                    onDelete = { id ->
+                        if (isAdmin) {
+                            caseViewModel.discardCase(id)
+                        }
+                    },
+                    confirmDeleteText = "¿Estás seguro de que deseas eliminar este caso?",
+                    navController = navController,
+                    route = if (isAdmin) {
+                        "actualizarcasos"
+                    } else "detallecasoestudiante",
+                    isAdmin = isAdmin
+                )
+            }
+            else{
+                CaseUserGenaralItem(
+                    case = case,
+                    navController = navController
+                )
+            }
+
+        }
+    } else if (search.isNotBlank()) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(start = 16.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.SearchOff,
+                contentDescription = "Sin resultados",
+                modifier = Modifier.size(48.dp),
+                tint = Color.Gray
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text = "No se encontraron casos",
+                style = TextStyle(fontSize = 16.sp, color = Color.Gray)
+            )
+        }
+    }
 }
+
+
 
 @Composable
 fun SearchBarPantallaInfo(
@@ -225,7 +350,7 @@ fun SearchBarPantallaInfo(
             modifier = Modifier.padding(start = 16.dp)
         ) {
             Icon(
-                imageVector = Icons.Default.SearchOff, // Cambia por el ícono que prefieras
+                imageVector = Icons.Default.SearchOff,
                 contentDescription = "Sin resultados",
                 modifier = Modifier.size(48.dp),
                 tint = Color.Gray
@@ -561,8 +686,8 @@ fun VideoCard(
     videoUrl: String,
     title: String,
     description: String,
-    onFullscreenClick: (String) -> Unit, // Callback para pantalla completa
-    isVisible: Boolean, // Controlar si el video está visible
+    onFullscreenClick: (String) -> Unit,
+    isVisible: Boolean,
 ) {
     var expanded by remember { mutableStateOf(false) }
     val maxHeight = if (expanded) Int.MAX_VALUE.dp else 428.dp
@@ -572,10 +697,10 @@ fun VideoCard(
             .fillMaxWidth()
             .padding(top = 8.dp, start = 16.dp, end = 16.dp, bottom = 16.dp)
             .heightIn(min = 428.dp, max = maxHeight)
-            .clip(RoundedCornerShape(16.dp)), // Aplicamos bordes redondeados a la tarjeta
+            .clip(RoundedCornerShape(16.dp)),
         colors = CardDefaults.cardColors(containerColor = Color(0xFFf0eee9)),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        shape = RoundedCornerShape(16.dp) // Bordes redondeados para la tarjeta
+        shape = RoundedCornerShape(16.dp)
     ) {
         Column(
             modifier = Modifier
@@ -583,14 +708,12 @@ fun VideoCard(
                 .padding(horizontal = 16.dp, vertical = 16.dp)
                 .animateContentSize()
         ) {
-            // Cuadro del video y el botón en el mismo Box
             Box(
                 modifier = Modifier
                     .background(Color.Black)
                     .fillMaxWidth()
                     .height((LocalConfiguration.current.screenWidthDp * 10 / 16).dp)
                     .padding(bottom = 4.dp)
-                    .clip(RoundedCornerShape(20.dp))
             ) {
                 Box(modifier = Modifier
                     .fillMaxWidth()
@@ -618,16 +741,19 @@ fun VideoCard(
 
                 }
 
-                // Botón para pantalla completa
-                Button(
-                    onClick = { onFullscreenClick(videoUrl) },
-                    colors = ButtonDefaults.buttonColors(Color(0xFF0B1F8C)),
+                Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(36.dp)
                         .align(Alignment.BottomCenter)
-                        .zIndex(1f) // Elevar el botón por encima del PlayerView
-
+                        .zIndex(1f)
+                        .height(38.dp)
+                        .clip(RectangleShape)
+                        .background(Color(0xFF0B1F8C))
+                        .clickable {
+                            onFullscreenClick(videoUrl)
+                        },
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
                 ) {
                     Row(
                         horizontalArrangement = Arrangement.Center,
@@ -1173,24 +1299,30 @@ fun Calendarios(title: String, eventos: List<Evento>) {
 //FUNCIONES PARA PANTALLA DE MOSTRAR SOLICITUDES
 @Composable
 fun CaseUserAdminItem(
-    case: Triple<Case,String,Boolean>,
+    case: Triple<Case, String, Boolean>,
     onDelete: (String) -> Unit,
     confirmDeleteText: String,
     caseCounterViewModel: Case_CounterViewModel = viewModel(),
     navController: NavController?,
-    route: String
+    route: String,
+    isAdmin: Boolean,
+    usuarioViewModel: UsuarioViewModel = viewModel()
 ) {
-
-
     var expanded by remember { mutableStateOf(false) }
     var showDialog by remember { mutableStateOf(false) }
 
     var caseCounter by remember { mutableStateOf<Int?>(null) }
+    var username by remember { mutableStateOf<String?>(null)}
 
     // Ejecutamos el LaunchedEffect solo para este caseId
     LaunchedEffect(case.first.case_id) {
         val index = caseCounterViewModel.findOrAddCase(case.first.case_id)
         caseCounter = index
+    }
+
+    LaunchedEffect(case.first.case_id) {
+        val generalUserName = usuarioViewModel.fetchGeneralUserByCaseId(case.first.case_id)
+        username = generalUserName
     }
 
     Card(
@@ -1200,7 +1332,7 @@ fun CaseUserAdminItem(
             .clip(RoundedCornerShape(16.dp))
             .shadow(1.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color(0xFFE4E4E4)
+            containerColor = Color(0xFFf0eee9)
         )
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -1216,10 +1348,10 @@ fun CaseUserAdminItem(
                         fontWeight = FontWeight.Bold,
                         fontSize = 14.5.sp
                     )
+                    Text(text = "$username", fontSize = 14.sp)
                     Text(text = "Lugar: ${case.first.place}", fontSize = 14.sp)
-                    Text(text = "Estado: ${case.first.state}", fontSize = 14.sp)
                 }
-                Box() {
+                Box {
                     IconButton(onClick = { expanded = true }) {
                         Icon(imageVector = Icons.Default.MoreVert, contentDescription = "Más opciones")
                     }
@@ -1227,17 +1359,23 @@ fun CaseUserAdminItem(
                     DropdownMenu(
                         expanded = expanded,
                         onDismissRequest = { expanded = false },
-                        // Ajustamos la posición hacia la derecha (x: positivo) y hacia abajo (y: positivo)
                         offset = DpOffset(x = 10.dp, y = 10.dp)
                     ) {
-                        DropdownMenuItem(
-                            onClick = {
-                                expanded = false
-                                showDialog = true
-                            },
-                            text = { Text("Eliminar") }
-                        )
-                        // Otra opción adicional
+                        // Si el usuario es admin, mostrar opción para eliminar
+                        if (isAdmin) {
+                            if(case.first.state != "Caso descartado")
+                            {
+                                DropdownMenuItem(
+                                    onClick = {
+                                        expanded = false
+                                        showDialog = true
+                                    },
+                                    text = { Text("Descartar") }
+                                )
+                            }
+                        }
+
+                        // Opción de ver detalles, común a ambos roles
                         DropdownMenuItem(
                             onClick = {
                                 expanded = false
@@ -1246,49 +1384,93 @@ fun CaseUserAdminItem(
                             text = { Text("Detalles") }
                         )
                     }
+
                 }
             }
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Mostrar las citas asociadas al caso
-            Text(
-                text = "Ultima cita agendada:",
-                fontWeight = FontWeight.Bold,
-                fontSize = 14.sp,
-                modifier = Modifier.padding(top = 8.dp)
-            )
-
-            Column(modifier = Modifier.padding(vertical = 4.dp)) {
-                // Asegurarse de que haya una cita en la lista
-                if (case.second.isNotEmpty()) {
-                    val lastAppointment = case.second  // case.second debería tener la última cita como su único elemento
-
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 4.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Columna con la información de la cita (última cita, confirmación)
+                Column {
                     Text(
-                        text = "Fecha: ${lastAppointment}", // Muestra la fecha de la última cita
+                        text = "Última cita agendada:",
+                        fontWeight = FontWeight.Bold,
                         fontSize = 14.sp
                     )
-                    Text(
-                        text = "Confirmada: ${if (case.third) "Sí" else "No"}",  // Cambia a is_confirmed si confirmación está en esa propiedad
-                        fontSize = 14.sp
-                    )
-                } else {
-                    Text(text = "Sin citas disponibles", fontSize = 14.sp)
+
+                    if (case.second.isNotEmpty()) {
+                        val lastAppointment = case.second
+
+                        // Fecha de la última cita
+                        Text(
+                            text = "Fecha: $lastAppointment",
+                            fontSize = 14.sp,
+                            color = if (case.first.suspended) Color.Red else Color.Blue
+                        )
+
+                        // Estado de confirmación
+                        Text(
+                            text = "Confirmada: ${if (case.third) "Sí" else "No"}",
+                            fontSize = 14.sp
+                        )
+                    } else {
+                        Text(text = "Sin citas disponibles", fontSize = 14.sp)
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(end = 17.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = "Estado: ${case.first.state}",
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 14.sp,
+                            modifier = Modifier.padding(end = 8.dp)  // Espacio entre el texto y el círculo
+                        )
+
+                        // Círculo de color según el estado
+                        Box(
+                            modifier = Modifier
+                                .size(16.dp)
+                                .clip(CircleShape)
+                                .background(
+                                    when (case.first.state) {
+                                        "Activo" -> Color.Yellow
+                                        "Finalizado" -> Color.Green
+                                        "Suspendido" -> Color.Red
+                                        else -> Color.Gray
+                                    }
+                                )
+                                .border(1.dp, Color.Black, CircleShape)
+                        )
+                    }
                 }
-                HorizontalDivider() // Separador entre citas
             }
         }
     }
 
-    if (showDialog) {
+    if (showDialog && isAdmin) {
         AlertDialog(
             onDismissRequest = { showDialog = false },
             confirmButton = {
                 TextButton(onClick = {
-                    // Lógica de confirmación de eliminación
+                    onDelete(case.first.case_id)
                     showDialog = false
+                    navController?.navigate(route)
                 }) {
-                    Text("Eliminar")
+                    Text("Descartar")
                 }
             },
             dismissButton = {
@@ -1296,18 +1478,17 @@ fun CaseUserAdminItem(
                     Text("Cancelar")
                 }
             },
-            title = { Text("Confirmar Eliminación") },
-            text = { Text("¿Estás seguro de que deseas eliminar este elemento?") }
+            title = { Text("Confirmar Descartar Caso") },
+            text = { Text(confirmDeleteText) }
         )
     }
 }
 
 @Composable
 fun CaseUserGenaralItem(
-    case: Triple<Case,String,Boolean>,
+    case: Triple<Case, String, Boolean>,
     caseCounterViewModel: Case_CounterViewModel = viewModel(),
-
-    navController: NavController? // Recibe el NavController para manejar la navegación
+    navController: NavController?
 ) {
     var expanded by remember { mutableStateOf(false) }
     var caseCounter by remember { mutableStateOf<Int?>(null) }
@@ -1324,9 +1505,7 @@ fun CaseUserGenaralItem(
             .padding(horizontal = 16.dp, vertical = 8.dp)
             .clip(RoundedCornerShape(16.dp))
             .shadow(1.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = Color(0xFFE4E4E4)
-        )
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFf0eee9))
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(
@@ -1336,36 +1515,117 @@ fun CaseUserGenaralItem(
             ) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = "Caso: ${case.first.case_id}",
+                        text = "Caso: ID-$caseCounter",
                         fontWeight = FontWeight.Bold,
                         fontSize = 14.5.sp
                     )
                     Text(text = "Lugar: ${case.first.place}", fontSize = 14.sp)
-                    Text(text = "Estado: ${case.first.state}", fontSize = 14.sp)
                 }
-                IconButton(onClick = { expanded = !expanded }) {
-                    Icon(
-                        imageVector = Icons.Default.MoreVert,
-                        contentDescription = "Más opciones",
-                        tint = Color.Black
-                    )
+
+                Box{
+                    IconButton(onClick = { expanded = true }) {
+                        Icon(imageVector = Icons.Default.MoreVert, contentDescription = "Más opciones")
+                    }
+                    DropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false },
+                        offset = DpOffset(x = 10.dp, y = 10.dp)
+                    ) {
+                        DropdownMenuItem(
+                            onClick = {
+                                expanded = false
+                                navController?.navigate("ReviewComentarios/${case.first.case_id}")
+                            },
+                            text = { Text("Valorar") }
+                        )
+                    }
                 }
-                DropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false }
-                ) {
-                    DropdownMenuItem(
-                        onClick = {
-                            expanded = false
-                            // Navegar a la pantalla de valoración con el case_id
-                            navController?.navigate("ReviewComentarios/${case.first.case_id}")
-                        },
-                        text = { Text("Valorar") }
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 4.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Columna con la información de la cita (última cita, confirmación)
+                Column {
+                    Text(
+                        text = "Última cita agendada:",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 14.sp
                     )
+
+                    if (case.second.isNotEmpty()) {
+                        val lastAppointment = case.second
+
+                        // Fecha de la última cita
+                        Text(
+                            text = "Fecha: $lastAppointment",
+                            fontSize = 14.sp,
+                            color = if (case.first.suspended) Color.Red else Color.Blue
+                        )
+
+                        // Estado de confirmación
+                        Text(
+                            text = "Confirmada: ${if (case.third) "Sí" else "No"}",
+                            fontSize = 14.sp
+                        )
+                    } else {
+                        Text(text = "Sin citas disponibles", fontSize = 14.sp)
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(end = 17.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = "Estado: ${case.first.state}",
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 14.sp,
+                            modifier = Modifier.padding(end = 8.dp)  // Espacio entre el texto y el círculo
+                        )
+
+                        // Círculo de color según el estado
+                        Box(
+                            modifier = Modifier
+                                .size(16.dp)
+                                .clip(CircleShape)
+                                .background(
+                                    when (case.first.state) {
+                                        "Activo" -> Color.Yellow
+                                        "Finalizado" -> Color.Green
+                                        "Suspendido" -> Color.Red
+                                        else -> Color.Gray
+                                    }
+                                )
+                                .border(1.dp, Color.Black, CircleShape)
+                        )
+                    }
                 }
             }
         }
     }
+}
+
+@Composable
+fun NotificationItem(notification: String) {
+    Text(
+        text = notification,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .clip(RoundedCornerShape(8.dp))
+            .background(Color(0xFFf0eee9))
+            .padding(16.dp)
+    )
 }
 
 

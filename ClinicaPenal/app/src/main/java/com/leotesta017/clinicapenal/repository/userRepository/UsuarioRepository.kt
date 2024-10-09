@@ -1,5 +1,6 @@
 package com.leotesta017.clinicapenal.repository.userRepository
 
+import android.util.Log
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.leotesta017.clinicapenal.model.modelUsuario.Usuario
@@ -122,6 +123,20 @@ class UsuarioRepository {
         catch (e: Exception)
         {
             false
+        }
+    }
+
+    suspend fun getGeneralUserByCaseId(caseId: String): Usuario? {
+        val querySnapshot = firestore.collection("usuarios")
+            .whereEqualTo("tipo", "general")
+            .whereArrayContains("listCases", caseId)
+            .get()
+            .await()
+
+        return if (querySnapshot.documents.isNotEmpty()) {
+            querySnapshot.documents.first().toObject(Usuario::class.java)
+        } else {
+            null
         }
     }
 }
