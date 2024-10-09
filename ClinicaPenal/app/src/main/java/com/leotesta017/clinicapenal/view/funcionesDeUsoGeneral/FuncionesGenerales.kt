@@ -411,36 +411,39 @@ fun GenericBottomBarItem(icon: ImageVector,
 }
 
 @Composable
-fun GenericBarraNav(navController: NavController?,
-                    modifier: Modifier = Modifier,
-                    destinations: List<String>,
-                    icons: List<ImageVector>,
-                    texts: List<String>)
-{
+fun GenericBarraNav(
+    navController: NavController?,
+    modifier: Modifier = Modifier,
+    destinations: List<String>,
+    icons: List<ImageVector>,
+    texts: List<String>
+) {
     val currentBackStackEntry = navController?.currentBackStackEntryAsState()?.value
     val currentDestination = currentBackStackEntry?.destination?.route
 
     Row(
         modifier = modifier
+            .fillMaxWidth()
             .background(Color.White)
             .padding(top = 15.dp, bottom = 10.dp),
-        horizontalArrangement = Arrangement.SpaceAround,
+        horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        destinations.indices.forEach { index ->
-            GenericBottomBarItem(
-                icon = icons[index],
-                text = texts[index],
-                isSelected = currentDestination == destinations[index],
-                onClick = { navController?.navigate(destinations[index]) }
-            )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceAround
+        ) {
+            destinations.indices.forEach { index ->
+                GenericBottomBarItem(
+                    icon = icons[index],
+                    text = texts[index],
+                    isSelected = currentDestination == destinations[index],
+                    onClick = { navController?.navigate(destinations[index]) }
+                )
+            }
         }
     }
 }
-
-
-
-
 
 @Composable
 fun RoundedButton(icon: ImageVector,
@@ -1270,6 +1273,7 @@ fun Calendarios(title: String, eventos: List<Evento>) {
                 text = title,
                 fontSize = 17.sp,
                 color = Color(0xFF002366),
+                fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth()
             )

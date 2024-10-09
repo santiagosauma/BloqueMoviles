@@ -14,6 +14,7 @@ import com.leotesta017.clinicapenal.view.templatesPantallas.PantallaInfoGenerica
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.CarruselDeNoticias
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.CategoriesSection
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.EstudiantesBarraNav
+import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.LabelCategoria
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.LabelCategoriaConBoton
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.MyTextNoticias
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.PantallasExtra
@@ -37,8 +38,8 @@ fun PantallaInfoEstudiante(navController: NavController?) {
                 errorCategoria = errorCategoria,
                 errorServicio = errorServicio,
                 navController = navController,
-                routeCategoria = "modificar-info",
-                routeServicio = "modificar_servicios_info",
+                routeCategoria = "detalle_info",
+                routeServicio = "servicios_info",
                 onSearchStarted = onSearchStarted
             )
         },
@@ -57,35 +58,29 @@ fun PantallaInfoEstudiante(navController: NavController?) {
 
         //SECCION DE INFORMACION LEGAL
         informacionLegal = { categorias, error ->
-            LabelCategoriaConBoton(
+            LabelCategoria(
                 label = "Información Legal",
-                navController = navController,
-                modifier = Modifier.padding(0.dp),
-                navigateroute = "agregar-info-estudiante"
+                modifier = Modifier.padding(0.dp)
             )
 
             CategoriesSection(
                 navController = navController,
-                route = "modificar-info",
+                route = "detalle_info",
                 categories = categorias,
-                error =  error
+                error = error
             )
-
         },
 
         //SECCION DE SERVICIOS
         servicios = { servicios,error ->
-            LabelCategoriaConBoton( //Cambiar aqui
+            LabelCategoria( //Cambiar aqui
                 label = "Servicios",
-                navController = navController,
-                modifier = Modifier.padding(0.dp),
-                navigateroute = "agregar-servicio-estudiante"
-
+                modifier = Modifier.padding(0.dp)
             )
 
             ServicesSection(
                 navController = navController,
-                route = "modificar_servicios_info",
+                route = "servicios_info",
                 servicios = servicios,
                 error = error
             )
