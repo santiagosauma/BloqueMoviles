@@ -733,7 +733,7 @@ fun VideoCard(
                             videoUrl = videoUrl,
                             isVisible = isVisible,
                             onControllerVisibilityChanged = {false}
-                           )
+                        )
                     }
                     else {
                         Text("URL no compatible", color = Color.Red)
@@ -747,7 +747,7 @@ fun VideoCard(
                         .align(Alignment.BottomCenter)
                         .zIndex(1f)
                         .height(38.dp)
-                        .clip(RectangleShape)
+                        .clip(RectangleShape) // Cambiado a RectangleShape para quitar esquinas redondeadas
                         .background(Color(0xFF0B1F8C))
                         .clickable {
                             onFullscreenClick(videoUrl)
@@ -771,7 +771,6 @@ fun VideoCard(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Mostrar el título
             Text(
                 text = title,
                 fontSize = 16.sp,
@@ -779,7 +778,6 @@ fun VideoCard(
                 modifier = Modifier.padding(bottom = 4.dp)
             )
 
-            // Mostrar la descripción del video
             Text(
                 text = description,
                 fontSize = 13.sp,
@@ -792,7 +790,6 @@ fun VideoCard(
                     .animateContentSize()
             )
 
-            // Texto "Ver más" o "Ver menos" para controlar la expansión
             Text(
                 text = if (expanded) "Ver menos" else "Ver más",
                 color = Color(0xFF303665),
@@ -804,6 +801,7 @@ fun VideoCard(
         }
     }
 }
+
 
 
 
