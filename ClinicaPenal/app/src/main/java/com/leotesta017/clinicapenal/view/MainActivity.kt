@@ -122,12 +122,13 @@ fun MyApp() {
             val titulo = backStackEntry.arguments?.getString("titulo") ?: ""
             val descripcion = backStackEntry.arguments?.getString("descripcion") ?: ""
             val categoriaId = backStackEntry.arguments?.getString("categoriaId") ?: ""
-            val url_imagen = Uri.decode(backStackEntry.arguments?.getString("url_image") ?: "")
+            val url_image = Uri.decode(backStackEntry.arguments?.getString("url_image") ?: "")
             DetalleInfo(
                 navController = navController,
                 titulo = titulo,
                 descripcion = descripcion,
-                categoriaId = categoriaId
+                categoriaId = categoriaId,
+                url_image = url_image
             )
         }
 
@@ -149,7 +150,8 @@ fun MyApp() {
                 navController = navController,
                 titulo = titulo,
                 descripcion = descripcion,
-                servicioId = servicioId
+                servicioId = servicioId,
+                url_imagen = url_imagen
             )
         }
 

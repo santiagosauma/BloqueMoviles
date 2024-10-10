@@ -1043,7 +1043,7 @@ fun HeaderSection(title: String, navController: NavController?) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp)
+            .padding(horizontal = 4.dp)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -1076,12 +1076,12 @@ fun SectionTitle(title: String) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color.LightGray)
+            .background(Color.White)
             .padding(vertical = 12.dp)
     ) {
         Text(
             text = title,
-            fontSize = 20.sp,
+            fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
             color = Color.Black,
             modifier = Modifier.padding(horizontal = 16.dp)
@@ -1692,49 +1692,28 @@ fun ApplyStyleButtons(
 //MARKDOWN PANTALLA DETALLE
 fun preprocesarMarkdown(markdown: String): String {
     return markdown
-        .replace("####", "\n####")
-        .replace("###", "\n###")
-        .replace("- ", "\n• ") // Cambiar guiones por bolitas
-        .replace("\n\n", "\n")
+        .replace(Regex("""\s*-\s*"""), "\n• ") // Convertir elementos de lista a viñetas con salto de línea
+        .replace(Regex("""\*\*(.*?)\*\*"""), "\n$0\n") // Asegurar que los textos en negrita tengan saltos antes y después
+        .replace(Regex("""\n{2,}"""), "\n") // Eliminar saltos de línea dobles o más
 }
 
 @Composable
 fun CustomMarkdownText(content: String) {
-    Column(modifier = Modifier
-        .fillMaxWidth()
-        .padding(vertical = 0.dp)) {
-        val lines = content.split("\n")
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 10.dp)
+    ) {
+        val lines = content.split("\n").map { it.trim() }
         for (line in lines) {
-            when {
-                line.startsWith("####") -> {
-                    SectionTitle(
-                        title = line.removePrefix("####").trim()
-                    )
-                    Spacer(modifier = Modifier.height(6.dp))  // Reducir el espacio aquí
-                }
-                line.startsWith("###") -> {
-                    Spacer(modifier = Modifier.height(12.dp))  // Reducir el espacio aquí
-                    Text(
-                        text = line.removePrefix("###").trim(),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(Color(0xFFF5F5F5))
-                            .padding(16.dp),
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.Black
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))  // Reducir el espacio aquí
-                }
-                else -> {
-                    Text(
-                        text = parseMarkdownToAnnotatedString(line),
-                        fontSize = 16.sp,
-                        color = Color.Black,
-                        modifier = Modifier.padding(start = 16.dp)
-                    )
-                    Spacer(modifier = Modifier.height(2.dp))  // Reducir el espacio aquí
-                }
+            if (line.isNotEmpty()) {
+                Text(
+                    text = parseMarkdownToAnnotatedString(line),
+                    fontSize = if (line.startsWith("**") || line.startsWith("• **")) 18.sp else 16.sp, // Negritas y títulos más grandes
+                    color = Color.Black,
+                    modifier = Modifier.padding(start = 16.dp)
+                )
+                Spacer(modifier = Modifier.height(10.dp))
             }
         }
     }
@@ -1757,4 +1736,3 @@ fun parseMarkdownToAnnotatedString(text: String): AnnotatedString {
         append(text.substring(currentIndex, text.length))
     }
 }
-

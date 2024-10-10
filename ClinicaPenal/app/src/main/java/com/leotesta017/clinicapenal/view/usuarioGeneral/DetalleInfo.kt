@@ -2,15 +2,22 @@ package com.leotesta017.clinicapenal.view.usuarioGeneral
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.Image
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import coil.compose.rememberImagePainter
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.BarraNav
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.CustomMarkdownText
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.HeaderSection
@@ -26,6 +33,7 @@ fun DetalleInfo(
     titulo: String,
     descripcion: String,
     categoriaId: String,
+    url_image: String,
     contenidoParam: String? = null,
     viewModel: CategoryViewModel = viewModel()
 ) {
@@ -50,9 +58,20 @@ fun DetalleInfo(
         },
         content = {
             HeaderSection(titulo, navController)
-            Spacer(modifier = Modifier.height(8.dp))  // Reducir el espacio aquí
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Image(
+                painter = rememberImagePainter(data = url_image),
+                contentDescription = null,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp)
+                    .padding(16.dp),
+                contentScale = ContentScale.Crop
+            )
+
             SectionTitle("Descripción")
-            Spacer(modifier = Modifier.height(4.dp).padding(end = 0.dp))  // Reducir el espacio aquí
+            Spacer(modifier = Modifier.height(4.dp).padding(end = 0.dp))
             SectionContent(descripcion)
 
             when {
@@ -74,4 +93,15 @@ fun DetalleInfo(
     )
 }
 
-
+@Preview(showBackground = true)
+@Composable
+fun PreviewDetalleInfo() {
+    DetalleInfo(
+        navController = null,
+        titulo = "Título de ejemplo",
+        descripcion = "Esta es una descripción de ejemplo para la vista DetalleInfo.",
+        categoriaId = "12345",
+        url_image = "https://www.ejemplo.com/imagen.jpg",
+        contenidoParam = "Este es el contenido procesado como Markdown."
+    )
+}

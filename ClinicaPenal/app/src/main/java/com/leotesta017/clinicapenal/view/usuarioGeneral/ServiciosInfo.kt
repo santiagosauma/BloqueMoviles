@@ -1,5 +1,6 @@
 package com.leotesta017.clinicapenal.view.usuarioGeneral
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.CircularProgressIndicator
@@ -11,20 +12,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.BarraNav
-import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.CustomMarkdownText
-import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.HeaderSection
-import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.SectionContent
-import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.SectionTitle
-import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.SpacedItem
-import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.preprocesarMarkdown
+import androidx.navigation.NavController
+import coil.compose.rememberAsyncImagePainter
+import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.*
 import com.leotesta017.clinicapenal.view.templatesPantallas.PantallaDetalleItemTemplate
 import com.leotesta017.clinicapenal.viewmodel.ServicioViewModel
-
 
 @Composable
 fun ServiciosInfo(
@@ -32,25 +28,18 @@ fun ServiciosInfo(
     titulo: String,
     descripcion: String,
     servicioId: String,
+    url_imagen: String,
     contenidoParam: String? = null,
     viewModel: ServicioViewModel = viewModel()
-
 ) {
-
-    // Llamar a fetchContenidoById para cargar el contenido del servicio
     LaunchedEffect(servicioId) {
         if (contenidoParam == null) {
             viewModel.fetchContenidoById(servicioId)
         }
-
     }
 
-    // Obtener el contenido del servicio desde el ViewModel
     val contenido by viewModel.contenido.collectAsState(initial = contenidoParam ?: "")
-
-    // Aquí puedes manejar cualquier error si lo necesitas
     val error by viewModel.error.collectAsState()
-
 
     PantallaDetalleItemTemplate(
         navController = navController,
@@ -64,9 +53,21 @@ fun ServiciosInfo(
         },
         content = {
             HeaderSection(titulo, navController)
-            Spacer(modifier = Modifier.height(8.dp))  // Reducir el espacio aquí
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Image(
+                painter = rememberAsyncImagePainter(url_imagen),
+                contentDescription = null,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp)
+                    .padding(horizontal = 16.dp),
+                contentScale = ContentScale.Crop
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
             SectionTitle("Descripción")
-            Spacer(modifier = Modifier.height(4.dp).padding(end = 0.dp))  // Reducir el espacio aquí
+            Spacer(modifier = Modifier.height(4.dp))
             SectionContent(descripcion)
 
             when {
@@ -78,7 +79,9 @@ fun ServiciosInfo(
                 }
                 contenido.isNotEmpty() -> {
                     val processedContent = preprocesarMarkdown(contenido)
-                    CustomMarkdownText(content = processedContent)
+                    CustomMarkdownText(
+                        content = processedContent
+                    )
                 }
                 else -> {
                     Text(text = "No hay contenido disponible", color = Color.Gray)
@@ -88,17 +91,18 @@ fun ServiciosInfo(
     )
 }
 
-
 @Preview(showBackground = true)
 @Composable
 fun ServiciosInfoPreview() {
     val titulo = "Servicio X"
     val descripcion = "detalle de descripcion"
     val id = "1"
+    val url_imagen = "https://example.com/image.jpg"
     ServiciosInfo(
         navController = null,
         titulo = titulo,
-        descripcion =  descripcion,
-        servicioId = id
+        descripcion = descripcion,
+        servicioId = id,
+        url_imagen = url_imagen
     )
 }
