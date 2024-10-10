@@ -30,6 +30,9 @@ import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.SearchBarHistoria
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.TopBar
 import com.leotesta017.clinicapenal.viewmodel.viewmodelUsuario.CaseViewModel
 import com.leotesta017.clinicapenal.viewmodel.viewmodelUsuario.UsuarioViewModel
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @Composable
 fun GenerarSolicitudPantallaTemplatenavController(
@@ -170,5 +173,4 @@ fun GenerarSolicitudPantallaTemplatenavController(
         barraNavComposable()
     }
 }
-
 

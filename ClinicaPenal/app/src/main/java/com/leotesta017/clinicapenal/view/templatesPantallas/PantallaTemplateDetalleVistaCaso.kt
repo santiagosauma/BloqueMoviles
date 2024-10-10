@@ -1,6 +1,7 @@
 package com.leotesta017.clinicapenal.view.templatesPantallas
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -37,6 +38,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.leotesta017.clinicapenal.model.modelUsuario.UserIdData
 import com.leotesta017.clinicapenal.model.modelUsuario.Usuario
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.SectionTitle
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.TopBar
@@ -154,7 +156,7 @@ fun PantallaTemplateDetalleVistaCaso(
                         .padding(horizontal = 16.dp)
                         .fillMaxWidth()
                         .height(48.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.Blue)
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF002366))
                 ) {
                     Text("Agendar", color = Color.White)
                 }
@@ -197,18 +199,29 @@ fun PantallaTemplateDetalleVistaCaso(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                Text(
-                    text = "Colaboradores disponibles",
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier
-                        .padding(start = 16.dp)
-                )
-                DropdownMenuColaboradores(colaboratorsandstudents)
+                val usuariotipo by userViewModel.userType.collectAsState()
+
+                LaunchedEffect(UserIdData.userId) {
+                    UserIdData.userId?.let { userViewModel.fetchUserType(it) }
+                }
+
+                if(usuariotipo == "colaborador")
+                {
+                    Text(
+                        text = "Colaboradores  y estudiantes disponibles",
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier
+                            .padding(start = 16.dp)
+                    )
+                    DropdownMenuColaboradores(colaboratorsandstudents)
+                }
+
 
                 Spacer(modifier = Modifier.height(16.dp))
 
                 SectionTitle("Comentarios")
                 Spacer(modifier = Modifier.height(8.dp))
+
 
 
                 val commentList = caseWithDetails?.second?.second
@@ -224,7 +237,7 @@ fun PantallaTemplateDetalleVistaCaso(
                         }
 
                         Text(
-                            text = formatDate(comment.fecha.toDate()) +
+                            text = formatDate(comment.fecha.toDate()) + " " +
                                     formatTime(comment.fecha.toDate()),
                             color = Color.Blue)
                         ClienteComentario(
@@ -233,8 +246,6 @@ fun PantallaTemplateDetalleVistaCaso(
                         )
                     }
                 }
-
-
 
                 Spacer(modifier = Modifier.height(8.dp))
 
@@ -246,7 +257,7 @@ fun PantallaTemplateDetalleVistaCaso(
                         .padding(horizontal = 16.dp)
                         .fillMaxWidth()
                         .height(48.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.Blue)
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF002366))
                 ) {
                     Text("Comentar", color = Color.White)
                 }
@@ -263,7 +274,7 @@ fun PantallaTemplateDetalleVistaCaso(
                         .padding(horizontal = 16.dp)
                         .fillMaxWidth()
                         .height(48.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.Blue)
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF002366))
                 ) {
                     Text("Guardar", color = Color.White)
                 }
@@ -291,7 +302,7 @@ fun BotonesRepresentacion() {
             OutlinedButton(
                 onClick = { selectedOption = "Representar" },
                 colors = ButtonDefaults.outlinedButtonColors(
-                    containerColor = if (selectedOption == "Representar") Color.Blue else Color.White,
+                    containerColor = if (selectedOption == "Representar") Color(0xFF002366) else Color.White,
                     contentColor = if (selectedOption == "Representar") Color.White else Color.Black
                 ),
                 shape = RoundedCornerShape(
@@ -309,7 +320,7 @@ fun BotonesRepresentacion() {
             OutlinedButton(
                 onClick = { selectedOption = "No Representar" },
                 colors = ButtonDefaults.outlinedButtonColors(
-                    containerColor = if (selectedOption == "No Representar") Color.Blue else Color.White,
+                    containerColor = if (selectedOption == "No Representar") Color(0xFF002366) else Color.White,
                     contentColor = if (selectedOption == "No Representar") Color.White else Color.Black
                 ),
                 shape = RoundedCornerShape(
@@ -343,7 +354,7 @@ fun BotonesEstado() {
             OutlinedButton(
                 onClick = { selectedOption = "Activo" },
                 colors = ButtonDefaults.outlinedButtonColors(
-                    containerColor = if (selectedOption == "Activo") Color.Blue else Color.White,
+                    containerColor = if (selectedOption == "Activo") Color(0xFF002366) else Color.White,
                     contentColor = if (selectedOption == "Activo") Color.White else Color.Black
                 ),
                 shape = RoundedCornerShape(
@@ -360,7 +371,7 @@ fun BotonesEstado() {
             OutlinedButton(
                 onClick = { selectedOption = "Suspendido" },
                 colors = ButtonDefaults.outlinedButtonColors(
-                    containerColor = if (selectedOption == "Suspendido") Color.Blue else Color.White,
+                    containerColor = if (selectedOption == "Suspendido") Color(0xFF002366) else Color.White,
                     contentColor = if (selectedOption == "Suspendido") Color.White else Color.Black
                 ),
                 shape = RoundedCornerShape(
@@ -377,7 +388,7 @@ fun BotonesEstado() {
             OutlinedButton(
                 onClick = { selectedOption = "Finalizado" },
                 colors = ButtonDefaults.outlinedButtonColors(
-                    containerColor = if (selectedOption == "Finalizado") Color.Blue else Color.White,
+                    containerColor = if (selectedOption == "Finalizado") Color(0xFF002366) else Color.White,
                     contentColor = if (selectedOption == "Finalizado") Color.White else Color.Black
                 ),
                 shape = RoundedCornerShape(

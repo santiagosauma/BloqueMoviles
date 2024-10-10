@@ -103,6 +103,7 @@ import com.leotesta017.clinicapenal.viewmodel.viewmodelUsuario.CaseViewModel
 import com.leotesta017.clinicapenal.viewmodel.viewmodelUsuario.Case_CounterViewModel
 import com.leotesta017.clinicapenal.viewmodel.viewmodelUsuario.UsuarioViewModel
 import java.text.SimpleDateFormat
+import java.util.Date
 import java.util.Locale
 
 // ========================================
@@ -1378,7 +1379,6 @@ fun CaseUserAdminItem(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Columna con la información de la cita (última cita, confirmación)
                 Column {
                     Text(
                         text = "Última cita agendada:",
@@ -1714,4 +1714,15 @@ fun parseMarkdownToAnnotatedString(text: String): AnnotatedString {
         }
         append(text.substring(currentIndex, text.length))
     }
+}
+
+
+fun formatDate(date: Date?): String {
+    val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+    return date?.let { dateFormat.format(it) } ?: ""
+}
+
+fun formatTime(date: Date?): String {
+    val timeFormat = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
+    return date?.let { timeFormat.format(it) } ?: ""
 }

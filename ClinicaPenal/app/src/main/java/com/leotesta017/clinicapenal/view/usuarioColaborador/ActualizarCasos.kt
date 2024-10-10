@@ -52,7 +52,7 @@ fun ActualizarCasos(navController: NavController?, case_id: String) {
                     .padding(horizontal = 16.dp)
                     .fillMaxWidth()
                     .height(48.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Blue)
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF002366))
             ) {
                 Text("Re-Asignar", color = Color.White)
             }

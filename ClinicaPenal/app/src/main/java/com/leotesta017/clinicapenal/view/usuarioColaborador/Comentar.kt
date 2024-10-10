@@ -77,7 +77,7 @@ fun ComentarioScreen(navController: NavController?,caseId: String) {
                         Icon(
                             imageVector = Icons.Default.FormatBold,
                             contentDescription = "Negrita",
-                            tint = if (isBold) Color.Blue else Color.Gray
+                            tint = if (isBold) Color.Black else Color.Gray
                         )
                     }
                     IconButton(onClick = { /* Acción para insertar enlace */ }) {

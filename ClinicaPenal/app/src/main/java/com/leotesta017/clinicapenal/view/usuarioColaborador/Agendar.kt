@@ -78,7 +78,7 @@ fun Agendar(navController: NavController?, caseId: String) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SeleccionarHoraDropdown() {
-    val horas = listOf("08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00")
+    val horas = listOf("09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00")
     var selectedTime by remember { mutableStateOf("") }
     var expanded by remember { mutableStateOf(false) }
 
@@ -139,7 +139,7 @@ fun SeleccionarFecha() {
     ) {
         Text(
             text = if (selectedDate.isEmpty()) "Seleccionar Fecha" else "Fecha seleccionada: $selectedDate",
-            style = MaterialTheme.typography.bodyLarge.copy(color = Color(0xFF0B1F8C)),
+            style = MaterialTheme.typography.bodyLarge.copy(color = Color(0xFF002366)),
             modifier = Modifier.padding(bottom = 8.dp)
         )
 
@@ -170,7 +170,7 @@ fun BotonAgendarCita() {
             .fillMaxWidth()
             .padding(vertical = 8.dp)
             .height(56.dp),
-        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0B1F8C))
+        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF002366))
     ) {
         Text(
             text = "Agendar Cita",
