@@ -52,39 +52,38 @@ fun ServiciosInfo(
             )
         },
         content = {
-            HeaderSection(titulo, navController)
-            Spacer(modifier = Modifier.height(8.dp))
+            Column(modifier = Modifier.padding(horizontal = 16.dp)) { // Agregar padding horizontal
+                HeaderSection(titulo, navController)
+                Spacer(modifier = Modifier.height(8.dp))
 
-            Image(
-                painter = rememberAsyncImagePainter(url_imagen),
-                contentDescription = null,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(200.dp)
-                    .padding(horizontal = 16.dp),
-                contentScale = ContentScale.Crop
-            )
+                Image(
+                    painter = rememberAsyncImagePainter(url_imagen),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(200.dp),
+                    contentScale = ContentScale.Crop
+                )
 
-            Spacer(modifier = Modifier.height(8.dp))
-            SectionTitle("Descripción")
-            Spacer(modifier = Modifier.height(4.dp))
-            SectionContent(descripcion)
+                Spacer(modifier = Modifier.height(8.dp))
+                SectionTitle("Descripción")
+                Spacer(modifier = Modifier.height(4.dp))
+                SectionContent(descripcion)
 
-            when {
-                contenido.isEmpty() && error == null -> {
-                    CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
-                }
-                error != null -> {
-                    Text(text = error ?: "Error desconocido", color = Color.Red)
-                }
-                contenido.isNotEmpty() -> {
-                    val processedContent = preprocesarMarkdown(contenido)
-                    CustomMarkdownText(
-                        content = processedContent
-                    )
-                }
-                else -> {
-                    Text(text = "No hay contenido disponible", color = Color.Gray)
+                when {
+                    contenido.isEmpty() && error == null -> {
+                        CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+                    }
+                    error != null -> {
+                        Text(text = error ?: "Error desconocido", color = Color.Red)
+                    }
+                    contenido.isNotEmpty() -> {
+                        val processedContent = preprocesarMarkdown(contenido)
+                        CustomMarkdownText(content = processedContent)
+                    }
+                    else -> {
+                        Text(text = "No hay contenido disponible", color = Color.Gray)
+                    }
                 }
             }
         }

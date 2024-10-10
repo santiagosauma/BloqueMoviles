@@ -10,6 +10,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.TopBar
 
@@ -26,6 +27,7 @@ fun PantallaDetalleItemTemplate(
     ) { innerPadding ->
         Column(
             modifier = Modifier
+                .padding(horizontal = 16.dp)
                 .fillMaxSize()
                 .padding(innerPadding)
                 .verticalScroll(rememberScrollState()),

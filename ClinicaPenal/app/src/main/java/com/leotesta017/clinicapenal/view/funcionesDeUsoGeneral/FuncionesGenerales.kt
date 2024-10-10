@@ -808,7 +808,8 @@ fun VideoCard(
 
 
 
-//FUNCIONES PARA ITEMS DE CATEGORIAS
+// FUNCIONES PARA ITEMS DE CATEGORIAS
+// FUNCIONES PARA ITEMS DE CATEGORIAS
 @Composable
 fun CategoriesSection(
     navController: NavController?,
@@ -818,8 +819,7 @@ fun CategoriesSection(
 ) {
     val loading = categories.isEmpty() && error == null
 
-    Column(modifier = Modifier.padding(4.dp))
-    {
+    Column(modifier = Modifier) {
         if (categories.isNotEmpty()) {
             categories.forEach { category ->
                 CategoryItem(
@@ -831,10 +831,8 @@ fun CategoriesSection(
                     categoriaId = category.id
                 )
             }
-        }
-
-        else if (error != null) {
-            Text(text = error, color = Color.Red)
+        } else if (error != null) {
+            Text(text = error, color = Color.Red, modifier = Modifier.padding(horizontal = 16.dp))
         }
 
         if (loading) {
@@ -842,11 +840,10 @@ fun CategoriesSection(
         }
 
         if (!loading && categories.isEmpty()) {
-            Text(text = "No hay categorías disponibles", color = Color.Gray)
+            Text(text = "No hay categorías disponibles", color = Color.Gray, modifier = Modifier.padding(horizontal = 16.dp))
         }
     }
 }
-
 
 @Composable
 fun CategoryItem(
@@ -855,19 +852,19 @@ fun CategoryItem(
     navController: NavController?,
     imageUrl: String,
     route: String,
-    categoriaId: String // Este ID es necesario para cargar la pantalla de detalles
+    categoriaId: String
 ) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp)
+            .padding(vertical = 11.dp, horizontal = 16.dp)
             .clickable {
                 val encodedUrlImagen = Uri.encode(imageUrl)
                 navController?.navigate("$route/$title/$description/$categoriaId/$encodedUrlImagen")
             },
         colors = CardDefaults.cardColors(containerColor = Color(0xFFf0eee9)),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        shape = RoundedCornerShape(16.dp) // Bordes redondeados
+        shape = RoundedCornerShape(16.dp)
     ) {
         Column(
             modifier = Modifier
@@ -892,12 +889,8 @@ fun CategoryItem(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                Column(
-                )
-                {
+            Row(modifier = Modifier.fillMaxWidth()) {
+                Column {
                     Text(
                         text = title,
                         fontSize = 18.sp,
@@ -920,7 +913,7 @@ fun CategoryItem(
     }
 }
 
-//FUNCIONES PARA ITEMS DE SERVICIO
+// FUNCIONES PARA ITEMS DE SERVICIO
 @Composable
 fun ServicesSection(
     navController: NavController?,
@@ -930,8 +923,7 @@ fun ServicesSection(
 ) {
     val loading = servicios.isEmpty() && error == null
 
-    Column(modifier = Modifier.padding(4.dp))
-    {
+    Column(modifier = Modifier) {
         if (servicios.isNotEmpty()) {
             servicios.forEach { servicio ->
                 ServiceItem(
@@ -943,10 +935,8 @@ fun ServicesSection(
                     servicioId = servicio.id
                 )
             }
-        }
-
-        else if (error != null) {
-            Text(text = error, color = Color.Red)
+        } else if (error != null) {
+            Text(text = error, color = Color.Red, modifier = Modifier.padding(horizontal = 16.dp))
         }
 
         if (loading) {
@@ -954,12 +944,10 @@ fun ServicesSection(
         }
 
         if (!loading && servicios.isEmpty()) {
-            Text(text = "No hay servicios disponibles", color = Color.Gray)
+            Text(text = "No hay servicios disponibles", color = Color.Gray, modifier = Modifier.padding(horizontal = 16.dp))
         }
     }
 }
-
-
 
 @Composable
 fun ServiceItem(
@@ -973,7 +961,7 @@ fun ServiceItem(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp)
+            .padding(vertical = 8.dp, horizontal = 16.dp)
             .clickable {
                 val encodedUrlImagen = Uri.encode(imageUrl)
                 navController?.navigate("$route/$title/$description/$servicioId/$encodedUrlImagen")
@@ -987,7 +975,6 @@ fun ServiceItem(
                 .fillMaxWidth()
                 .padding(16.dp)
         ) {
-
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -1006,13 +993,8 @@ fun ServiceItem(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                Column(
-                )
-                {
+            Row(modifier = Modifier.fillMaxWidth()) {
+                Column {
                     Text(
                         text = title,
                         fontSize = 18.sp,
@@ -1021,6 +1003,7 @@ fun ServiceItem(
                     )
 
                     Spacer(modifier = Modifier.height(4.dp))
+
                     Text(
                         text = description,
                         fontSize = 14.sp,
@@ -1034,15 +1017,13 @@ fun ServiceItem(
     }
 }
 
-
-
-//FUNCIONES PARA LA PANTALLA DE DETALLE
+// FUNCIONES PARA LA PANTALLA DE DETALLE
 @Composable
 fun HeaderSection(title: String, navController: NavController?) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 4.dp)
+            .padding(horizontal = 6.dp)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -1062,11 +1043,9 @@ fun HeaderSection(title: String, navController: NavController?) {
                 fontWeight = FontWeight.Bold,
                 color = Color.Black,
                 modifier = Modifier
-                    .padding(start = 8.dp)
                     .weight(1f)
             )
         }
-
     }
 }
 
@@ -1097,6 +1076,7 @@ fun SectionContent(content: String) {
         modifier = Modifier.padding(horizontal = 16.dp)
     )
 }
+
 
 
 //FUNCIONES PARA LA PANTALLA DE INFO DE LA CLINICA
