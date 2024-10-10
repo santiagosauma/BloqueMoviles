@@ -226,8 +226,34 @@ fun MyApp() {
             )
         }
         composable("infoclinicaadmin") { PantallaInfoClinicaAdmin(navController) }
-        composable("agendar") { Agendar(navController) }
-        composable("comentar") { ComentarioScreen(navController) }
+        composable(
+            route = "agendar/{caseId}",
+            arguments = listOf(
+                navArgument("caseId"){type = NavType.StringType}
+            )
+        ) { backStackEntry ->
+
+            val caseId = backStackEntry.arguments?.getString("caseId") ?: ""
+
+            Agendar(
+                navController =  navController,
+                caseId = caseId
+            )
+        }
+        composable(
+            route = "comentar/{caseId}",
+            arguments = listOf(
+                navArgument("caseId"){type = NavType.StringType}
+            )
+        ) { backStackEntry ->
+
+            val caseId = backStackEntry.arguments?.getString("caseId") ?: ""
+
+            ComentarioScreen(
+                navController =  navController,
+                caseId = caseId
+            )
+        }
 
         //PANTALLA DEL JURIBOT PARA ADMIN
         composable("JuriBotAdmin") { JuriBotAdmin(navController) }

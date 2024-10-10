@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -187,7 +186,7 @@ fun SearchBarHistorialSolicitudes(
 
         if (caseUserNames[caseId] == null) {
             LaunchedEffect(caseId) {
-                val generalUserName = usuarioViewModel.fetchGeneralUserByCaseId(caseId)
+                val generalUserName = usuarioViewModel.fetchUserByNameCaseId(caseId,"general")
                 caseUserNames[caseId] = generalUserName
             }
         }
@@ -228,7 +227,7 @@ fun SearchBarHistorialSolicitudes(
                             caseViewModel.discardCase(id)
                         }
                     },
-                    confirmDeleteText = "¿Estás seguro de que deseas eliminar este caso?",
+                    confirmDeleteText = "¿Estás seguro de que deseas descartar este caso?",
                     navController = navController,
                     route = if (isAdmin) {
                         "actualizarcasos"
@@ -1323,7 +1322,7 @@ fun CaseUserAdminItem(
     }
 
     LaunchedEffect(case.first.case_id) {
-        val generalUserName = usuarioViewModel.fetchGeneralUserByCaseId(case.first.case_id)
+        val generalUserName = usuarioViewModel.fetchUserByNameCaseId(case.first.case_id,"general")
         username = generalUserName
     }
 

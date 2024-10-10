@@ -27,7 +27,7 @@ import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.RoundedButton
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.TopBar
 
 @Composable
-fun ComentarioScreen(navController: NavController?) {
+fun ComentarioScreen(navController: NavController?,caseId: String) {
 
     var comentario by remember { mutableStateOf("") }
     var isBold by remember { mutableStateOf(false) }
@@ -147,5 +147,5 @@ fun ComentarioScreen(navController: NavController?) {
 @Preview(showBackground = true)
 @Composable
 fun PreviewComentarioScreen() {
-    ComentarioScreen(navController = null)
+    ComentarioScreen(navController = null, "1")
 }

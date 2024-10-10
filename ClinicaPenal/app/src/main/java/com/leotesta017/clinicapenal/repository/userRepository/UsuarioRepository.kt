@@ -1,6 +1,5 @@
 package com.leotesta017.clinicapenal.repository.userRepository
 
-import android.util.Log
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.leotesta017.clinicapenal.model.modelUsuario.Usuario
@@ -22,10 +21,10 @@ class UsuarioRepository {
             if (document.exists()) {
                 document.toObject(Usuario::class.java) ?: Usuario()
             } else {
-                Usuario()  // Usuario vacío si no existe el documento
+                Usuario()
             }
         } catch (e: Exception) {
-            Usuario()  // Usuario vacío en caso de error
+            Usuario()
         }
     }
 
@@ -42,10 +41,33 @@ class UsuarioRepository {
                 // Retornamos el nombre y tipo del usuario
                 Pair(user?.nombre, user?.tipo)
             } else {
-                Pair(null, null)  // Usuario no encontrado
+                Pair(null, null)
             }
         } catch (e: Exception) {
-            Pair(null, null)  // Error al obtener datos
+            Pair(null, null)
+        }
+    }
+
+    suspend fun getUserNameFromComent(userId: String): String? {
+        return try {
+            val document = firestore.collection("usuarios")
+                .document(userId)
+                .get()
+                .await()
+
+            if (document.exists()) {
+                val nombre = document.getString("nombre")
+                val apellidos = document.getString("apellidos")
+                if (nombre != null && apellidos != null) {
+                    "$nombre $apellidos"
+                } else {
+                    null
+                }
+            } else {
+                null
+            }
+        } catch (e: Exception) {
+            null
         }
     }
 
@@ -60,16 +82,16 @@ class UsuarioRepository {
 
             if (document.exists())
             {
-                document.getString("tipo") ?: ""  // Obtener el nombre directamente del documento
+                document.getString("tipo") ?: ""
             }
             else
             {
-                ""  // Retorna una cadena vacía si el documento no existe
+                ""
             }
         }
         catch (e: Exception)
         {
-            ""  // Retorna una cadena vacía en caso de error
+            ""
         }
     }
 
@@ -84,16 +106,16 @@ class UsuarioRepository {
 
             if (document.exists())
             {
-                document.get("listCases") as? List<String> ?:  emptyList<String>()  // Obtener el nombre directamente del documento
+                document.get("listCases") as? List<String> ?:  emptyList<String>()
             }
             else
             {
-                emptyList<String>()  // Retorna una cadena vacía si el documento no existe
+                emptyList<String>()
             }
         }
         catch (e: Exception)
         {
-            emptyList<String>()  // Retorna una cadena vacía en caso de error
+            emptyList<String>()
         }
     }
 
@@ -126,9 +148,9 @@ class UsuarioRepository {
         }
     }
 
-    suspend fun getGeneralUserByCaseId(caseId: String): Usuario? {
+    suspend fun getUserByCaseId(caseId: String,type:String): Usuario? {
         val querySnapshot = firestore.collection("usuarios")
-            .whereEqualTo("tipo", "general")
+            .whereEqualTo("tipo", type)
             .whereArrayContains("listCases", caseId)
             .get()
             .await()
@@ -139,4 +161,21 @@ class UsuarioRepository {
             null
         }
     }
+
+    suspend fun getCollaboratorsAndStudents(): List<Usuario> {
+        return try {
+            val querySnapshot = firestore.collection("usuarios")
+                .whereNotEqualTo("tipo", "general")
+                .get()
+                .await()
+
+            querySnapshot.documents.mapNotNull { document ->
+                document.toObject(Usuario::class.java)
+            }
+        } catch (e: Exception) {
+            emptyList()
+        }
+    }
+
+
 }

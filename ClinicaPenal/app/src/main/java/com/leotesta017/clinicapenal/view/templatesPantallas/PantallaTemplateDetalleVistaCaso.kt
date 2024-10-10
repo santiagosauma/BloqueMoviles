@@ -14,7 +14,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
@@ -24,6 +24,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -33,9 +35,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.leotesta017.clinicapenal.model.modelUsuario.Usuario
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.SectionTitle
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.TopBar
+import com.leotesta017.clinicapenal.viewmodel.viewmodelUsuario.CaseViewModel
+import com.leotesta017.clinicapenal.viewmodel.viewmodelUsuario.Case_CounterViewModel
+import com.leotesta017.clinicapenal.viewmodel.viewmodelUsuario.ComentarioViewModel
+import com.leotesta017.clinicapenal.viewmodel.viewmodelUsuario.UsuarioViewModel
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @Composable
 fun PantallaTemplateDetalleVistaCaso(
@@ -43,8 +54,31 @@ fun PantallaTemplateDetalleVistaCaso(
     caseId: String,
     route: String,
     barraNav: @Composable () -> Unit,
-    contenidoExtra: @Composable () -> Unit
+    contenidoExtra: @Composable () -> Unit,
+    caseViewModel: CaseViewModel = viewModel(),
+    userViewModel: UsuarioViewModel = viewModel(),
+    caseCounterViewModel: Case_CounterViewModel = viewModel(),
+    comentViewModel: ComentarioViewModel = viewModel()
 ) {
+
+    val caseWithDetails by caseViewModel.caseWithDetails.collectAsState()
+    val error by caseViewModel.error.collectAsState()
+    val colaboratorsandstudents by userViewModel.usersColaboratorsandStudents.collectAsState()
+    var refactoredCaseId by remember { mutableStateOf<Int?>(null) }
+
+    LaunchedEffect(caseId) {
+        caseViewModel.fetchCaseWithDetails(caseId)
+    }
+
+    LaunchedEffect(Unit) {
+        userViewModel.fetchColaboratorsandStudents()
+    }
+
+    LaunchedEffect(caseId) {
+        val index = caseCounterViewModel.findOrAddCase(caseId)
+        refactoredCaseId = index
+    }
+
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -66,13 +100,13 @@ fun PantallaTemplateDetalleVistaCaso(
                         }
                 ) {
                     Icon(
-                        imageVector = Icons.Default.ArrowBack,
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Flecha",
                         tint = Color.Black
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "Caso $caseId",
+                        text = "Caso $refactoredCaseId",
                         fontWeight = FontWeight.Bold,
                         style = MaterialTheme.typography.headlineSmall
                     )
@@ -83,23 +117,38 @@ fun PantallaTemplateDetalleVistaCaso(
                 // Información del Cliente (común)
                 SectionTitle("Información del Cliente")
                 Spacer(modifier = Modifier.height(8.dp))
-                ClienteInfo("Nombre", "Edsel Cisneros James", FontWeight.Bold, FontWeight.Normal)
-                ClienteInfo("Tipo (Cliente)", "Víctima", FontWeight.Bold, FontWeight.Normal)
-                ClienteInfo("Lugar de Procedencia", "Guadalupe, Monterrey", FontWeight.Bold, FontWeight.Normal)
+
+                //AUN FALTA MODIFICAR ESTO
+                ClienteInfo("Nombre", "Edsel Cisneros James",Color.Black, FontWeight.Bold, FontWeight.Normal)
+                ClienteInfo("Tipo (Cliente)", "Víctima",Color.Black, FontWeight.Bold, FontWeight.Normal)
+                ClienteInfo("Lugar de Procedencia", "Guadalupe, Monterrey",Color.Black, FontWeight.Bold, FontWeight.Normal)
 
                 Spacer(modifier = Modifier.height(16.dp))
 
                 // Histórico (común)
-                SectionTitle("Histórico")
+                SectionTitle("Histórico de Citas")
                 Spacer(modifier = Modifier.height(8.dp))
-                ClienteInfo("19/06/2024", "Cita Realizada (6:30)")
-                ClienteInfo("12/08/2024", "Próxima Cita (5:30)")
+
+
+
+                val appointmentList = caseWithDetails?.second?.first
+
+                appointmentList?.forEachIndexed { index, cita ->
+                    val isLastItem = index == appointmentList.lastIndex
+
+                    ClienteInfo(
+                        campo = formatDate(cita.fecha.toDate()),
+                        valor = formatTime(cita.fecha.toDate()),
+                        campoColor = if (isLastItem) Color.Blue else Color.Black
+                    )
+                }
+
 
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Button(
                     onClick = {
-                        navController?.navigate("agendar")
+                        navController?.navigate("agendar/$caseId")
                     },
                     modifier = Modifier
                         .padding(horizontal = 16.dp)
@@ -115,35 +164,83 @@ fun PantallaTemplateDetalleVistaCaso(
                 // Encargados (común)
                 SectionTitle("Encargados")
                 Spacer(modifier = Modifier.height(8.dp))
-                ClienteInfo("Agente a cargo", "Raul Jiménez", FontWeight.Bold, FontWeight.Normal)
-                ClienteInfo("Estudiante Vinculado", "Luis Domínguez", FontWeight.Bold, FontWeight.Normal)
+
+
+                val abogado by userViewModel.abogadoName.collectAsState()
+                val estudiante by userViewModel.estudianteName.collectAsState()
+
+                LaunchedEffect(caseWithDetails?.first?.lawyerAssigned) {
+                    caseWithDetails?.first?.lawyerAssigned?.let {
+                        userViewModel.fetchColaboratorOrStudentById(
+                            it,"colaborador")
+                    }
+                }
+                LaunchedEffect(caseWithDetails?.first?.studentAssigned) {
+                    caseWithDetails?.first?.studentAssigned?.let{
+                        userViewModel.fetchColaboratorOrStudentById(it, "estudiante")
+                    }
+                }
+
+                ClienteInfo(
+                    campo = "Agente a cargo",
+                    valor = if (abogado.isNotEmpty()) abogado else "No hay un abogado asignado aun",
+                    Color.Black,
+                    FontWeight.Bold, FontWeight.Normal
+                )
+                ClienteInfo(
+                    campo = "Estudiante Vinculado",
+                    valor = if (estudiante.isNotEmpty()) estudiante else "No hay un estudiante asignado aun",
+                    Color.Black,
+                    FontWeight.Bold, FontWeight.Normal
+                )
+
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Dropdown menu (común)
                 Text(
                     text = "Colaboradores disponibles",
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier
                         .padding(start = 16.dp)
                 )
-                DropdownMenuExample()
+                DropdownMenuColaboradores(colaboratorsandstudents)
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Comentarios (común)
                 SectionTitle("Comentarios")
                 Spacer(modifier = Modifier.height(8.dp))
+
+
+                val commentList = caseWithDetails?.second?.second
+
                 Column(modifier = Modifier.padding(horizontal = 16.dp)) {
-                    ClienteComentario("Raul Jiménez", "En espera de documentos para continuar proceso")
-                    ClienteComentario("Luis Domínguez", "Documentos entregados día Lunes 19 de Agosto")
+                    commentList?.forEach { comment ->
+                        // Crear un estado independiente para almacenar el usuario de este comentario
+                        val userName by comentViewModel.usuarioByComentario.collectAsState()
+
+                        // Lanzar un efecto para obtener el usuario asociado a este comentario
+                        LaunchedEffect(comment.comentario_id) {
+                            comentViewModel.getUserNameByComentarioId(comment.comentario_id)
+                        }
+
+                        Text(
+                            text = formatDate(comment.fecha.toDate()) +
+                                    formatTime(comment.fecha.toDate()),
+                            color = Color.Blue)
+                        ClienteComentario(
+                            nombre = userName ?: "Usuario desconocido",
+                            comentario = comment.contenido
+                        )
+                    }
                 }
+
+
 
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Button(
                     onClick = {
-                        navController?.navigate("comentar")
+                        navController?.navigate("comentar/$caseId")
                     },
                     modifier = Modifier
                         .padding(horizontal = 16.dp)
@@ -156,14 +253,12 @@ fun PantallaTemplateDetalleVistaCaso(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Aquí se inyecta el contenido extra (diferente para cada pantalla)
                 contenidoExtra()
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Botón de Guardar (común)
                 Button(
-                    onClick = { /* Acción Guardar */ },
+                    onClick = {  },
                     modifier = Modifier
                         .padding(horizontal = 16.dp)
                         .fillMaxWidth()
@@ -175,7 +270,7 @@ fun PantallaTemplateDetalleVistaCaso(
             }
         }
 
-        // Barra de navegación (diferente para cada pantalla)
+
         barraNav()
     }
 }
@@ -300,22 +395,31 @@ fun BotonesEstado() {
 }
 
 @Composable
-fun ClienteInfo(campo: String, valor: String, fontWeightCampo: FontWeight = FontWeight.Normal, fontWeightValor: FontWeight = FontWeight.Normal) {
+fun ClienteInfo(campo: String,
+                valor: String,
+                campoColor: Color,
+                fontWeightCampo: FontWeight = FontWeight.Normal,
+                fontWeightValor: FontWeight = FontWeight.Normal
+) {
     Row(modifier = Modifier.padding(start = 16.dp)) {
         Text(
             text = "$campo: ",
-            fontWeight = fontWeightCampo
+            fontWeight = fontWeightCampo,
+            color = campoColor
         )
         Text(
             text = valor,
-            fontWeight = fontWeightValor
+            fontWeight = fontWeightValor,
+            color = campoColor
         )
     }
 }
 
 
 @Composable
-fun ClienteComentario(nombre: String, comentario: String) {
+fun ClienteComentario(nombre: String,
+                      comentario: String
+) {
     Column {
         Text(
             text = "$nombre: ",
@@ -327,9 +431,24 @@ fun ClienteComentario(nombre: String, comentario: String) {
 }
 
 @Composable
-fun DropdownMenuExample() {
+fun DropdownMenuColaboradores(ColaboradoresEstudiantes: List<Usuario>?){
     var expanded by remember { mutableStateOf(false) }
-    var selectedOptionText by remember { mutableStateOf("Selecciona un colaborador") }
+    var selectedColaboradorOptionText by remember { mutableStateOf("Selecciona un colaborador") }
+    var selectedEstudianteOptionText by remember { mutableStateOf("Selecciona un estudiante")}
+
+    val colaboradores = mutableListOf<Usuario>()
+    val estudiantes = mutableListOf<Usuario>()
+
+    ColaboradoresEstudiantes?.forEach { usuario ->
+        if (usuario.tipo == "colaborador") {
+            colaboradores.add(usuario)
+        } else {
+            estudiantes.add(usuario)
+        }
+    }
+
+    var expandedColaboradores by remember { mutableStateOf(false) }
+    var expandedEstudiantes by remember { mutableStateOf(false) }
 
     Box(
         modifier = Modifier
@@ -337,38 +456,65 @@ fun DropdownMenuExample() {
             .padding(horizontal = 16.dp)
     ) {
         OutlinedButton(
-            onClick = { expanded = true },
+            onClick = { expandedColaboradores = true },
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text(selectedOptionText)
+            Text(selectedColaboradorOptionText)
         }
-
         DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false },
+            expanded = expandedColaboradores,
+            onDismissRequest = { expandedColaboradores = false },
             modifier = Modifier.fillMaxWidth()
         ) {
-            DropdownMenuItem(
-                text = { Text("Colaborador 1") },
-                onClick = {
-                    selectedOptionText = "Colaborador 1"
-                    expanded = false
-                }
-            )
-            DropdownMenuItem(
-                text = { Text("Colaborador 2") },
-                onClick = {
-                    selectedOptionText = "Colaborador 2"
-                    expanded = false
-                }
-            )
-            DropdownMenuItem(
-                text = { Text("Colaborador 3") },
-                onClick = {
-                    selectedOptionText = "Colaborador 3"
-                    expanded = false
-                }
-            )
+            colaboradores.forEach { usuario ->
+                DropdownMenuItem(
+                    text = { Text(usuario.nombre + " " + usuario.apellidos) },
+                    onClick = {
+                        selectedColaboradorOptionText = usuario.nombre + " " + usuario.apellidos
+                        expandedColaboradores = false
+                    }
+                )
+            }
         }
     }
+
+    Spacer(modifier = Modifier.height(8.dp))
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
+    ) {
+        OutlinedButton(
+            onClick = { expandedEstudiantes = true },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(selectedEstudianteOptionText)
+        }
+        DropdownMenu(
+            expanded = expandedEstudiantes,
+            onDismissRequest = { expandedEstudiantes = false },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            estudiantes.forEach { usuario ->
+                DropdownMenuItem(
+                    text = { Text(usuario.nombre + " " + usuario.apellidos) },
+                    onClick = {
+                        selectedEstudianteOptionText = usuario.nombre + " " + usuario.apellidos
+                        expandedEstudiantes = false
+                    }
+                )
+            }
+        }
+    }
+}
+
+fun formatDate(date: Date?): String {
+    val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+    return date?.let { dateFormat.format(it) } ?: ""
+}
+
+fun formatTime(date: Date?): String {
+    val timeFormat = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
+    return date?.let { timeFormat.format(it) } ?: ""
 }

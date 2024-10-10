@@ -28,7 +28,7 @@ import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.TopBar
 import com.leotesta017.clinicapenal.view.theme.ClinicaPenalTheme
 
 @Composable
-fun Agendar(navController: NavController?) {
+fun Agendar(navController: NavController?, caseId: String) {
     Scaffold(
         topBar = {
             Column {
@@ -184,6 +184,6 @@ fun BotonAgendarCita() {
 @Composable
 fun AgendarPreview() {
     ClinicaPenalTheme {
-        Agendar(navController = rememberNavController())
+        Agendar(navController = rememberNavController(),"1")
     }
 }

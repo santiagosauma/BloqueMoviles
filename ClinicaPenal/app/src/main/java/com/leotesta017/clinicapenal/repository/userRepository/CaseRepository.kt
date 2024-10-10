@@ -1,14 +1,13 @@
 package com.leotesta017.clinicapenal.repository.userRepository
 
-import android.util.Log
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.leotesta017.clinicapenal.model.modelUsuario.Appointment
 import com.leotesta017.clinicapenal.model.modelUsuario.Case
+import com.leotesta017.clinicapenal.model.modelUsuario.Comentario
 import com.leotesta017.clinicapenal.model.modelUsuario.ExtraInfo
 import kotlinx.coroutines.tasks.await
-import org.w3c.dom.Comment
 
 class CaseRepository {
 
@@ -192,7 +191,7 @@ class CaseRepository {
     }
 
 
-    suspend fun getCaseWithDetails(caseId: String): Pair<Case, Triple<List<Appointment>, List<Comment>, List<ExtraInfo>>>? {
+    suspend fun getCaseWithDetails(caseId: String): Pair<Case, Triple<List<Appointment>, List<Comentario>, List<ExtraInfo>>>? {
         return try {
             // Obtener el caso
             val caseSnapshot = firestore.collection("cases").document(caseId).get().await()
@@ -200,39 +199,56 @@ class CaseRepository {
             if (caseSnapshot.exists()) {
                 val case = caseSnapshot.toObject(Case::class.java)
 
-                // Verificar que el caso no sea nulo
                 case?.let {
                     // Obtener las listas de IDs de citas, comentarios y extraInfo
                     val appointmentIds = it.listAppointments
                     val comentIds = it.listComents
                     val extraInfoIds = it.listExtraInfo
 
-                    // Obtener las citas (Appointments) a partir de sus IDs
-                    val appointments = appointmentIds.mapNotNull { appointmentId ->
-                        firestore.collection("appointments").document(appointmentId).get().await().toObject(Appointment::class.java)
+                    // Inicializar las listas como listas mutables
+                    val appointments = mutableListOf<Appointment>()
+                    val comments = mutableListOf<Comentario>()
+                    val extraInfoList = mutableListOf<ExtraInfo>()
+
+                    val appointmentRepository = AppointmentRepository()
+
+                    appointmentIds.forEach { appointmentId ->
+                        val appointment = appointmentRepository.getAppointmentById(appointmentId)
+
+                        appointment?.let {
+                            appointments.add(it)
+                        }
                     }
 
-                    // Obtener los comentarios (Comments) a partir de sus IDs
-                    val comments = comentIds.mapNotNull { commentId ->
-                        firestore.collection("coments").document(commentId).get().await().toObject(Comment::class.java)
+                    val comentarioRepository = ComentarioRepository()
+                    comentIds.forEach { commentId ->
+                        val comment = comentarioRepository.getComentarioById(commentId)
+
+                        comment?.let {
+                            comments.add(it)
+                        }
                     }
 
-                    // Obtener la información extra (ExtraInfo) a partir de sus IDs
-                    val extraInfoList = extraInfoIds.mapNotNull { extraInfoId ->
-                        firestore.collection("extrainfo").document(extraInfoId).get().await().toObject(ExtraInfo::class.java)
+                    val extraInfoRepository = ExtraInfoRepository()
+                    extraInfoIds.forEach { extraInfoId ->
+                        val extraInfo = extraInfoRepository.getExtraInfoById(extraInfoId)
+
+                        extraInfo?.let {
+                            extraInfoList.add(it)
+                        }
                     }
+
 
                     Pair(case, Triple(appointments, comments, extraInfoList))
                 }
             } else {
-                null
+                null // Caso no existe
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            null
+            null // Error al obtener los detalles del caso
         }
     }
-
 
 
 

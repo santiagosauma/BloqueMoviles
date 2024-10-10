@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.leotesta017.clinicapenal.model.modelUsuario.Appointment
 import com.leotesta017.clinicapenal.model.modelUsuario.Case
+import com.leotesta017.clinicapenal.model.modelUsuario.Comentario
 import com.leotesta017.clinicapenal.model.modelUsuario.ExtraInfo
 import com.leotesta017.clinicapenal.repository.userRepository.AppointmentRepository
 import com.leotesta017.clinicapenal.repository.userRepository.CaseRepository
@@ -23,8 +24,8 @@ class CaseViewModel : ViewModel() {
     private val _unrepresentedCasesWithLastAppointment = MutableStateFlow<List<Triple<Case, String, Boolean>>>(emptyList())
     val unrepresentedCasesWithLastAppointment: StateFlow<List<Triple<Case, String, Boolean>>> = _unrepresentedCasesWithLastAppointment
 
-    private val _caseWithDetails = MutableStateFlow<Pair<Case, Triple<List<Appointment>, List<Comment>, List<ExtraInfo>>>?>(null)
-    val caseWithDetails: StateFlow<Pair<Case, Triple<List<Appointment>, List<Comment>, List<ExtraInfo>>>?> = _caseWithDetails
+    private val _caseWithDetails = MutableStateFlow<Pair<Case, Triple<List<Appointment>, List<Comentario>, List<ExtraInfo>>>?>(null)
+    val caseWithDetails: StateFlow<Pair<Case, Triple<List<Appointment>, List<Comentario>, List<ExtraInfo>>>?> = _caseWithDetails
 
 
     private val _caseDeleted = MutableStateFlow<Boolean>(false)

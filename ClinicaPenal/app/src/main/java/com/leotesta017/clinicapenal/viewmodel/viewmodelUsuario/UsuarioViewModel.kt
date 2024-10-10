@@ -12,7 +12,7 @@ import kotlinx.coroutines.launch
 class UsuarioViewModel : ViewModel()
 {
 
-    private val repository = UsuarioRepository()
+    val repository = UsuarioRepository()
     private val caseViewModel = CaseViewModel()
     private val appointmentViewModel = AppointmentViewModel()
 
@@ -25,6 +25,9 @@ class UsuarioViewModel : ViewModel()
     private val _userCasesWithAppointments = MutableStateFlow<List<Triple<Case,String,Boolean>>>(emptyList())  // Cambiamos a lista de Case
     val userCasesWithAppointments: StateFlow<List<Triple<Case,String,Boolean>>> = _userCasesWithAppointments
 
+    private val _usersColaboratorsandStudents = MutableStateFlow<List<Usuario>>(emptyList())
+    val usersColaboratorsandStudents: StateFlow<List<Usuario>?> = _usersColaboratorsandStudents
+
     private val _userName = MutableStateFlow<String?>(null)
     val userName: StateFlow<String?> = _userName
 
@@ -33,6 +36,12 @@ class UsuarioViewModel : ViewModel()
 
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error
+
+    private val _abogadoName = MutableStateFlow<String>("")
+    val abogadoName: StateFlow<String> = _abogadoName
+
+    private val _estudianteName = MutableStateFlow<String>("")
+    val estudianteName: StateFlow<String> = _estudianteName
 
     // Obtener información del usuario
     fun fetchUsuario(id: String)
@@ -154,10 +163,44 @@ class UsuarioViewModel : ViewModel()
         }
     }
 
-    suspend fun fetchGeneralUserByCaseId(caseId: String): String
+    suspend fun fetchUserByNameCaseId(caseId: String, type: String): String
     {
-        val user  = repository.getGeneralUserByCaseId(caseId)
+        val user  = repository.getUserByCaseId(caseId,type)
 
-        return user?.nombre + " " + user?.apellidos
+        if (user != null)
+        {
+            return user.nombre + " " + user.apellidos
+        }
+        return ""
+    }
+
+    suspend fun fetchColaboratorsandStudents()
+    {
+        viewModelScope.launch {
+            try
+            {
+                val colaboratorsandstudents = repository.getCollaboratorsAndStudents()
+                _usersColaboratorsandStudents.value = colaboratorsandstudents
+            }
+            catch (e: Exception)
+            {
+                _error.value = "Error al obtener el tipo del usuario: ${e.message}"
+            }
+        }
+    }
+
+    // Función para obtener el nombre del usuario por su ID y tipo
+    fun fetchColaboratorOrStudentById(userId: String, type: String) {
+        viewModelScope.launch {
+            val userName = repository.getUserInfo(userId) // Supón que el repositorio tiene esta función
+            when (type) {
+                "colaborador" -> _abogadoName.value =
+                    (userName.nombre + " " + userName.apellidos) ?: "Desconocido"
+                "estudiante" -> _estudianteName.value =
+                    (userName.nombre + " " + userName.apellidos) ?: "Desconocido"
+            }
+        }
     }
 }
+
+
