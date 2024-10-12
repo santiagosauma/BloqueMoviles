@@ -12,7 +12,6 @@ Presentan:
 - Francisco Vaquera Saavedra  
 - Abdiel Fritsche Barajas  
 - Leonardo Zamudio Gómez  
-- César Eduardo Cortés Gaytán
 
 Docentes:  
 - Rolando Evelio Pérez Versón  
