@@ -35,10 +35,3 @@ Esta herramienta no solo mejorará la interacción con los clientes, sino que ta
 
 - **MockUp Digital - Figma**: [Clínica Penal App](https://www.figma.com/design/zh6VobRc6wSZPaGuifHL6s/Cl%C3%ADnica-Penal-App---Equipo-5?node-id=1-1501&t=yKHhERyovNj70uUR-1)
 - **Presentación Inicial - Canva**: [Clínica Penal Presentación Inicial](https://www.canva.com/design/DAGN4p9d1Y0/C_7YrhZfzL6iPidXGJ2dAA/view?utm_content=DAGN4p9d1Y0&utm_campaign=designshare&utm_medium=link&utm_source=editor)
-
-## Instalación y Uso
-
-1. **Clona el repositorio**: `git clone https://github.com/santiagosauma/SoftBlitz-ClinicaPenal_Project.git`
-2. **Navega al directorio del proyecto**: `cd SoftBlitz-ClinicaPenal_Project`
-3. **Instala dependencias**: `npm install` (o el gestor de paquetes que utilices)
-4. **Ejecuta la aplicación**: `npm start`
