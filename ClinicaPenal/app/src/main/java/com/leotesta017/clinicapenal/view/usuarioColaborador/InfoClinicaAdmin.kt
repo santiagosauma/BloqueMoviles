@@ -35,6 +35,8 @@ fun PantallaInfoClinicaAdmin(navController: NavController?) {
     var errorMessage by remember { mutableStateOf<String?>(null) }
     val coroutineScope = rememberCoroutineScope()
     val scaffoldState = rememberScaffoldState()
+    var eventoAEliminar by remember { mutableStateOf<Evento?>(null) }
+    var showDeleteDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         try {
@@ -89,22 +91,15 @@ fun PantallaInfoClinicaAdmin(navController: NavController?) {
                         Column(
                             modifier = Modifier
                                 .padding(horizontal = 16.dp)
-                                .verticalScroll(rememberScrollState()) // Habilita el scroll vertical
+                                .verticalScroll(rememberScrollState())
                         ) {
                             Calendarios(
                                 title = "Calendario Eventos",
                                 eventos = eventosState ?: emptyList(),
                                 isCollaborator = true,
                                 onDeleteEvento = { evento ->
-                                    coroutineScope.launch {
-                                        try {
-                                            eventRepository.deleteEvento(evento.id)
-                                            eventosState = eventRepository.getEventos().sortedBy { it.fecha }
-                                            scaffoldState.snackbarHostState.showSnackbar("Evento eliminado con éxito.")
-                                        } catch (e: Exception) {
-                                            scaffoldState.snackbarHostState.showSnackbar("Error al eliminar el evento.")
-                                        }
-                                    }
+                                    eventoAEliminar = evento
+                                    showDeleteDialog = true
                                 }
                             )
                             Spacer(modifier = Modifier.height(8.dp))
@@ -156,12 +151,96 @@ fun PantallaInfoClinicaAdmin(navController: NavController?) {
                                     R.drawable.logox,
                                     R.drawable.youtube
                                 ),
-                                onIconClick = { /* Manejar clic en el icono */ }
+                                onIconClick = { }
                             )
                             Spacer(modifier = Modifier.height(30.dp))
                         }
                     }
                 }
+
+                if (showDeleteDialog && eventoAEliminar != null) {
+                    AlertDialog(
+                        onDismissRequest = { showDeleteDialog = false },
+                        title = { Text("Eliminar evento") },
+                        text = { Text("¿Estás seguro de que deseas eliminar este evento?") },
+                        confirmButton = {
+                            Button(onClick = {
+                                coroutineScope.launch {
+                                    try {
+                                        eventRepository.deleteEvento(eventoAEliminar!!.id)
+                                        eventosState = eventRepository.getEventos().sortedBy { it.fecha }
+                                        scaffoldState.snackbarHostState.showSnackbar("Evento eliminado con éxito.")
+                                    } catch (e: Exception) {
+                                        scaffoldState.snackbarHostState.showSnackbar("Error al eliminar el evento.")
+                                    }
+                                }
+                                showDeleteDialog = false
+                            }) {
+                                Text("Sí")
+                            }
+                        },
+                        dismissButton = {
+                            Button(onClick = { showDeleteDialog = false }) {
+                                Text("No")
+                            }
+                        }
+                    )
+                }
             }
         })
+}
+
+@Composable
+fun Calendarios(
+    title: String,
+    eventos: List<Evento>,
+    isCollaborator: Boolean,
+    onDeleteEvento: (Evento) -> Unit
+) {
+    Box(
+        modifier = estiloCaja
+    ) {
+        Column(
+            horizontalAlignment = Alignment.Start
+        ) {
+            Text(
+                text = title,
+                fontSize = 17.sp,
+                color = Color(0xFF002366),
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(modifier = Modifier.height(10.dp))
+            val sdf = SimpleDateFormat("dd 'de' MMMM (HH:mm)", Locale("es", "ES"))
+            eventos.forEach { evento ->
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = buildAnnotatedString {
+                            withStyle(style = SpanStyle(color = Color(0xFF002366))) {
+                                append(sdf.format(evento.fecha))
+                            }
+                            append(" : ${evento.titulo} - ${evento.lugar}")
+                        },
+                        fontSize = 12.sp,
+                        color = Color.Black,
+                        modifier = Modifier.weight(1f)
+                    )
+                    if (isCollaborator) {
+                        IconButton(onClick = { onDeleteEvento(evento) }) {
+                            Icon(
+                                imageVector = Icons.Default.Delete,
+                                contentDescription = "Eliminar evento",
+                                tint = Color.Black
+                            )
+                        }
+                    }
+                }
+                Spacer(modifier = Modifier.height(10.dp))
+            }
+        }
+    }
 }
