@@ -54,7 +54,9 @@ fun PantallaInfoClinica(navController: NavController?) {
             content = {
                 Calendarios(
                     title = "Calendario Eventos",
-                    eventos = eventosState ?: emptyList()
+                    eventos = eventosState ?: emptyList(),
+                    isCollaborator = false,
+                    onDeleteEvento = {}
                 )
                 Spacer(modifier = Modifier.height(20.dp))
                 SeccionNosotros(

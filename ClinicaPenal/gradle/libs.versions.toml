@@ -18,6 +18,7 @@ constraintlayoutCompose = "1.0.1"
 pagingCommonAndroid = "3.3.2"
 youtubePlayer = "11.0.1"
 appcompat = "1.7.0"
+roomCommon = "2.6.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -45,6 +46,7 @@ androidx-constraintlayout-compose = { group = "androidx.constraintlayout", name 
 androidx-paging-common-android = { group = "androidx.paging", name = "paging-common-android", version.ref = "pagingCommonAndroid" }
 youtube-player = { module = "com.google.android.youtube:youtube-player", version.ref = "youtubePlayer" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+androidx-room-common = { group = "androidx.room", name = "room-common", version.ref = "roomCommon" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

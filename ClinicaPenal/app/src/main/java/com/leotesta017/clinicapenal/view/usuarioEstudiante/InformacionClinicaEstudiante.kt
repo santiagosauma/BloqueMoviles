@@ -1,4 +1,3 @@
-// InformacionClinicaEstudiante.kt
 package com.leotesta017.clinicapenal.view.usuarioEstudiante
 
 import androidx.compose.foundation.layout.*
@@ -55,7 +54,9 @@ fun InformacionClinicaEstudiante(navController: NavController?) {
             content = {
                 Calendarios(
                     title = "Calendario Eventos",
-                    eventos = eventosState ?: emptyList()
+                    eventos = eventosState ?: emptyList(),
+                    isCollaborator = false, // Aseguramos que no se muestre el botón de eliminar
+                    onDeleteEvento = {} // No se implementa funcionalidad de eliminación para estudiantes
                 )
                 Spacer(modifier = Modifier.height(20.dp))
                 SeccionNosotros(

@@ -34,6 +34,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.FormatBold
 import androidx.compose.material.icons.filled.FormatItalic
 import androidx.compose.material.icons.filled.FormatUnderlined
@@ -90,6 +91,7 @@ import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.room.Delete
 import coil.compose.AsyncImage
 import com.leotesta017.clinicapenal.model.Categoria
 import com.leotesta017.clinicapenal.model.Evento
@@ -1244,7 +1246,12 @@ val estiloCaja = Modifier
     .padding(16.dp)
 
 @Composable
-fun Calendarios(title: String, eventos: List<Evento>) {
+fun Calendarios(
+    title: String,
+    eventos: List<Evento>,
+    isCollaborator: Boolean,
+    onDeleteEvento: (Evento) -> Unit
+) {
     Box(
         modifier = estiloCaja
     ) {
@@ -1262,22 +1269,37 @@ fun Calendarios(title: String, eventos: List<Evento>) {
             Spacer(modifier = Modifier.height(10.dp))
             val sdf = SimpleDateFormat("dd 'de' MMMM (HH:mm)", Locale("es", "ES"))
             eventos.forEach { evento ->
-                val fechaString = sdf.format(evento.fecha)
-                Text(
-                    text = buildAnnotatedString {
-                        withStyle(style = SpanStyle(color = Color(0xFF002366))) {
-                            append(fechaString)
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = buildAnnotatedString {
+                            withStyle(style = SpanStyle(color = Color(0xFF002366))) {
+                                append(sdf.format(evento.fecha))
+                            }
+                            append(" : ${evento.titulo} - ${evento.lugar}")
+                        },
+                        fontSize = 12.sp,
+                        color = Color.Black,
+                        modifier = Modifier.weight(1f)
+                    )
+                    if (isCollaborator) {
+                        IconButton(onClick = { onDeleteEvento(evento) }) {
+                            Icon(
+                                imageVector = Icons.Default.Delete,
+                                contentDescription = "Eliminar evento",
+                                tint = Color.Black // Color del botón cambiado a negro
+                            )
                         }
-                        append(" : ${evento.titulo} - ${evento.lugar}")
-                    },
-                    fontSize = 12.sp,
-                    color = Color.Black
-                )
+                    }
+                }
                 Spacer(modifier = Modifier.height(10.dp))
             }
         }
     }
 }
+
 
 
 //FUNCIONES PARA PANTALLA DE MOSTRAR SOLICITUDES

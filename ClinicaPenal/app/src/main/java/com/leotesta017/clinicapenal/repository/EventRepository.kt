@@ -16,6 +16,7 @@ class EventRepository {
                 val timestamp = document.getTimestamp("fecha") ?: com.google.firebase.Timestamp.now()
                 val fecha = timestamp.toDate()
                 Evento(
+                    id = document.id, // Asignar el ID del documento
                     fecha = fecha,
                     titulo = document.getString("titulo") ?: "",
                     lugar = document.getString("lugar") ?: ""
@@ -37,5 +38,9 @@ class EventRepository {
             .add(eventoData)
             .addOnSuccessListener { onSuccess() }
             .addOnFailureListener { exception -> onError(exception.message ?: "Error desconocido") }
+    }
+
+    suspend fun deleteEvento(id: String) {
+        firestore.collection("eventos").document(id).delete().await()
     }
 }
