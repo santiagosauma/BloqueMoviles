@@ -32,13 +32,9 @@ fun DetalleCasoEstudiante(
             }
 
         },
-        contenidoExtra = {
-            // Aquí puedes agregar contenido adicional específico para estudiantes
+        contenidoExtra = { case,abogadoseleccionado ,estudianteseleccionado->
+
             Spacer(modifier = Modifier.height(16.dp))
-            Text(
-                text = "Acciones adicionales para estudiantes",
-                modifier = Modifier.padding(horizontal = 16.dp)
-            )
         }
     )
 }

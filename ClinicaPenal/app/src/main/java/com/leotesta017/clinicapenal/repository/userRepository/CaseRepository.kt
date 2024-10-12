@@ -1,5 +1,6 @@
 package com.leotesta017.clinicapenal.repository.userRepository
 
+import android.util.Log
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -85,27 +86,56 @@ class CaseRepository {
         }
     }
 
-    // Método para asignar abogado o estudiante a un caso
+    // Método para asignar abogado o estudiante a un caso, eliminando los asignados previamente si no están vacíos
     suspend fun assignUserToCase(caseId: String, userId: String, role: String): Boolean {
         return try {
             // Referencia al documento del caso en Firestore
             val caseRef = firestore.collection("cases").document(caseId)
 
-            // Dependiendo del rol, actualiza el campo correspondiente
+            // Obtener el caso actual para verificar si hay abogados o estudiantes ya asignados
+            val caseSnapshot = caseRef.get().await()
+            val caseData = caseSnapshot.data
+
+            val previousLawyerId = caseData?.get("lawyerAssigned") as? String
+            val previousStudentId = caseData?.get("studentAssigned") as? String
+
+            // Actualizar el campo correspondiente
             val updateData = when (role) {
-                "lawyerAssigned" -> mapOf("lawyerAssigned" to userId)  // Asignar abogado
-                "studentAssigned" -> mapOf("studentAssigned" to userId)  // Asignar estudiante
-                else -> return false  // Si el rol no es válido, retornamos false
+                "lawyerAssigned" -> {
+                    // Eliminar el abogado anterior si existe
+                    previousLawyerId?.takeIf { it.isNotEmpty() }?.let {
+                        firestore.collection("usuarios").document(it)
+                            .update("listCases", FieldValue.arrayRemove(caseId)).await()
+                    }
+                    // Asignar el nuevo abogado
+                    mapOf("lawyerAssigned" to userId)
+                }
+                "studentAssigned" -> {
+                    // Eliminar el estudiante anterior si existe
+                    previousStudentId?.takeIf { it.isNotEmpty() }?.let {
+                        firestore.collection("usuarios").document(it)
+                            .update("listCases", FieldValue.arrayRemove(caseId)).await()
+                    }
+                    // Asignar el nuevo estudiante
+                    mapOf("studentAssigned" to userId)
+                }
+                else -> return false // Si el rol no es válido, retornamos false
             }
 
-            // Actualizar el documento del caso con el campo correspondiente
+            // Actualizar el documento del caso con el nuevo valor
             caseRef.update(updateData).await()
 
-            true  // Asignación exitosa
+            // Añadir el caso a la lista del nuevo abogado o estudiante
+            firestore.collection("usuarios").document(userId)
+                .update("listCases", FieldValue.arrayUnion(caseId)).await()
+
+            true // Asignación exitosa
         } catch (e: Exception) {
-            false  // Ocurrió un error durante la asignación
+            Log.e("Error", "Error al asignar usuario al caso: ${e.message}")
+            false // Ocurrió un error durante la asignación
         }
     }
+
 
     // Actualizar un caso existente
     suspend fun updateCase(id: String, caseData: Map<String, Any>): Boolean {
@@ -250,6 +280,35 @@ class CaseRepository {
         }
     }
 
+    suspend fun getLastAppointmentForCase(caseId: String, appointmentRepository: AppointmentRepository): Appointment? {
+        return try {
+            // Obtener el caso por su ID
+            val caseSnapshot = firestore.collection("cases").document(caseId).get().await()
 
+            if (caseSnapshot.exists()) {
+                val case = caseSnapshot.toObject(Case::class.java)
+
+                case?.let {
+                    // Verificar si tiene citas en la lista de citas
+                    if (it.listAppointments.isNotEmpty()) {
+                        // Obtener el ID del último Appointment de la lista
+                        val lastAppointmentId = it.listAppointments.last()
+
+                        // Obtener la cita por su ID usando el repositorio de citas
+                        val lastAppointment = appointmentRepository.getAppointmentById(lastAppointmentId)
+
+                        lastAppointment // Retornar la última cita
+                    } else {
+                        null // No hay citas asociadas al caso
+                    }
+                }
+            } else {
+                null // Caso no existe
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null // Error al obtener la cita
+        }
+    }
 
 }

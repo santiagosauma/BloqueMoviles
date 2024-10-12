@@ -5,7 +5,10 @@ import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.leotesta017.clinicapenal.model.modelUsuario.Appointment
+import com.leotesta017.clinicapenal.model.modelUsuario.Case
 import kotlinx.coroutines.tasks.await
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 class AppointmentRepository {
 
@@ -35,24 +38,28 @@ class AppointmentRepository {
         }
     }
 
-
-    // Método para agregar una nueva cita y actualizar el caso (en lugar de usuario)
-    suspend fun addAppointmentToCase(appointment: Appointment, caseId: String): Boolean {
+    suspend fun getAppointmentsByDate(date: String): List<Appointment> {
         return try {
-            val appointmentRef = firestore.collection("appointments")
-                .document(appointment.appointment_id)
+            // Obtener todas las citas
+            val snapshot = firestore.collection("appointments").get().await()
 
-            // Primero, agregar la cita
-            appointmentRef.set(appointment).await()
+            // Filtrar citas cuya fecha coincida con la fecha seleccionada
+            snapshot.documents.mapNotNull { document ->
+                val appointment = document.toObject(Appointment::class.java)
+                appointment?.let {
+                    // Convertir el `Timestamp` de la cita a un string en el formato de "dd/MM/yyyy"
+                    val appointmentDate = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(it.fecha.toDate())
 
-            // Ahora, actualizar la lista de citas del caso
-            val caseRef = firestore.collection("cases").document(caseId)
-            caseRef.update("listAppointments", FieldValue.arrayUnion(appointment.appointment_id))
-                .await()
-
-            true
+                    // Comparar con la fecha seleccionada
+                    if (appointmentDate == date) {
+                        appointment
+                    } else {
+                        null
+                    }
+                }
+            }
         } catch (e: Exception) {
-            false
+            emptyList()
         }
     }
 
@@ -68,5 +75,77 @@ class AppointmentRepository {
             false
         }
     }
+
+    suspend fun addAppointmentAndCreateNewCase(appointment: Appointment, userId: String, place: String): Boolean {
+        return try {
+            // Generar un nuevo ID para el caso
+            val newCaseId = firestore.collection("cases").document().id
+
+            // Generar un nuevo ID para la cita
+            val newAppointmentId = firestore.collection("appointments").document().id
+
+            // Actualizar el appointment con el nuevo ID generado
+            val newAppointment = appointment.copy(appointment_id = newAppointmentId)
+
+            // Crear el nuevo caso
+            val newCase = Case(
+                case_id = newCaseId,
+                represented = false,
+                available = true,
+                completed = false,
+                suspended = false,
+                lawyerAssigned = "",
+                studentAssigned = "",
+                place = place,
+                situation = "Primer cita creada",
+                state = "Activo",
+                listAppointments = listOf(newAppointmentId),
+                listComents = emptyList(),
+                listExtraInfo = emptyList()
+            )
+
+            // Guardar el nuevo caso en la base de datos
+            firestore.collection("cases").document(newCaseId).set(newCase).await()
+
+            // Guardar la cita con su ID en la colección de "appointments"
+            firestore.collection("appointments").document(newAppointmentId).set(newAppointment).await()
+
+            // Actualizar la lista de casos del usuario
+            firestore.collection("usuarios").document(userId)
+                .update("listCases", FieldValue.arrayUnion(newCaseId)).await()
+
+            true  // Operación exitosa
+        } catch (e: Exception) {
+            Log.e("Error", "Error creando nuevo caso y agregando cita: ${e.message}")
+            false  // Operación fallida
+        }
+    }
+
+
+    suspend fun addAppointmentToExistingCase(appointment: Appointment, caseId: String): Boolean {
+        return try {
+            // Generar un nuevo ID para la cita
+            val newAppointmentId = firestore.collection("appointments").document().id
+
+            // Actualizar el appointment con el nuevo ID generado
+            val newAppointment = appointment.copy(appointment_id = newAppointmentId)
+
+            // Agregar la cita a la colección "appointments" con el nuevo ID
+            firestore.collection("appointments").document(newAppointmentId)
+                .set(newAppointment).await()
+
+            // Actualizar la lista de citas del caso existente
+            firestore.collection("cases").document(caseId)
+                .update("listAppointments", FieldValue.arrayUnion(newAppointmentId))
+                .await()
+
+            true  // Operación exitosa
+        } catch (e: Exception) {
+            Log.e("Error", "Error agregando cita a caso existente: ${e.message}")
+            false  // Operación fallida
+        }
+    }
+
+
 }
 

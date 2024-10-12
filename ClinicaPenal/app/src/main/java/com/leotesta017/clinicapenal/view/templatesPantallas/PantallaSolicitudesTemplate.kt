@@ -81,7 +81,7 @@ fun GenerarSolicitudPantallaTemplatenavController(
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(bottom = 64.dp),
+                .padding(bottom = 100.dp),
             horizontalAlignment = Alignment.Start
         ) {
             item {
@@ -131,7 +131,7 @@ fun GenerarSolicitudPantallaTemplatenavController(
                         route = if (isAdmin) "actualizarcasos" else "detallecasoestudiante",
                         isAdmin = isAdmin
                     )
-                    Spacer(modifier = Modifier.height(4.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
                 }
 
                 item {
@@ -169,7 +169,7 @@ fun GenerarSolicitudPantallaTemplatenavController(
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // Barra de navegación
+
         barraNavComposable()
     }
 }

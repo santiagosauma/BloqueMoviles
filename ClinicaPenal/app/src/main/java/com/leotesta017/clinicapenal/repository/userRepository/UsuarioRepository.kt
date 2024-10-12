@@ -69,7 +69,7 @@ class UsuarioRepository {
         } catch (e: Exception) {
             null
         }
-    }
+    }  
 
     suspend fun getUserTypeById(id: String): String
     {

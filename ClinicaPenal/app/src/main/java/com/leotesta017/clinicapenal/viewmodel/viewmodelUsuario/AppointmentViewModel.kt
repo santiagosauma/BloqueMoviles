@@ -15,6 +15,13 @@ class AppointmentViewModel : ViewModel() {
     private val _appointment = MutableStateFlow<Appointment?>(null)
     val appointment: StateFlow<Appointment?> = _appointment
 
+    private val _appointmentResult = MutableStateFlow<Boolean>(false)
+    val appointmentResult: StateFlow<Boolean> = _appointmentResult
+
+    // Estado para almacenar las citas filtradas por fecha
+    private val _appointmentsByDate = MutableStateFlow<List<Appointment>>(emptyList())
+    val appointmentsByDate: StateFlow<List<Appointment>> = _appointmentsByDate
+
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error
 
@@ -34,14 +41,68 @@ class AppointmentViewModel : ViewModel() {
         }
     }
 
-    // Método para agregar una nueva cita y actualizar el caso
-    fun addNewAppointment(appointment: Appointment, caseId: String) {
+    // Función para obtener citas por fecha
+    fun fetchAppointmentsByDate(date: String) {
         viewModelScope.launch {
-            val success = repository.addAppointmentToCase(appointment, caseId)
-            if (!success) {
-                _error.value = "Error al agregar la cita al caso"
+            try {
+                val result = repository.getAppointmentsByDate(date)
+                if (result.isNotEmpty()) {
+                    _appointmentsByDate.value = result
+                    _error.value = ""
+                } else {
+                    _error.value = "No hay citas para la fecha seleccionada"
+                    _appointmentsByDate.value = emptyList()
+                }
+            } catch (e: Exception) {
+                _error.value = "Error al obtener las citas: ${e.message}"
             }
         }
+    }
+
+
+    // Método para agregar una nueva cita y crear un nuevo caso
+    fun addAppointmentAndCreateNewCase(appointment: Appointment, userId: String, place: String) {
+        viewModelScope.launch {
+            try {
+                // Llamamos al repositorio para ejecutar la función
+                val success = repository.addAppointmentAndCreateNewCase(appointment, userId, place)
+                if (success) {
+                    _appointmentResult.value = true
+                } else {
+                    _error.value = "Error al crear un nuevo caso y agregar la cita."
+                }
+            } catch (e: Exception) {
+                _error.value = "Error: ${e.message}"
+            }
+        }
+    }
+
+    // Método para agregar una cita a un caso existente
+    fun addAppointmentToExistingCase(appointment: Appointment, caseId: String) {
+        viewModelScope.launch {
+            try {
+                // Llamamos al repositorio para ejecutar la función
+                val success = repository.addAppointmentToExistingCase(appointment, caseId)
+                if (success) {
+                    _appointmentResult.value = true
+                } else {
+                    _error.value = "Error al agregar la cita al caso existente."
+                }
+            } catch (e: Exception) {
+                _error.value = "Error: ${e.message}"
+            }
+        }
+    }
+
+    fun resetAppointments() {
+        _appointmentsByDate.value = emptyList()  // Vaciar las citas almacenadas
+        _error.value = ""
+    }
+
+    // Método para resetear el estado de error y resultado
+    fun resetState() {
+        _appointmentResult.value = false
+        _error.value = ""
     }
 
     // Método para actualizar una cita existente

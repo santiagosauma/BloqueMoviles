@@ -12,7 +12,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import org.w3c.dom.Comment
-
 class CaseViewModel : ViewModel() {
 
     val repository = CaseRepository()
@@ -20,6 +19,10 @@ class CaseViewModel : ViewModel() {
 
     private val _case = MutableStateFlow<Case?>(null)
     val case: StateFlow<Case?> = _case
+
+    // Estado para almacenar la última cita obtenida
+    private val _lastAppointment = MutableStateFlow<Appointment?>(null)
+    val lastAppointment: StateFlow<Appointment?> = _lastAppointment
 
     private val _unrepresentedCasesWithLastAppointment = MutableStateFlow<List<Triple<Case, String, Boolean>>>(emptyList())
     val unrepresentedCasesWithLastAppointment: StateFlow<List<Triple<Case, String, Boolean>>> = _unrepresentedCasesWithLastAppointment
@@ -116,4 +119,33 @@ class CaseViewModel : ViewModel() {
         }
     }
 
+    fun fetchLastAppointment(caseId: String) {
+        viewModelScope.launch {
+            try {
+                // Resetear el estado antes de la nueva llamada
+                resetLastAppointment()
+
+                // Llamar al repositorio para obtener el último appointment
+                val lastAppointment = repository.getLastAppointmentForCase(caseId, appointmentRepository)
+
+                if (lastAppointment != null) {
+                    _lastAppointment.value = lastAppointment
+                    _error.value = null // Sin error
+                } else {
+                    _lastAppointment.value = null
+                    _error.value = "No se encontró ninguna cita para este caso."
+                }
+            } catch (e: Exception) {
+                _error.value = "Error al obtener la última cita: ${e.message}"
+            }
+        }
+    }
+
+    // Método para resetear el estado de la última cita
+    fun resetLastAppointment() {
+        _lastAppointment.value = null
+        _error.value = null
+    }
+
 }
+

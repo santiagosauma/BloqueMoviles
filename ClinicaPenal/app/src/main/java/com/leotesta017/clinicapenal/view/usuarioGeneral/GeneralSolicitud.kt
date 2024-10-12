@@ -50,7 +50,7 @@ fun GeneralSolicitud(
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(bottom = 64.dp),
+                .padding(bottom = 100.dp),
             horizontalAlignment = Alignment.Start
         ) {
             item {
