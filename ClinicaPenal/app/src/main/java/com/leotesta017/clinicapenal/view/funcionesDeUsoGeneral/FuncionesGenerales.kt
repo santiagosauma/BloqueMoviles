@@ -795,7 +795,11 @@ fun VideoCard(
                 Spacer(modifier = Modifier.height(8.dp))
                 Button(
                     onClick = { onEditClick?.invoke() },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF002366),
+                        contentColor = Color.White
+                    )
                 ) {
                     Text(text = "Editar Video")
                 }
