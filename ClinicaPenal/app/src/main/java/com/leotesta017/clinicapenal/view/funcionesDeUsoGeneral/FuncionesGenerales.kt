@@ -1028,7 +1028,6 @@ fun HeaderSection(title: String, navController: NavController?) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 6.dp)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),

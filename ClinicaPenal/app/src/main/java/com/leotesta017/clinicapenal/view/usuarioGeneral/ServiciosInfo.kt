@@ -52,7 +52,7 @@ fun ServiciosInfo(
             )
         },
         content = {
-            Column(modifier = Modifier.padding(horizontal = 16.dp)) { // Agregar padding horizontal
+            Column(modifier = Modifier.padding(horizontal = 8.dp)) {
                 HeaderSection(titulo, navController)
                 Spacer(modifier = Modifier.height(8.dp))
 
