@@ -1,37 +1,40 @@
-
 package com.leotesta017.clinicapenal.view.usuarioGeneral
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 
-//TEMPLATE DE LA VISTA
+// TEMPLATE DE LA VISTA
 import com.leotesta017.clinicapenal.view.templatesPantallas.PantallaInfoGenerica
 
-//FUNCIONES GENERALES
+// FUNCIONES GENERALES
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.BarraNav
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.CarruselDeNoticias
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.CategoriesSection
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.LabelCategoria
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.MyTextNoticias
-import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.ServicesSection
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.PantallasExtra
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.SearchBarPantallaInfo
+import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.ServicesSection
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.SpacedItem
 
-//FUNCIONES VIEW MODEL
+// VIEWMODELS
 import com.leotesta017.clinicapenal.viewmodel.VideoViewModel
+import com.leotesta017.clinicapenal.viewmodel.viewmodelUsuario.UsuarioViewModel
 
 @Composable
-fun PantallaInfoCategorias(navController: NavController?) {
+fun PantallaInfoCategorias(navController: NavController) {
+    val videoViewModel: VideoViewModel = viewModel()
+    val usuarioViewModel: UsuarioViewModel = viewModel()
+
     PantallaInfoGenerica(
         navController = navController,
 
-        searchBar = { categorias, servicios, errorCategoria, errorServicio, onSearchStarted  ->
+        searchBar = { categorias, servicios, errorCategoria, errorServicio, onSearchStarted ->
             SearchBarPantallaInfo(
                 searchText = "",
                 onSearchTextChange = {},
@@ -46,10 +49,13 @@ fun PantallaInfoCategorias(navController: NavController?) {
             )
         },
 
+        // SECCION DE NOTICIAS
         noticias = {
             SpacedItem(spacing = 16) {
                 CarruselDeNoticias(
-                    viewModel = VideoViewModel(),
+                    navController = navController,
+                    viewModel = videoViewModel,
+                    userModel = usuarioViewModel,
                     contentText = {
                         MyTextNoticias(text = "Noticias")
                     }
@@ -57,6 +63,7 @@ fun PantallaInfoCategorias(navController: NavController?) {
             }
         },
 
+        // SECCION DE INFORMACION LEGAL
         informacionLegal = { categorias, error ->
             LabelCategoria(
                 label = "Información Legal",
@@ -69,9 +76,9 @@ fun PantallaInfoCategorias(navController: NavController?) {
                 categories = categorias,
                 error = error
             )
-
         },
 
+        // SECCION DE SERVICIOS
         servicios = { servicios, error ->
             LabelCategoria(
                 label = "Servicios",
@@ -84,11 +91,10 @@ fun PantallaInfoCategorias(navController: NavController?) {
                 servicios = servicios,
                 error = error
             )
-
         },
 
+        // SECCION DE JURIBOT Y GENERARSOLICITUD
         pantallasExtra = {
-
             PantallasExtra(
                 navController = navController,
                 routeJuribot = "Juribot",
@@ -96,9 +102,9 @@ fun PantallaInfoCategorias(navController: NavController?) {
             )
         },
 
+        // SECCION INFERIOR DE LA BARRA DE NAVEGACION
         barraNav = {
-            Box(modifier = Modifier.fillMaxSize())
-            {
+            Box(modifier = Modifier.fillMaxSize()) {
                 BarraNav(
                     navController = navController,
                     modifier = Modifier
@@ -108,10 +114,4 @@ fun PantallaInfoCategorias(navController: NavController?) {
             }
         }
     )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PantallaInfoCategoriasPreview() {
-    PantallaInfoCategorias(navController = null)
 }

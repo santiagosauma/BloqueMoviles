@@ -5,12 +5,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 
-//TEMPLATE DE LA VISTA
+// TEMPLATE DE LA VISTA
 import com.leotesta017.clinicapenal.view.templatesPantallas.PantallaInfoGenerica
 
-//FUNCIONES GENERALES
+// FUNCIONES GENERALES
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.CarruselDeNoticias
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.CategoriesSection
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.EstudiantesBarraNav
@@ -22,11 +23,15 @@ import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.SearchBarPantalla
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.ServicesSection
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.SpacedItem
 
-//VIEW MODEL
+// VIEWMODELS
 import com.leotesta017.clinicapenal.viewmodel.VideoViewModel
+import com.leotesta017.clinicapenal.viewmodel.viewmodelUsuario.UsuarioViewModel
 
 @Composable
-fun PantallaInfoEstudiante(navController: NavController?) {
+fun PantallaInfoEstudiante(navController: NavController) {
+    val videoViewModel: VideoViewModel = viewModel()
+    val usuarioViewModel: UsuarioViewModel = viewModel()
+
     PantallaInfoGenerica(
         navController = navController,
         searchBar = { categorias, servicios, errorCategoria, errorServicio, onSearchStarted ->
@@ -44,11 +49,13 @@ fun PantallaInfoEstudiante(navController: NavController?) {
             )
         },
 
-        //SECCION DE NOTICIAS
+        // SECCION DE NOTICIAS
         noticias = {
             SpacedItem(spacing = 16) {
                 CarruselDeNoticias(
-                    viewModel = VideoViewModel(),
+                    navController = navController,
+                    viewModel = videoViewModel,
+                    userModel = usuarioViewModel,
                     contentText = {
                         MyTextNoticias(text = "Noticias")
                     }
@@ -56,7 +63,7 @@ fun PantallaInfoEstudiante(navController: NavController?) {
             }
         },
 
-        //SECCION DE INFORMACION LEGAL
+        // SECCION DE INFORMACION LEGAL
         informacionLegal = { categorias, error ->
             LabelCategoria(
                 label = "Información Legal",
@@ -71,9 +78,9 @@ fun PantallaInfoEstudiante(navController: NavController?) {
             )
         },
 
-        //SECCION DE SERVICIOS
-        servicios = { servicios,error ->
-            LabelCategoria( //Cambiar aqui
+        // SECCION DE SERVICIOS
+        servicios = { servicios, error ->
+            LabelCategoria(
                 label = "Servicios",
                 modifier = Modifier.padding(0.dp)
             )
@@ -84,10 +91,9 @@ fun PantallaInfoEstudiante(navController: NavController?) {
                 servicios = servicios,
                 error = error
             )
-
         },
 
-        //SECCION DE JURIBOT Y GENERARSOLICITUD
+        // SECCION DE JURIBOT Y GENERARSOLICITUD
         pantallasExtra = {
             PantallasExtra(
                 navController = navController,
@@ -96,10 +102,9 @@ fun PantallaInfoEstudiante(navController: NavController?) {
             )
         },
 
-        //SECCION INFERIOR DE LA BARRA DE NAVEGACION
+        // SECCION INFERIOR DE LA BARRA DE NAVEGACION
         barraNav = {
-            Box(modifier =  Modifier.fillMaxSize())
-            {
+            Box(modifier = Modifier.fillMaxSize()) {
                 EstudiantesBarraNav(
                     navController = navController,
                     modifier = Modifier
@@ -107,9 +112,6 @@ fun PantallaInfoEstudiante(navController: NavController?) {
                         .fillMaxWidth()
                 )
             }
-
         }
     )
 }
-
-

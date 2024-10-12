@@ -5,12 +5,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 
-//PANTALLA TEMPLATE
+// PANTALLA TEMPLATE
 import com.leotesta017.clinicapenal.view.templatesPantallas.PantallaInfoGenerica
 
-//FUNCIONES GENERALES
+// FUNCIONES GENERALES
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.AdminBarraNav
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.CarruselDeNoticias
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.CategoriesSection
@@ -20,11 +21,15 @@ import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.SearchBarPantalla
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.ServicesSection
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.SpacedItem
 
-//VIEWMODEL
+// VIEWMODELS
 import com.leotesta017.clinicapenal.viewmodel.VideoViewModel
+import com.leotesta017.clinicapenal.viewmodel.viewmodelUsuario.UsuarioViewModel
 
 @Composable
-fun PantallaInfoAdmin(navController: NavController?) {
+fun PantallaInfoAdmin(navController: NavController) {
+    val videoViewModel: VideoViewModel = viewModel()
+    val usuarioViewModel: UsuarioViewModel = viewModel()
+
     PantallaInfoGenerica(
         navController = navController,
         searchBar = { categorias, servicios, errorCategoria, errorServicio, onSearchStarted ->
@@ -50,10 +55,14 @@ fun PantallaInfoAdmin(navController: NavController?) {
                 navigateroute = "AccionVideo",
             )
             SpacedItem(spacing = 16) {
-                CarruselDeNoticias(viewModel = VideoViewModel())
+                CarruselDeNoticias(
+                    navController = navController,
+                    viewModel = videoViewModel,
+                    userModel = usuarioViewModel
+                )
             }
         },
-        informacionLegal = { categorias,error ->
+        informacionLegal = { categorias, error ->
             LabelCategoriaConBoton(
                 label = "Información Legal",
                 navController = navController,
@@ -69,7 +78,7 @@ fun PantallaInfoAdmin(navController: NavController?) {
             )
 
         },
-        servicios = { servicios,error ->
+        servicios = { servicios, error ->
             LabelCategoriaConBoton(
                 label = "Servicios",
                 navController = navController,
@@ -93,8 +102,7 @@ fun PantallaInfoAdmin(navController: NavController?) {
             )
         },
         barraNav = {
-            Box(modifier = Modifier.fillMaxSize())
-            {
+            Box(modifier = Modifier.fillMaxSize()) {
                 AdminBarraNav(
                     navController = navController,
                     modifier = Modifier

@@ -45,6 +45,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CardDefaults.cardColors
+import androidx.compose.material3.CardDefaults.cardElevation
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -92,6 +94,7 @@ import coil.compose.AsyncImage
 import com.leotesta017.clinicapenal.model.Categoria
 import com.leotesta017.clinicapenal.model.Evento
 import com.leotesta017.clinicapenal.model.Servicio
+import com.leotesta017.clinicapenal.model.Video
 import com.leotesta017.clinicapenal.model.modelUsuario.Case
 import com.leotesta017.clinicapenal.model.modelUsuario.UserIdData
 import com.leotesta017.clinicapenal.view.videoPlayer.googleDrivePlayer.GoogleDriveVideoPlayer
@@ -588,10 +591,10 @@ fun isGoogleDriveUrl(videoUrl: String): Boolean {
     return videoUrl.contains("drive.google.com")
 }
 
-
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun CarruselDeNoticias(
+    navController: NavController,
     viewModel: VideoViewModel = viewModel(),
     userModel: UsuarioViewModel = viewModel(),
     contentText: @Composable (() -> Unit)? = null,
@@ -599,21 +602,20 @@ fun CarruselDeNoticias(
     val videos by viewModel.videos.collectAsState()
     val error by viewModel.error.collectAsState()
 
-
     val tipousuario by userModel.userType.collectAsState()
 
     LaunchedEffect(Unit) {
         val userid = UserIdData.userId
         if (userid != null) {
             userModel.fetchUserType(userid)
-
         }
     }
 
-    val filteredVideos = when (tipousuario){
+    val filteredVideos = when (tipousuario) {
         "estudiante" -> videos.filter { it.tipo == "estudiante" }
         "general" -> videos.filter { it.tipo == "general" }
         "colaborador" -> videos.filter { it.tipo == "estudiante" || it.tipo == "general" }
+        "administrador" -> videos // Administrador can see all videos
         else -> emptyList()
     }
 
@@ -631,16 +633,12 @@ fun CarruselDeNoticias(
     ) {
         contentText?.invoke()
 
-        if (error != null)
-        {
+        if (error != null) {
             Text(text = error ?: "Error desconocido", color = Color.Red)
-        }
-        else
-        {
+        } else {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-
             ) {
                 if (totalPages > 0) {
                     HorizontalPager(
@@ -656,22 +654,24 @@ fun CarruselDeNoticias(
                                 .clip(RoundedCornerShape(20.dp))
                         ) {
                             VideoCard(
-                                videoUrl = video.url_video,
-                                title = video.titulo,
-                                description = video.descripcion,
+                                video = video,
                                 onFullscreenClick = { url ->
                                     if (isYouTubeUrl(url)) {
                                         val intent = Intent(context, FullscreenActivity::class.java)
                                         intent.putExtra("VIDEO_URL", url)
                                         context.startActivity(intent)
                                     } else if (isGoogleDriveUrl(url)) {
-
                                         val intent = Intent(context, FullscreenVideoActivity::class.java)
                                         intent.putExtra("VIDEO_URL", url)
                                         context.startActivity(intent)
                                     }
                                 },
                                 isVisible = isVisible,
+                                showEditButton = tipousuario == "administrador" || tipousuario == "colaborador",
+                                onEditClick = {
+                                    // Navigate to the edit screen, passing necessary data
+                                    navController.navigate("editar_video/${video.id}")
+                                }
                             )
                         }
                     }
@@ -683,14 +683,13 @@ fun CarruselDeNoticias(
     }
 }
 
-
 @Composable
 fun VideoCard(
-    videoUrl: String,
-    title: String,
-    description: String,
+    video: Video,
     onFullscreenClick: (String) -> Unit,
     isVisible: Boolean,
+    showEditButton: Boolean = false,
+    onEditClick: (() -> Unit)? = null
 ) {
     var expanded by remember { mutableStateOf(false) }
     val maxHeight = if (expanded) Int.MAX_VALUE.dp else 428.dp
@@ -701,8 +700,8 @@ fun VideoCard(
             .padding(top = 8.dp, start = 16.dp, end = 16.dp, bottom = 16.dp)
             .heightIn(min = 428.dp, max = maxHeight)
             .clip(RoundedCornerShape(16.dp)),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFf0eee9)),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        colors = cardColors(containerColor = Color(0xFFf0eee9)),
+        elevation = cardElevation(defaultElevation = 4.dp),
         shape = RoundedCornerShape(16.dp)
     ) {
         Column(
@@ -718,30 +717,26 @@ fun VideoCard(
                     .height((LocalConfiguration.current.screenWidthDp * 10 / 16).dp)
                     .padding(bottom = 4.dp)
             ) {
-                Box(modifier = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.TopCenter)
-                    .padding(bottom = 40.dp)
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .align(Alignment.TopCenter)
+                        .padding(bottom = 40.dp)
                 ) {
-
-                    if(isYouTubeUrl(videoUrl))  {
+                    if (isYouTubeUrl(video.url_video)) {
                         YouTubePlayerWithLifecycle(
-                            videoUrl = videoUrl,
+                            videoUrl = video.url_video,
                             isVisible = isVisible,
-                            onControllerVisibilityChanged = {false})
-                    }
-
-                    else if (isGoogleDriveUrl(videoUrl)) {
+                            onControllerVisibilityChanged = { false })
+                    } else if (isGoogleDriveUrl(video.url_video)) {
                         GoogleDriveVideoPlayer(
-                            videoUrl = videoUrl,
+                            videoUrl = video.url_video,
                             isVisible = isVisible,
-                            onControllerVisibilityChanged = {false}
+                            onControllerVisibilityChanged = { false }
                         )
-                    }
-                    else {
+                    } else {
                         Text("URL no compatible", color = Color.Red)
                     }
-
                 }
 
                 Row(
@@ -750,39 +745,33 @@ fun VideoCard(
                         .align(Alignment.BottomCenter)
                         .zIndex(1f)
                         .height(38.dp)
-                        .clip(RectangleShape) // Cambiado a RectangleShape para quitar esquinas redondeadas
+                        .clip(RectangleShape)
                         .background(Color(0xFF0B1F8C))
                         .clickable {
-                            onFullscreenClick(videoUrl)
+                            onFullscreenClick(video.url_video)
                         },
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center
                 ) {
-                    Row(
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.fillMaxWidth(),
-                    ) {
-                        Text(
-                            text = "Pantalla Completa",
-                            color = Color.White,
-                            modifier = Modifier.padding(0.dp)
-                        )
-                    }
+                    Text(
+                        text = "Pantalla Completa",
+                        color = Color.White,
+                        modifier = Modifier.padding(0.dp)
+                    )
                 }
             }
 
             Spacer(modifier = Modifier.height(12.dp))
 
             Text(
-                text = title,
+                text = video.titulo,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(bottom = 4.dp)
             )
 
             Text(
-                text = description,
+                text = video.descripcion,
                 fontSize = 13.sp,
                 color = Color.Gray,
                 maxLines = if (expanded) Int.MAX_VALUE else 1,
@@ -801,10 +790,19 @@ fun VideoCard(
                     .clickable { expanded = !expanded }
                     .padding(top = 4.dp)
             )
+
+            if (showEditButton) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Button(
+                    onClick = { onEditClick?.invoke() },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(text = "Editar Video")
+                }
+            }
         }
     }
 }
-
 
 
 
