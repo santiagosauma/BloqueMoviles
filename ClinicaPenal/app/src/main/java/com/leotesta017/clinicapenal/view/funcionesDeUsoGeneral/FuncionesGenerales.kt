@@ -4,6 +4,7 @@ package com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral
 //VIEW MODEL
 import android.content.Intent
 import android.net.Uri
+import android.util.Log
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -1593,8 +1594,20 @@ fun CaseUserGenaralItem(
                             e.printStackTrace()
                             null
                         }
-                        if(parsedCaseDate != null && parsedCaseDate.before(currentDate))
-                        {
+
+                        val caseViewModel: CaseViewModel = viewModel()
+
+                        val ultimaCita by caseViewModel.lastAppointment.collectAsState()
+
+                        LaunchedEffect(Unit) {
+                            Log.d("ReviewComentarios", "Fetching last appointment for caseId: ${case.first.case_id}")
+                            caseViewModel.fetchLastAppointment(case.first.case_id)
+                        }
+
+                        val rating = ultimaCita?.valoration
+                        
+                        if (parsedCaseDate != null && parsedCaseDate.before(currentDate) && rating == 0) {
+
                             DropdownMenuItem(
                                 onClick = {
                                     expanded = false
@@ -1604,6 +1617,7 @@ fun CaseUserGenaralItem(
                             )
                             hasOptions = true
                         }
+
                         if(parsedCaseDate != null && (parsedCaseDate.after(currentDate) || parsedCaseDate.compareTo(currentDate) == 0))
                         {
                             DropdownMenuItem(
