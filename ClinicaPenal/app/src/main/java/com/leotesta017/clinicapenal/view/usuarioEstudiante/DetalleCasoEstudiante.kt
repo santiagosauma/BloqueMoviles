@@ -20,6 +20,8 @@ fun DetalleCasoEstudiante(
     PantallaTemplateDetalleVistaCaso(
         navController = navController,
         caseId = case_id,
+        routeComentario = "comentarestudiante",
+        routeAgendar = "agendarestudiante",
         route = "generasolicitudestudiante",
         barraNav = {
             Box(modifier = Modifier.fillMaxSize()){

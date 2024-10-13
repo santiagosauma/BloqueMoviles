@@ -1,8 +1,6 @@
 package com.leotesta017.clinicapenal.view.templatesPantallas
 
-import android.widget.Toast
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,9 +14,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicText
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
@@ -39,12 +40,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.leotesta017.clinicapenal.model.modelUsuario.Case
+import com.leotesta017.clinicapenal.model.modelUsuario.ExtraInfo
 import com.leotesta017.clinicapenal.model.modelUsuario.UserIdData
 import com.leotesta017.clinicapenal.model.modelUsuario.Usuario
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.SectionTitle
@@ -53,6 +58,7 @@ import com.leotesta017.clinicapenal.viewmodel.viewmodelUsuario.CaseViewModel
 import com.leotesta017.clinicapenal.viewmodel.viewmodelUsuario.Case_CounterViewModel
 import com.leotesta017.clinicapenal.viewmodel.viewmodelUsuario.ComentarioViewModel
 import com.leotesta017.clinicapenal.viewmodel.viewmodelUsuario.UsuarioViewModel
+import kotlinx.coroutines.runBlocking
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -63,6 +69,8 @@ fun PantallaTemplateDetalleVistaCaso(
     navController: NavController?,
     caseId: String,
     route: String,
+    routeAgendar: String,
+    routeComentario: String,
     barraNav: @Composable () -> Unit,
     contenidoExtra: @Composable (Case,Usuario,Usuario) -> Unit,
     caseViewModel: CaseViewModel = viewModel(),
@@ -128,14 +136,32 @@ fun PantallaTemplateDetalleVistaCaso(
                 SectionTitle("Información del Cliente")
                 Spacer(modifier = Modifier.height(8.dp))
 
-                //AUN FALTA MODIFICAR ESTO
-                ClienteInfo("Nombre", "Edsel Cisneros James",Color.Black, FontWeight.Bold, FontWeight.Normal)
-                ClienteInfo("Tipo (Cliente)", "Víctima",Color.Black, FontWeight.Bold, FontWeight.Normal)
-                ClienteInfo("Lugar de Procedencia", "Guadalupe, Monterrey",Color.Black, FontWeight.Bold, FontWeight.Normal)
+                val extraInfoList = caseWithDetails?.second?.third
 
+                println("extraInfoList: $extraInfoList")
+
+                extraInfoList?.lastOrNull()?.let { extraInfo ->
+                    // Log extra details
+                    println("ExtraInfo ID Usuario: ${extraInfo.id_Usuario}, Lugar Procedencia: ${extraInfo.lugarProcedencia}")
+
+                    // Obtener el ID del usuario
+                    val userExtraInfoId = extraInfo.id_Usuario
+
+                    LaunchedEffect(userExtraInfoId) {
+                        userViewModel.fetchUsuario(userExtraInfoId)
+                    }
+
+                    // Recolectar la información del usuario
+                    val usuarioExtraInfo by userViewModel.usuario.collectAsState()
+
+                    // Mostrar la información de cliente
+                    ClienteInfoComponent(
+                        userInfo = usuarioExtraInfo,
+                        extraInfo = extraInfo,
+                        isRepresented = caseWithDetails?.first?.represented ?: false
+                    )
+                }
                 Spacer(modifier = Modifier.height(16.dp))
-
-                // Histórico (común)
                 SectionTitle("Histórico de Citas")
                 Spacer(modifier = Modifier.height(8.dp))
 
@@ -151,6 +177,9 @@ fun PantallaTemplateDetalleVistaCaso(
                         valor = formatTime(cita.fecha.toDate()),
                         suspended = cita.suspended,
                         appointmentId = cita.appointment_id,
+                        asistido = cita.asisted,
+                        confirmado = cita.confirmed,
+                        valoracion = cita.valoration,
                         navController = navController,
                         campoColor = if(cita.suspended) Color.Red
                                      else if (isLastItem) Color.Blue
@@ -164,7 +193,7 @@ fun PantallaTemplateDetalleVistaCaso(
 
                 Button(
                     onClick = {
-                        navController?.navigate("agendar/$caseId")
+                        navController?.navigate("$routeAgendar/$caseId")
                     },
                     modifier = Modifier
                         .padding(horizontal = 16.dp)
@@ -199,15 +228,14 @@ fun PantallaTemplateDetalleVistaCaso(
 
                 ClienteInfo(
                     campo = "Agente a cargo",
-                    valor = if (abogado.isNotEmpty()) abogado else "No hay un abogado asignado aun",
+                    valor = abogado.ifEmpty { "No hay un abogado asignado aun" },
                     Color.Black,
-                    FontWeight.Bold, FontWeight.Normal
+
                 )
                 ClienteInfo(
                     campo = "Estudiante Vinculado",
-                    valor = if (estudiante.isNotEmpty()) estudiante else "No hay un estudiante asignado aun",
+                    valor = estudiante.ifEmpty { "No hay un estudiante asignado aun" },
                     Color.Black,
-                    FontWeight.Bold, FontWeight.Normal
                 )
 
 
@@ -232,7 +260,7 @@ fun PantallaTemplateDetalleVistaCaso(
                     )
 
                     DropdownMenuColaboradores(
-                        ColaboradoresEstudiantes = colaboratorsandstudents,  // Lista que contiene tanto colaboradores como estudiantes
+                        colaboradoresEstudiantes = colaboratorsandstudents,  // Lista que contiene tanto colaboradores como estudiantes
                         onColaboradorSelected = { colaborador ->
                             colaboradorSeleccionado = colaborador  // Guardar colaborador seleccionado
                         },
@@ -268,7 +296,11 @@ fun PantallaTemplateDetalleVistaCaso(
                             color = Color.Blue)
                         ClienteComentario(
                             nombre = userName ?: "Usuario desconocido",
-                            comentario = comment.contenido
+                            comentario = comment.contenido,
+                            isImportant = comment.important,
+                            author = comment.madeBy,
+                            comentarioId = comment.comentario_id,
+                            navController = navController
                         )
                     }
                 }
@@ -277,7 +309,7 @@ fun PantallaTemplateDetalleVistaCaso(
 
                 Button(
                     onClick = {
-                        navController?.navigate("comentar/$caseId")
+                        navController?.navigate("$routeComentario/$caseId")
                     },
                     modifier = Modifier
                         .padding(horizontal = 16.dp)
@@ -291,7 +323,6 @@ fun PantallaTemplateDetalleVistaCaso(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 caseWithDetails?.first?.let { datos ->
-                    // Siempre mostramos el contenido, aunque no estén seleccionados los colaboradores o estudiantes
                     contenidoExtra(
                         datos,
                         colaboradorSeleccionado ?: Usuario(id = "", nombre = "Sin abogado", apellidos = ""),
@@ -305,6 +336,108 @@ fun PantallaTemplateDetalleVistaCaso(
         }
 
         barraNav()
+    }
+}
+
+
+@Composable
+fun ClienteInfoComponent(
+    userInfo: Usuario,
+    extraInfo: ExtraInfo,
+    isRepresented: Boolean
+) {
+    // Mostrar información básica del cliente
+    ClienteInfo(
+        campo = "Nombre Completo",
+        valor = "${userInfo.nombre} ${userInfo.apellidos}",
+        Color.Black,
+    )
+
+    ClienteInfo(
+        campo = "Tipo (Cliente)",
+        valor = if (extraInfo.victima) "Víctima" else if (extraInfo.investigado) "Investigado" else "No se encontró información",
+        Color.Black,
+    )
+
+    ClienteInfo(
+        campo = "Lugar de Procedencia",
+        valor = extraInfo.lugarProcedencia,
+        Color.Black,
+    )
+
+    // Información del Segundo Formulario
+    ClienteInfo(
+        campo = "Fiscalía",
+        valor = extraInfo.fiscalia.ifEmpty { "No se ha respondido aún el segundo formulario" },
+        Color.Black,
+    )
+
+    ClienteInfo(
+        campo = "Crimen",
+        valor = extraInfo.crime.ifEmpty { "No se ha respondido aún el segundo formulario" },
+        Color.Black,
+    )
+
+    ClienteInfo(
+        campo = "INE",
+        valor = extraInfo.ine.ifEmpty { "No se ha respondido aún el segundo formulario" },
+        Color.Black,
+    )
+
+    // Mostrar información adicional si el caso está representado
+    if (isRepresented) {
+        Spacer(modifier = Modifier.height(16.dp))
+        SectionTitle(title = "Información del Caso")
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Mostrar datos específicos del caso
+        ClienteInfo(
+            campo = "Número Único de Causa",
+            valor = extraInfo.nuc.ifEmpty { "No hay información aún" },
+            Color.Black,
+        )
+
+        ClienteInfo(
+            campo = "Carpeta Judicial",
+            valor = extraInfo.carpetaJudicial.ifEmpty { "No hay información aún" },
+            Color.Black,
+        )
+
+        ClienteInfo(
+            campo = "Carpeta de Investigación",
+            valor = extraInfo.carpetaInvestigacion.ifEmpty { "No hay información aún" },
+            Color.Black,
+        )
+
+        ClienteInfo(
+            campo = "Acceso a la Fiscalía Virtual",
+            valor = extraInfo.afv.ifEmpty { "No hay información aún" },
+            Color.Black,
+        )
+
+        ClienteInfo(
+            campo = "Contraseña a la Fiscalía Virtual",
+            valor = extraInfo.passwordFV.ifEmpty { "No hay información aún" },
+            Color.Black,
+        )
+
+        ClienteInfo(
+            campo = "Fiscal Titular",
+            valor = extraInfo.fiscalTitular.ifEmpty { "No hay información aún" },
+            Color.Black,
+        )
+
+        ClienteInfo(
+            campo = "Unidad de Investigación",
+            valor = extraInfo.unidadInvestigacion.ifEmpty { "No hay información aún" },
+            Color.Black,
+        )
+
+        ClienteInfo(
+            campo = "Dirección de la Unidad de Investigación",
+            valor = extraInfo.direccionUI.ifEmpty { "No hay información aún" },
+            Color.Black,
+        )
     }
 }
 
@@ -333,6 +466,10 @@ fun BotonesRepresentacion(
                         // Si el caso no está representado, cambia el estado a "Representado"
                         selectedOption = "Representado"
                         onRepresented(true)  // Notificar que ahora el caso está representado
+                    }
+                    else{
+                        selectedOption = "Representado"
+                        onRepresented(true)
                     }
                 },
                 colors = ButtonDefaults.outlinedButtonColors(
@@ -473,24 +610,24 @@ fun BotonesEstado(
     }
 }
 
-
-
 @Composable
-fun CitaInfo(campo: String,
-             valor: String,
-             campoColor: Color,
-             suspended: Boolean,
-             appointmentId: String,
-             navController: NavController?,
-             fontWeightCampo: FontWeight = FontWeight.Normal,
-             fontWeightValor: FontWeight = FontWeight.Normal
+fun CitaInfo(
+    campo: String,
+    valor: String,
+    campoColor: Color,
+    suspended: Boolean,
+    appointmentId: String,
+    asistido: Boolean,
+    confirmado: Boolean,
+    valoracion: Int,
+    navController: NavController?,
+    fontWeightCampo: FontWeight = FontWeight.Normal,
+    fontWeightValor: FontWeight = FontWeight.Normal
 ) {
-    Row(
+    Column(
         modifier = Modifier
             .padding(start = 16.dp, end = 16.dp)
-            .fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
+            .fillMaxWidth()
     ) {
         val currentDate = Calendar.getInstance().time
         val formatter = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
@@ -501,64 +638,141 @@ fun CitaInfo(campo: String,
             null
         }
 
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 8.dp)
+                .height(30.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
 
-        Text(
-            text = "$campo:  $valor",
-            fontWeight = fontWeightCampo,
-            color = campoColor
-        )
 
-        // Verificar si la cita es antes del día actual y no está suspendida
-        if (appointmentDate != null && appointmentDate.before(currentDate) && !suspended) {
-            Text(
-                text = "Cita completada",
-                fontWeight = fontWeightCampo,
-                color = campoColor
-            )
-        }
-        // Si la cita no está suspendida, mostramos el ícono de edición
-        else if (!suspended) {
-            IconButton(
-                onClick = {
-                    navController?.navigate("editAppointment/$appointmentId")
-                }
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Edit,
-                    contentDescription = "Editar cita",
-                    tint = Color.Black,
-                    modifier = Modifier.size(15.dp)
+            // Mostrar el campo y valor
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = "$campo:  $valor",
+                    fontWeight = fontWeightCampo,
+                    color = campoColor,
+                    modifier = Modifier.fillMaxWidth()
                 )
+
+                appointmentDate?.let { date ->
+                    val oneHourAfter = Date(date.time + 60 * 60 * 1000)
+
+                    when {
+                        suspended -> {
+                            Text(
+                                text = "Cita suspendida",
+                                fontWeight = fontWeightCampo,
+                                color = campoColor,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
+                        date.before(currentDate) && currentDate.before(oneHourAfter) -> {
+                            Text(
+                                text = "Cita en progreso",
+                                fontWeight = fontWeightCampo,
+                                color = Color.Blue,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
+                        date.before(currentDate) && currentDate.after(oneHourAfter) -> {
+                            Text(
+                                text = "Cita completada",
+                                fontWeight = fontWeightCampo,
+                                color = campoColor,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
+                        !confirmado -> {
+                            Text(
+                                text = "Cita no confirmada",
+                                fontWeight = fontWeightCampo,
+                                color = Color.Red,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
+                        !asistido ->{
+                            Text(
+                                text = "No se presentó a la cita",
+                                fontWeight = fontWeightCampo,
+                                color = Color.Red,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
+                    }
+                } ?: run {
+                    Text(
+                        text = "Fecha inválida",
+                        fontWeight = fontWeightCampo,
+                        color = Color.Red,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            }
+
+            // Icono de edición
+            if (!suspended) {
+                IconButton(
+                    onClick = {
+                        navController?.navigate("editAppointment/$appointmentId")
+                    }
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Edit,
+                        contentDescription = "Editar cita",
+                        tint = Color.Black,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
             }
         }
-        // Si la cita está suspendida, mostramos el texto "Cita suspendida"
-        else {
-            Text(
-                text = "Cita suspendida",
-                fontWeight = fontWeightCampo,
-                color = campoColor
-            )
+
+        // Mostrar barra de estrellas debajo de la cita completada
+        if (!suspended && appointmentDate != null && appointmentDate.before(currentDate)) {
+            Spacer(modifier = Modifier.height(4.dp))
+            RatingBar(rating = valoracion)
         }
     }
 }
 
 @Composable
+fun RatingBar(rating: Int) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),  // Asegura que la barra de valoración ocupe todo el ancho
+        horizontalArrangement = Arrangement.Start
+    ) {
+        for (i in 1..5) {
+            Icon(
+                imageVector = if (i <= rating) Icons.Default.Star else Icons.Default.StarBorder,
+                contentDescription = if (i <= rating) "Estrella llena" else "Estrella vacía",
+                tint = Color(0xFFFFD700), // Color dorado
+                modifier = Modifier.size(24.dp)
+            )
+        }
+    }
+}
+
+
+
+@Composable
 fun ClienteInfo(campo: String,
                 valor: String,
                 campoColor: Color,
-                fontWeightCampo: FontWeight = FontWeight.Normal,
-                fontWeightValor: FontWeight = FontWeight.Normal
 ) {
     Row(modifier = Modifier.padding(start = 16.dp)) {
-        Text(
-            text = "$campo: ",
-            fontWeight = fontWeightCampo,
-            color = campoColor
-        )
-        Text(
-            text = valor,
-            fontWeight = fontWeightValor,
-            color = campoColor
+        BasicText(
+            text = AnnotatedString.Builder().apply {
+                withStyle(style = SpanStyle(fontWeight = FontWeight.Bold, color = campoColor)) {
+                    append("$campo: ")
+                }
+                withStyle(style = SpanStyle(fontWeight = FontWeight.Normal, color = campoColor)) {
+                    append(valor)
+                }
+            }.toAnnotatedString(),
+            style = androidx.compose.ui.text.TextStyle(fontSize = 16.sp),
+
         )
     }
 }
@@ -566,29 +780,59 @@ fun ClienteInfo(campo: String,
 
 @Composable
 fun ClienteComentario(nombre: String,
-                      comentario: String
+                      comentario: String,
+                      isImportant: Boolean,
+                      author: String,
+                      comentarioId:String,
+                      navController:NavController?
 ) {
-    Column {
-        Text(
-            text = "$nombre: ",
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(bottom = 4.dp)
-        )
-        Text(text = comentario, modifier = Modifier.padding(bottom = 8.dp))
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
+    )
+    {
+        Column {
+            Text(
+                text = "$nombre: ",
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(bottom = 4.dp)
+            )
+            Text(text = if(isImportant) "$comentario \nMensaje Importante"
+            else comentario,
+                modifier = Modifier.padding(bottom = 8.dp),
+                color = if(isImportant) Color.Red else Color.Black
+            )
+        }
+        val userId = UserIdData.userId
+        if (userId == author)
+        {
+            IconButton(
+                onClick = {
+                    navController?.navigate("editComentario/$comentarioId")
+                }
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Edit,
+                    contentDescription = "Editar Comentario",
+                    tint = Color.Black,
+                    modifier = Modifier.size(15.dp)
+                )
+            }
+        }
     }
 }
 
 @Composable
 fun DropdownMenuColaboradores(
-    ColaboradoresEstudiantes: List<Usuario>?,
+    colaboradoresEstudiantes: List<Usuario>?,
     onColaboradorSelected: (Usuario) -> Unit,
     onEstudianteSelected: (Usuario) -> Unit
 ) {
     var selectedColaboradorOptionText by remember { mutableStateOf("Selecciona un colaborador") }
     var selectedEstudianteOptionText by remember { mutableStateOf("Selecciona un estudiante") }
 
-    val colaboradores = ColaboradoresEstudiantes?.filter { it.tipo == "colaborador" } ?: emptyList()
-    val estudiantes = ColaboradoresEstudiantes?.filter { it.tipo == "estudiante" } ?: emptyList()
+    val colaboradores = colaboradoresEstudiantes?.filter { it.tipo == "colaborador" } ?: emptyList()
+    val estudiantes = colaboradoresEstudiantes?.filter { it.tipo == "estudiante" } ?: emptyList()
 
     var expandedColaboradores by remember { mutableStateOf(false) }
     var expandedEstudiantes by remember { mutableStateOf(false) }

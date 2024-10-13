@@ -1,5 +1,6 @@
 package com.leotesta017.clinicapenal.repository.userRepository
 
+import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -29,23 +30,40 @@ class ComentarioRepository {
         }
     }
 
-    // Agregar un nuevo comentario y actualizar la lista de comentarios del caso
-    suspend fun addComentarioToCase(comentario: Comentario, caseId: String): Boolean {
+
+
+
+
+    // Método para generar y agregar un nuevo comentario
+    suspend fun addNewComentarioToCase(contenido: String, important: Boolean, userId: String, caseId: String): Boolean {
         return try {
-            val comentarioRef = firestore.collection("coments").document(comentario.comentario_id)
+            // Generar un nuevo ID para el comentario en Firestore
+            val newComentarioId = firestore.collection("coments").document().id
+                // Crear un nuevo comentario
+            val nuevoComentario = Comentario(
+                comentario_id = newComentarioId,
+                contenido = contenido,
+                fecha = Timestamp.now(),
+                madeBy = userId,  // El userId proporcionado
+                important = important,
+                representation = ""  // Dejar vacío por defecto
+            )
+            // Guardar el comentario en la colección "coments"
+            val comentarioRef = firestore.collection("coments").document(newComentarioId)
+            comentarioRef.set(nuevoComentario).await()
 
-            // Primero, agregar el comentario a la colección "comments"
-            comentarioRef.set(comentario).await()
-
-            // Luego, actualizar la lista de comentarios del caso
+            // Actualizar la lista de comentarios del caso
             val caseRef = firestore.collection("cases").document(caseId)
-            caseRef.update("listComents", FieldValue.arrayUnion(comentario.comentario_id)).await()
+            caseRef.update("listComents", FieldValue.arrayUnion(newComentarioId)).await()
 
-            true
-        } catch (e: Exception) {
-            false
+            true  // Operación exitosa
+        }
+        catch (e: Exception) {
+                false  // Error durante el proceso //
         }
     }
+
+
 
     // Actualizar un comentario existente
     suspend fun updateComentario(id: String, comentarioData: Map<String, Any>): Boolean {

@@ -9,5 +9,4 @@ data class Comentario(
     val madeBy: String = "",//ID del usuario que hizo el comentario
     val important: Boolean = false,  // Si es importante o no
     val representation: String = "" // Cualquier representación adicional
-
 )

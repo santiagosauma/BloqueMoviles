@@ -35,6 +35,8 @@ fun ActualizarCasos(
     PantallaTemplateDetalleVistaCaso(
         navController = navController,
         caseId = case_id,
+        routeComentario = "comentar",
+        routeAgendar = "agendar",
         route = "generalsolicitudadmin",
         barraNav = {
             Box(
@@ -82,6 +84,23 @@ fun ActualizarCasos(
                         return@Button
                     }
 
+                    caseViewModel.assignUserToCase(case.case_id, abogadoseleccionado.id, "lawyerAssigned")
+                    caseViewModel.assignUserToCase(case.case_id, estudianteseleccionado.id, "studentAssigned")
+
+                    Toast.makeText(context, "Abogado y estudiante asignados correctamente", Toast.LENGTH_SHORT).show()
+                },
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+                    .fillMaxWidth()
+                    .height(48.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF002366))
+            ) {
+                Text("Reasignar", color = Color.White)
+            }
+            Spacer(Modifier.height(16.dp))
+            Button(
+                onClick = {
+
                     val caseUpdateData = mapOf(
                         "represented" to representacionSeleccionada,
                         "state" to estadoSeleccionado,
@@ -91,9 +110,6 @@ fun ActualizarCasos(
                     )
 
                     caseViewModel.updateCase(case.case_id, caseUpdateData)
-
-                    caseViewModel.assignUserToCase(case.case_id, abogadoseleccionado.id, "lawyerAssigned")
-                    caseViewModel.assignUserToCase(case.case_id, estudianteseleccionado.id, "studentAssigned")
 
                     Toast.makeText(context, "Caso guardado exitosamente", Toast.LENGTH_SHORT).show()
                 },

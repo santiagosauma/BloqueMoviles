@@ -126,12 +126,16 @@ fun MyApp() {
         }
 
         composable("Juribot") { JuriBotScreen(navController) }
+
         composable("SegundoFormulario") { SegundoFormulario(navController) }
+
+
 
         /*=======================================================================================*/
         // PANTALLAS DE ADMIN
         /*=======================================================================================*/
         composable("pantallainfoadmin") { PantallaInfoAdmin(navController) }
+
         composable(
             route = "modificar-info/{titulo}/{descripcion}/{categoriaId}/{url_image}",
             arguments = listOf(
@@ -151,6 +155,21 @@ fun MyApp() {
                 titulo = titulo,
                 descripcion = descripcion,
                 urlimagen = url_imagen
+            )
+        }
+
+
+        // PANTALLA PARA EDITAR VIDEO
+        composable(
+            route = "editar_video/{videoId}",
+            arguments = listOf(
+                navArgument("videoId") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val videoId = backStackEntry.arguments?.getString("videoId") ?: ""
+            EditVideoScreen(
+                navController = navController,
+                videoId = videoId
             )
         }
 
@@ -226,6 +245,9 @@ fun MyApp() {
         //PANTALLA DEL JURIBOT PARA ADMIN
         composable("JuriBotAdmin") { JuriBotAdmin(navController) }
 
+
+
+
         /*=======================================================================================*/
         // PANTALLAS DE ESTUDIANTE
         /*=======================================================================================*/
@@ -260,20 +282,37 @@ fun MyApp() {
         composable("AgregarEvento") { AgregarEvento(navController) }
         composable("AccionVideo") { AccionVideo(navController) }
 
-        /*=======================================================================================*/
-        // PANTALLA PARA EDITAR VIDEO
-        /*=======================================================================================*/
         composable(
-            route = "editar_video/{videoId}",
+            route = "comentarestudiante/{caseId}",
             arguments = listOf(
-                navArgument("videoId") { type = NavType.StringType }
+                navArgument("caseId") { type = NavType.StringType }
             )
         ) { backStackEntry ->
-            val videoId = backStackEntry.arguments?.getString("videoId") ?: ""
-            EditVideoScreen(
+
+            val caseId = backStackEntry.arguments?.getString("caseId") ?: ""
+
+            ComentarioScreenEstudiante(
                 navController = navController,
-                videoId = videoId
+                caseId = caseId
             )
         }
+
+        composable(
+            route = "agendarestudiante/{caseId}",
+            arguments = listOf(
+                navArgument("caseId") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+
+            val caseId = backStackEntry.arguments?.getString("caseId") ?: ""
+
+            AgendarEstudiante(
+                navController = navController,
+                caseId = caseId
+            )
+        }
+
+
+
     }
 }

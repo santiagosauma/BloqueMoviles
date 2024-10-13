@@ -38,10 +38,10 @@ class ComentarioViewModel : ViewModel() {
         }
     }
 
-    // Agregar un nuevo comentario a un caso
-    fun addNewComentarioToCase(comentario: Comentario, caseId: String) {
+    // Método para agregar un nuevo comentario a un caso
+    fun addNewComentarioToCase(contenido: String, important: Boolean, userId: String, caseId: String) {
         viewModelScope.launch {
-            val success = repository.addComentarioToCase(comentario, caseId)
+            val success = repository.addNewComentarioToCase(contenido, important, userId, caseId)
             if (!success) {
                 _error.value = "Error al agregar el comentario al caso"
             }

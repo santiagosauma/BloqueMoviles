@@ -91,7 +91,6 @@ import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.room.Delete
 import coil.compose.AsyncImage
 import com.leotesta017.clinicapenal.model.Categoria
 import com.leotesta017.clinicapenal.model.Evento
@@ -396,7 +395,7 @@ fun GenericBottomBarItem(icon: ImageVector,
             modifier = Modifier
                 .size(48.dp)
                 .background(
-                    color = if (isSelected) Color(0xFF0B1F8C) else Color.Transparent,
+                    color = if (isSelected) Color(0xFF002366) else Color.Transparent,
                     shape = CircleShape
                 ),
             contentAlignment = Alignment.Center
@@ -459,7 +458,7 @@ fun RoundedButton(icon: ImageVector,
         modifier = Modifier
             .clickable(onClick = onClick)
             .clip(RoundedCornerShape(50))
-            .background(Color(0xFF1A237E))
+            .background(Color(0xFF002366))
             .padding(horizontal = 20.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -553,7 +552,7 @@ fun LabelCategoriaConBoton(label: String,
         Button(
             onClick = { navController?.navigate(navigateroute) },
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF0B1F8C),
+                containerColor = Color(0xFF002366),
                 contentColor = Color.White
             ),
             shape = RoundedCornerShape(24.dp),
@@ -748,7 +747,7 @@ fun VideoCard(
                         .zIndex(1f)
                         .height(38.dp)
                         .clip(RectangleShape)
-                        .background(Color(0xFF0B1F8C))
+                        .background(Color(0xFF002366))
                         .clickable {
                             onFullscreenClick(video.url_video)
                         },

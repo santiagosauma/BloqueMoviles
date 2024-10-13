@@ -20,11 +20,16 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.FormatBold
 import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.Save
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -37,19 +42,31 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.leotesta017.clinicapenal.model.modelUsuario.UserIdData
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.RoundedButton
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.TopBar
+import com.leotesta017.clinicapenal.viewmodel.viewmodelUsuario.ComentarioViewModel
 
 @Composable
 fun PantallaComentarTemplate(
     navController: NavController?,
     title: String,
-    bottomBarNav: @Composable () -> Unit
+    caseId: String,
+    route: String,
+    bottomBarNav: @Composable () -> Unit,
+    comentarioViewModel: ComentarioViewModel = viewModel(),
+    onAddComment: (String, Boolean, String, String) -> Unit
 ) {
 
     var comentario by remember { mutableStateOf("") }
     var isBold by remember { mutableStateOf(false) }
+    var showDialog by remember { mutableStateOf(false) }
+    var showUnsavedChangesDialog by remember { mutableStateOf(false) }
+    var linkInput by remember { mutableStateOf("") }
+    var isUrgent by remember { mutableStateOf(false) }  // Controlar si el comentario es urgente
+    var hasChanges by remember { mutableStateOf(false) } // Variable booleana para detectar cambios
 
     Scaffold(
         topBar = {
@@ -61,7 +78,14 @@ fun PantallaComentarTemplate(
                         .padding(horizontal = 16.dp, vertical = 3.dp)
                         .fillMaxWidth()
                 ) {
-                    IconButton(onClick = { navController?.popBackStack() }) {
+                    IconButton(onClick = {
+                        // Si hay cambios sin guardar, mostrar diálogo
+                        if (hasChanges) {
+                            showUnsavedChangesDialog = true
+                        } else {
+                            navController?.navigate("$route/$caseId")
+                        }
+                    }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
                     }
                     Spacer(modifier = Modifier.width(8.dp))
@@ -92,14 +116,7 @@ fun PantallaComentarTemplate(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.Start
                 ) {
-                    IconButton(onClick = { isBold = !isBold }) {
-                        Icon(
-                            imageVector = Icons.Default.FormatBold,
-                            contentDescription = "Negrita",
-                            tint = if (isBold) Color.Black else Color.Gray
-                        )
-                    }
-                    IconButton(onClick = { /* Acción para insertar enlace */ }) {
+                    IconButton(onClick = { showDialog = true }) {
                         Icon(
                             imageVector = Icons.Default.Link,
                             contentDescription = "Insertar enlace",
@@ -119,7 +136,10 @@ fun PantallaComentarTemplate(
                 ) {
                     BasicTextField(
                         value = comentario,
-                        onValueChange = { comentario = it },
+                        onValueChange = {
+                            comentario = it
+                            hasChanges = true // Marcar que ha habido cambios
+                        },
                         modifier = Modifier
                             .fillMaxSize()
                             .verticalScroll(rememberScrollState()),
@@ -142,25 +162,128 @@ fun PantallaComentarTemplate(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
+                Row(modifier = Modifier
+                    .fillMaxWidth()
+                ){
+                    OutlinedButton(
+                        onClick = { isUrgent = !isUrgent },
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            containerColor = if (isUrgent) Color.Red else Color(0xFF002366),
+                            contentColor = if (isUrgent) Color.White else Color.White
+                        ),
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text(text = if (isUrgent) "Urgente" else "Marcar como urgente")
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
                 Row(
                     modifier = Modifier
                         .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
+
+
+                    val userId = UserIdData.userId
                     RoundedButton(
                         icon = Icons.Default.Save,
                         label = "Guardar",
-                        onClick = { /* Acción para guardar */ }
+                        onClick = {
+                            if (comentario.isNotEmpty()) {
+                                if (userId != null) {
+                                    onAddComment(
+                                        comentario,
+                                        isUrgent,
+                                        userId,
+                                        caseId
+                                    )
+                                }
+                                comentario = ""  // Limpiar el campo después de guardar
+                                isUrgent = false  // Reiniciar el estado de urgencia
+                            }
+
+                            hasChanges = false // Reiniciar el estado de cambios después de guardar
+
+                        }
                     )
                     RoundedButton(
                         icon = Icons.Default.Delete,
                         label = "Descartar",
-                        onClick = { /* Acción para descartar */ }
+                        onClick = {
+                            comentario = "" // Limpiar el comentario
+                            isUrgent = false
+                            hasChanges = false // Reiniciar el estado de cambios
+                        }
+                    )
+                }
+
+                // Mostrar el diálogo para insertar enlace
+                if (showDialog) {
+                    AlertDialog(
+                        onDismissRequest = { showDialog = false },
+                        title = { Text("Insertar enlace") },
+                        text = {
+                            Column {
+                                Text("Introduce el enlace:")
+                                TextField(
+                                    value = linkInput,
+                                    onValueChange = { linkInput = it },
+                                    placeholder = { Text("https://") }
+                                )
+                            }
+                        },
+                        confirmButton = {
+                            Button(
+                                onClick = {
+                                    comentario += " $linkInput" // Insertar el enlace en el comentario
+                                    hasChanges = true
+                                    showDialog = false
+                                }
+                            ) {
+                                Text("Aceptar")
+                            }
+                        },
+                        dismissButton = {
+                            Button(
+                                onClick = {
+                                    showDialog = false
+                                }
+                            ) {
+                                Text("Cancelar")
+                            }
+                        }
+                    )
+                }
+
+                // Mostrar el diálogo de advertencia al salir sin guardar
+                if (showUnsavedChangesDialog) {
+                    AlertDialog(
+                        onDismissRequest = { showUnsavedChangesDialog = false },
+                        title = { Text("Cambios sin guardar") },
+                        text = { Text("Tienes cambios sin guardar, ¿deseas salir de todos modos?") },
+                        confirmButton = {
+                            Button(onClick = {
+                                showUnsavedChangesDialog = false
+                                navController?.navigate("$route/$caseId") // Salir sin guardar
+                            }) {
+                                Text("Salir")
+                            }
+                        },
+                        dismissButton = {
+                            Button(onClick = {
+                                showUnsavedChangesDialog = false // Cerrar el diálogo y no salir
+                            }) {
+                                Text("Cancelar")
+                            }
+                        }
                     )
                 }
             }
         }
     )
 }
+
 
 

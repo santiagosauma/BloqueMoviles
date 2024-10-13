@@ -13,7 +13,7 @@ class ExtraInfoRepository {
     // Obtener información extra por su ID
     suspend fun getExtraInfoById(id: String): ExtraInfo? {
         return try {
-            val document = firestore.collection("extraInfo")
+            val document = firestore.collection("extrainfo")
                 .document(id)
                 .get()
                 .await()
@@ -31,7 +31,7 @@ class ExtraInfoRepository {
     // Agregar nueva información extra y actualizar la lista de extraInfo del caso
     suspend fun addExtraInfoToCase(extraInfo: ExtraInfo, caseId: String): Boolean {
         return try {
-            val extraInfoRef = firestore.collection("extraInfo").document(extraInfo.extraInfo_id)
+            val extraInfoRef = firestore.collection("extrainfo").document(extraInfo.extraInfo_id)
 
             // Primero, agregar la información extra a la colección "extraInfo"
             extraInfoRef.set(extraInfo).await()
@@ -49,7 +49,7 @@ class ExtraInfoRepository {
     // Actualizar información extra existente
     suspend fun updateExtraInfo(id: String, extraInfoData: Map<String, Any>): Boolean {
         return try {
-            firestore.collection("extraInfo")
+            firestore.collection("extrainfo")
                 .document(id)
                 .update(extraInfoData)
                 .await()
