@@ -45,7 +45,6 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CardDefaults.cardColors
 import androidx.compose.material3.CardDefaults.cardElevation
 import androidx.compose.material3.CircularProgressIndicator
@@ -98,10 +97,10 @@ import com.leotesta017.clinicapenal.model.Servicio
 import com.leotesta017.clinicapenal.model.Video
 import com.leotesta017.clinicapenal.model.modelUsuario.Case
 import com.leotesta017.clinicapenal.model.modelUsuario.UserIdData
-import com.leotesta017.clinicapenal.view.videoPlayer.googleDrivePlayer.GoogleDriveVideoPlayer
-import com.leotesta017.clinicapenal.view.videoPlayer.youtubeVideoPlayer.YouTubePlayerWithLifecycle
 import com.leotesta017.clinicapenal.view.videoPlayer.fullscreenActivities.FullscreenActivity
 import com.leotesta017.clinicapenal.view.videoPlayer.fullscreenActivities.FullscreenVideoActivity
+import com.leotesta017.clinicapenal.view.videoPlayer.googleDrivePlayer.GoogleDriveVideoPlayer
+import com.leotesta017.clinicapenal.view.videoPlayer.youtubeVideoPlayer.YouTubePlayerWithLifecycle
 import com.leotesta017.clinicapenal.viewmodel.VideoViewModel
 import com.leotesta017.clinicapenal.viewmodel.viewmodelUsuario.CaseViewModel
 import com.leotesta017.clinicapenal.viewmodel.viewmodelUsuario.Case_CounterViewModel
@@ -227,7 +226,7 @@ fun SearchBarHistorialSolicitudes(
             if(!isUsuarioGeneral){
                 CaseUserAdminItem(
                     case = case,
-                    onDelete = { id ->
+                    onDiscard = { id ->
                         if (isAdmin) {
                             caseViewModel.discardCase(id)
                         }
@@ -237,7 +236,12 @@ fun SearchBarHistorialSolicitudes(
                     route = if (isAdmin) {
                         "actualizarcasos"
                     } else "detallecasoestudiante",
-                    isAdmin = isAdmin
+                    isAdmin = isAdmin,
+                    onDelete = { id ->
+                        if (isAdmin) {
+                            caseViewModel.deleteCase(id)
+                        }
+                    },
                 )
             }
             else{
@@ -866,8 +870,8 @@ fun CategoryItem(
                 val encodedUrlImagen = Uri.encode(imageUrl)
                 navController?.navigate("$route/$title/$description/$categoriaId/$encodedUrlImagen")
             },
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFf0eee9)),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        colors = cardColors(containerColor = Color(0xFFf0eee9)),
+        elevation = cardElevation(defaultElevation = 4.dp),
         shape = RoundedCornerShape(16.dp)
     ) {
         Column(
@@ -970,8 +974,8 @@ fun ServiceItem(
                 val encodedUrlImagen = Uri.encode(imageUrl)
                 navController?.navigate("$route/$title/$description/$servicioId/$encodedUrlImagen")
             },
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFf0eee9)),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        colors = cardColors(containerColor = Color(0xFFf0eee9)),
+        elevation = cardElevation(defaultElevation = 4.dp),
         shape = RoundedCornerShape(16.dp)
     ) {
         Column(
@@ -1304,16 +1308,18 @@ fun Calendarios(
 @Composable
 fun CaseUserAdminItem(
     case: Triple<Case, String, Boolean>,
-    onDelete: (String) -> Unit,
+    onDiscard: (String) -> Unit,
+    onDelete:  (String) -> Unit,
     confirmDeleteText: String,
     caseCounterViewModel: Case_CounterViewModel = viewModel(),
     navController: NavController?,
     route: String,
     isAdmin: Boolean,
-    usuarioViewModel: UsuarioViewModel = viewModel()
+    usuarioViewModel: UsuarioViewModel = viewModel(),
 ) {
     var expanded by remember { mutableStateOf(false) }
     var showDialog by remember { mutableStateOf(false) }
+    var showDeleteDialog by remember { mutableStateOf(false) }
 
     var caseCounter by remember { mutableStateOf<Int?>(null) }
     var username by remember { mutableStateOf<String?>(null)}
@@ -1335,12 +1341,11 @@ fun CaseUserAdminItem(
             .padding(horizontal = 16.dp, vertical = 8.dp)
             .clip(RoundedCornerShape(16.dp))
             .shadow(1.dp),
-        colors = CardDefaults.cardColors(
+        colors = cardColors(
             containerColor = Color(0xFFf0eee9)
         )
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            // Información del caso
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -1367,7 +1372,7 @@ fun CaseUserAdminItem(
                     ) {
                         // Si el usuario es admin, mostrar opción para eliminar
                         if (isAdmin) {
-                            if(case.first.state != "Caso descartado")
+                            if(case.first.situation != "Caso descartado")
                             {
                                 DropdownMenuItem(
                                     onClick = {
@@ -1375,6 +1380,16 @@ fun CaseUserAdminItem(
                                         showDialog = true
                                     },
                                     text = { Text("Descartar") }
+                                )
+                            }
+                            else if(case.first.situation == "Caso descartado")
+                            {
+                                DropdownMenuItem(
+                                    onClick = {
+                                        expanded = false
+                                        showDeleteDialog = true
+                                    },
+                                    text = { Text("Eliminar") }
                                 )
                             }
                         }
@@ -1469,9 +1484,9 @@ fun CaseUserAdminItem(
             onDismissRequest = { showDialog = false },
             confirmButton = {
                 TextButton(onClick = {
-                    onDelete(case.first.case_id)
+                    onDiscard(case.first.case_id)
                     showDialog = false
-                    navController?.navigate(route)
+                    navController?.navigate("generalsolicitudadmin")
                 }) {
                     Text("Descartar")
                 }
@@ -1482,6 +1497,27 @@ fun CaseUserAdminItem(
                 }
             },
             title = { Text("Confirmar Descartar Caso") },
+            text = { Text(confirmDeleteText) }
+        )
+    }
+    if (showDeleteDialog && isAdmin) {
+        AlertDialog(
+            onDismissRequest = { showDeleteDialog = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    onDelete(case.first.case_id)
+                    showDeleteDialog = false
+                    navController?.navigate("generalsolicitudadmin")
+                }) {
+                    Text("Eliminar")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteDialog = false }) {
+                    Text("Cancelar")
+                }
+            },
+            title = { Text("Confirmar Eliminar Caso") },
             text = { Text(confirmDeleteText) }
         )
     }
@@ -1508,7 +1544,7 @@ fun CaseUserGenaralItem(
             .padding(horizontal = 16.dp, vertical = 8.dp)
             .clip(RoundedCornerShape(16.dp))
             .shadow(1.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFf0eee9))
+        colors = cardColors(containerColor = Color(0xFFf0eee9))
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(
@@ -1534,13 +1570,57 @@ fun CaseUserGenaralItem(
                         onDismissRequest = { expanded = false },
                         offset = DpOffset(x = 10.dp, y = 10.dp)
                     ) {
-                        DropdownMenuItem(
-                            onClick = {
-                                expanded = false
-                                navController?.navigate("ReviewComentarios/${case.first.case_id}")
-                            },
-                            text = { Text("Valorar") }
-                        )
+                        var hasOptions = false
+
+                        if(!case.first.represented && !case.first.segundoFormulario)
+                        {
+                            DropdownMenuItem(
+                                onClick = {
+                                    expanded = false
+                                    navController?.navigate("SegundoFormulario/${case.first.case_id}")
+                                },
+                                text = { Text("Segundo Formulario") }
+                            )
+                            hasOptions = true
+                        }
+
+                        val currentDate = Date()
+
+                        val dateFormat = SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.getDefault())
+                        val parsedCaseDate: Date? = try {
+                            dateFormat.parse(case.second)
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                            null
+                        }
+                        if(parsedCaseDate != null && parsedCaseDate.before(currentDate))
+                        {
+                            DropdownMenuItem(
+                                onClick = {
+                                    expanded = false
+                                    navController?.navigate("ReviewComentarios/${case.first.case_id}")
+                                },
+                                text = { Text("Valorar Cita") }
+                            )
+                            hasOptions = true
+                        }
+                        if(parsedCaseDate != null && (parsedCaseDate.after(currentDate) || parsedCaseDate.compareTo(currentDate) == 0))
+                        {
+                            DropdownMenuItem(
+                                onClick = {
+                                    expanded = false
+                                    navController?.navigate("CambiarCitaOConfirmar/${case.first.case_id}")
+                                },
+                                text = { Text("Confirmar o Cancelar Cita") }
+                            )
+                            hasOptions = true
+                        }
+                        if (!hasOptions) {
+                            DropdownMenuItem(
+                                onClick = { /* No hace nada ya que no hay opciones */ },
+                                text = { Text("No hay opciones disponibles para este caso") }
+                            )
+                        }
                     }
                 }
             }
@@ -1738,13 +1818,3 @@ fun parseMarkdownToAnnotatedString(text: String): AnnotatedString {
     }
 }
 
-
-fun formatDate(date: Date?): String {
-    val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-    return date?.let { dateFormat.format(it) } ?: ""
-}
-
-fun formatTime(date: Date?): String {
-    val timeFormat = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
-    return date?.let { timeFormat.format(it) } ?: ""
-}

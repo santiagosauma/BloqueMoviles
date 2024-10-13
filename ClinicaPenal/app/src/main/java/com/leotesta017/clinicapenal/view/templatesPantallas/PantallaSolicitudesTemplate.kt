@@ -119,7 +119,7 @@ fun GenerarSolicitudPantallaTemplatenavController(
                 items(citasList) { cita ->
                     CaseUserAdminItem(
                         case = cita,
-                        onDelete = { id ->
+                        onDiscard = { id ->
                             if (isAdmin) {
                                 caseViewModel.discardCase(id)
                             } else {
@@ -129,7 +129,14 @@ fun GenerarSolicitudPantallaTemplatenavController(
                         confirmDeleteText = "¿Estás seguro de que deseas eliminar esta cita?",
                         navController = navController,
                         route = if (isAdmin) "actualizarcasos" else "detallecasoestudiante",
-                        isAdmin = isAdmin
+                        isAdmin = isAdmin,
+                        onDelete = { id ->
+                            if (isAdmin) {
+                                caseViewModel.deleteCase(id)
+                            } else {
+                                //El estudiante no podria eliminar casos
+                            }
+                        }
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                 }
@@ -149,7 +156,7 @@ fun GenerarSolicitudPantallaTemplatenavController(
                 items(representacionList.value) { representacion ->
                     CaseUserAdminItem(
                         case = representacion,
-                        onDelete = { id ->
+                        onDiscard = { id ->
                             if (isAdmin) {
                                 caseViewModel.discardCase(id)
                             } else {
@@ -159,7 +166,14 @@ fun GenerarSolicitudPantallaTemplatenavController(
                         confirmDeleteText = "¿Estás seguro de que deseas eliminar este caso de representación?",
                         navController = navController,
                         route = if (isAdmin) "actualizarcasos" else "detallecasoestudiante",
-                        isAdmin = isAdmin
+                        isAdmin = isAdmin,
+                        onDelete = { id ->
+                            if (isAdmin) {
+                                caseViewModel.deleteCase(id)
+                            } else {
+                                //El estudiante no podria eliminar casos
+                            }
+                        }
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                 }

@@ -6,6 +6,7 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.leotesta017.clinicapenal.model.modelUsuario.Appointment
 import com.leotesta017.clinicapenal.model.modelUsuario.Case
+import com.leotesta017.clinicapenal.model.modelUsuario.ExtraInfo
 import kotlinx.coroutines.tasks.await
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -76,7 +77,14 @@ class AppointmentRepository {
         }
     }
 
-    suspend fun addAppointmentAndCreateNewCase(appointment: Appointment, userId: String, place: String): Boolean {
+    suspend fun addAppointmentAndCreateNewCase(
+        appointment: Appointment,
+        userId: String,
+        place: String,
+        lugarProcedencia: String,
+        victima: Boolean,
+        investigado: Boolean
+    ): Boolean {
         return try {
             // Generar un nuevo ID para el caso
             val newCaseId = firestore.collection("cases").document().id
@@ -86,6 +94,31 @@ class AppointmentRepository {
 
             // Actualizar el appointment con el nuevo ID generado
             val newAppointment = appointment.copy(appointment_id = newAppointmentId)
+
+            // Generar un nuevo ID para el extraInfo
+            val newExtraInfoId = firestore.collection("extrainfo").document().id
+
+            // Crear un nuevo ExtraInfo con los campos inicializados
+            val newExtraInfo = ExtraInfo(
+                extraInfo_id = newExtraInfoId,
+                victima =  victima,
+                investigado = investigado,
+                lugarProcedencia = lugarProcedencia,
+                id_Usuario = userId,
+
+                // Inicializamos los campos restantes como vacíos
+                fiscalia = "",
+                crime = "",
+                ine = "",
+                nuc = "",
+                carpetaJudicial = "",
+                carpetaInvestigacion = "",
+                afv = "",
+                passwordFV = "",
+                fiscalTitular = "",
+                unidadInvestigacion = "",
+                direccionUI = ""
+            )
 
             // Crear el nuevo caso
             val newCase = Case(
@@ -99,12 +132,16 @@ class AppointmentRepository {
                 place = place,
                 situation = "Primer cita creada",
                 state = "Activo",
+                segundoFormulario = false,
                 listAppointments = listOf(newAppointmentId),
                 listComents = emptyList(),
-                listExtraInfo = emptyList()
+                listExtraInfo = listOf(newExtraInfoId)
             )
 
-            // Guardar el nuevo caso en la base de datos
+            // Guardar el nuevo ExtraInfo en la colección "extrainfo"
+            firestore.collection("extrainfo").document(newExtraInfoId).set(newExtraInfo).await()
+
+            // Guardar el nuevo caso en la colección "cases"
             firestore.collection("cases").document(newCaseId).set(newCase).await()
 
             // Guardar la cita con su ID en la colección de "appointments"
@@ -120,6 +157,7 @@ class AppointmentRepository {
             false  // Operación fallida
         }
     }
+
 
 
     suspend fun addAppointmentToExistingCase(appointment: Appointment, caseId: String): Boolean {

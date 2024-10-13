@@ -1,6 +1,7 @@
 package com.leotesta017.clinicapenal.repository.userRepository
 
 import android.util.Log
+import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -13,6 +14,8 @@ import kotlinx.coroutines.tasks.await
 class CaseRepository {
 
     private val firestore = Firebase.firestore
+    private val ExtraInforepository = ExtraInfoRepository()
+
 
     // Obtener un caso por su ID
     suspend fun getCaseById(id: String): Case? {
@@ -310,5 +313,161 @@ class CaseRepository {
             null // Error al obtener la cita
         }
     }
+
+    suspend fun deleteCase(caseId: String): Boolean {
+        return try {
+            // Obtener el caso por su ID
+            val caseSnapshot = firestore.collection("cases").document(caseId).get().await()
+
+            if (caseSnapshot.exists()) {
+                val case = caseSnapshot.toObject(Case::class.java)
+
+                case?.let {
+                    // Eliminar citas asociadas
+                    it.listAppointments.forEach { appointmentId ->
+                        firestore.collection("appointments").document(appointmentId).delete().await()
+                    }
+
+                    // Eliminar comentarios asociados
+                    it.listComents.forEach { commentId ->
+                        firestore.collection("coments").document(commentId).delete().await()
+                    }
+
+                    // Eliminar ExtraInfo asociado
+                    it.listExtraInfo.forEach { extraInfoId ->
+                        firestore.collection("extrainfo").document(extraInfoId).delete().await()
+                    }
+
+                    // Remover el caso de la lista de casos del abogado asignado
+                    if (it.lawyerAssigned.isNotEmpty()) {
+                        firestore.collection("usuarios").document(it.lawyerAssigned)
+                            .update("listCases", FieldValue.arrayRemove(caseId)).await()
+                    }
+
+                    // Remover el caso de la lista de casos del estudiante asignado
+                    if (it.studentAssigned.isNotEmpty()) {
+                        firestore.collection("usuarios").document(it.studentAssigned)
+                            .update("listCases", FieldValue.arrayRemove(caseId)).await()
+                    }
+
+                    // Remover el caso de la lista de casos de todos los usuarios generales
+                    val usersQuerySnapshot = firestore.collection("usuarios")
+                        .whereEqualTo("tipo", "general")
+                        .get()
+                        .await()
+
+                    for (userDocument in usersQuerySnapshot.documents) {
+                        val userId = userDocument.id
+                        val userCases = userDocument.get("listCases") as? List<String> ?: emptyList()
+
+                        if (caseId in userCases) {
+                            firestore.collection("usuarios")
+                                .document(userId)
+                                .update("listCases", FieldValue.arrayRemove(caseId))
+                                .await()
+                        }
+                    }
+
+                    // Finalmente, eliminar el caso de la colección "cases"
+                    firestore.collection("cases").document(caseId).delete().await()
+
+                    true // Operación exitosa
+                } ?: false // Caso no encontrado
+            } else {
+                false // Caso no existe
+            }
+        } catch (e: Exception) {
+            Log.e("Error", "Error eliminando el caso: ${e.message}")
+            false // Error al eliminar el caso
+        }
+    }
+
+    suspend fun updateLastExtraInfoInCase(caseId: String, extraInfoData: Map<String, Any>): Boolean {
+        return try {
+            // Obtener el caso por su ID
+            val caseSnapshot = firestore.collection("cases").document(caseId).get().await()
+
+            if (caseSnapshot.exists()) {
+                val case = caseSnapshot.toObject(Case::class.java)
+
+                case?.let {
+                    // Verificar si tiene información extra en la lista
+                    if (it.listExtraInfo.isNotEmpty()) {
+                        // Obtener el ID del último ExtraInfo de la lista
+                        val lastExtraInfoId = it.listExtraInfo.last()
+
+                        // Llamar a la función de updateExtraInfo para actualizar la información
+                        ExtraInforepository.updateExtraInfo(lastExtraInfoId, extraInfoData)
+                    } else {
+                        // Si no tiene ExtraInfo, devolver false
+                        return false
+                    }
+                }
+                true // Operación exitosa
+            } else {
+                false // El caso no existe
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false // Ocurrió un error
+        }
+    }
+
+    suspend fun updateAppointmentAndAddCommentIfExists(
+        caseId: String,
+        rating: Int,
+        commentContent: String,
+        userId: String
+    ): Boolean {
+        return try {
+            // Obtener el documento del caso
+            val caseSnapshot = firestore.collection("cases").document(caseId).get().await()
+
+            if (caseSnapshot.exists()) {
+                val case = caseSnapshot.toObject(Case::class.java)
+
+                case?.let {
+                    // Obtener el último ID del appointment
+                    val lastAppointmentId = case.listAppointments.lastOrNull()
+
+                    if (lastAppointmentId != null) {
+                        // Actualizar la valoración del último appointment
+                        val appointmentRef = firestore.collection("appointments").document(lastAppointmentId)
+                        appointmentRef.update("valoration", rating).await()
+
+                        // Si el contenido del comentario no está vacío, agregar un nuevo comentario
+                        if (commentContent.isNotBlank()) {
+                            // Generar un nuevo ID para el comentario
+                            val newCommentId = firestore.collection("coments").document().id
+
+                            // Crear el nuevo comentario con los detalles
+                            val newComment = mapOf(
+                                "comentario_id" to newCommentId,
+                                "contenido" to commentContent,
+                                "madeBy" to userId,
+                                "fecha" to Timestamp.now(),
+                                "important" to false,
+                                "representation" to ""
+                            )
+
+                            // Guardar el comentario en Firestore
+                            firestore.collection("coments").document(newCommentId).set(newComment).await()
+
+                            // Actualizar la lista de comentarios en el caso
+                            firestore.collection("cases").document(caseId)
+                                .update("listComents", FieldValue.arrayUnion(newCommentId)).await()
+                        }
+
+                        return true // Operación exitosa
+                    }
+                }
+            }
+            false // Caso no encontrado o lista de appointments vacía
+        } catch (e: Exception) {
+            Log.e("Error", "Error al actualizar la valoración o agregar comentario: ${e.message}")
+            false
+        }
+    }
+
 
 }

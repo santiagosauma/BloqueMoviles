@@ -1,7 +1,9 @@
 package com.leotesta017.clinicapenal.repository.userRepository
 
+import android.util.Log
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import com.leotesta017.clinicapenal.model.modelUsuario.Case
 import com.leotesta017.clinicapenal.model.modelUsuario.Usuario
 import kotlinx.coroutines.tasks.await
 
@@ -177,5 +179,43 @@ class UsuarioRepository {
         }
     }
 
+    // Función para obtener el último caso del usuario y verificar si está disponible, no suspendido y no completado
+    suspend fun getLastAvailableCase(userId: String): Case? {
+        return try {
+            // Obtener la referencia del documento del usuario
+            val userRef = firestore.collection("usuarios").document(userId)
+
+            // Obtener los detalles del usuario
+            val userSnapshot = userRef.get().await()
+
+            // Extraer la lista de casos del usuario
+            val listCases = userSnapshot.get("listCases") as? List<String> ?: emptyList()
+
+            // Si la lista de casos está vacía, retornamos null
+            if (listCases.isEmpty()) {
+                return null
+            }
+
+            // Obtener el último caso (el más reciente)
+            val lastCaseId = listCases.last()
+
+            // Obtener los detalles del último caso
+            val caseRef = firestore.collection("cases").document(lastCaseId)
+            val caseSnapshot = caseRef.get().await()
+
+            // Convertir el snapshot en un objeto Case
+            val lastCase = caseSnapshot.toObject(Case::class.java)
+
+            // Verificar si el caso está disponible, no suspendido y no completado
+            if (lastCase != null && lastCase.available && !lastCase.suspended && !lastCase.completed) {
+                lastCase // Retornar el caso si cumple con las condiciones
+            } else {
+                null // Retornar null si no cumple las condiciones
+            }
+        } catch (e: Exception) {
+            Log.e("Error", "Error obteniendo el último caso disponible: ${e.message}")
+            null
+        }
+    }
 
 }

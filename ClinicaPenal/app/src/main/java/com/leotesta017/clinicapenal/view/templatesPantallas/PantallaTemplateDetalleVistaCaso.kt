@@ -72,7 +72,7 @@ fun PantallaTemplateDetalleVistaCaso(
     routeAgendar: String,
     routeComentario: String,
     barraNav: @Composable () -> Unit,
-    contenidoExtra: @Composable (Case,Usuario,Usuario) -> Unit,
+    contenidoExtra: @Composable (Case,Usuario,Usuario,String,String) -> Unit,
     caseViewModel: CaseViewModel = viewModel(),
     userViewModel: UsuarioViewModel = viewModel(),
     caseCounterViewModel: Case_CounterViewModel = viewModel(),
@@ -326,7 +326,9 @@ fun PantallaTemplateDetalleVistaCaso(
                     contenidoExtra(
                         datos,
                         colaboradorSeleccionado ?: Usuario(id = "", nombre = "Sin abogado", apellidos = ""),
-                        estudianteSeleccionado ?: Usuario(id = "", nombre = "Sin estudiante", apellidos = "")
+                        estudianteSeleccionado ?: Usuario(id = "", nombre = "Sin estudiante", apellidos = ""),
+                        abogado,
+                        estudiante
                     )
                 }
 

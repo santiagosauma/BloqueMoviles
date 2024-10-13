@@ -54,12 +54,13 @@ fun ActualizarCasos(
             }
 
         },
-        contenidoExtra = { case, abogadoseleccionado, estudianteseleccionado ->
+        contenidoExtra = { case, abogadoseleccionado, estudianteseleccionado,abogadoactual,estudianteactual ->
             Spacer(modifier = Modifier.height(16.dp))
             SectionTitle("Representación")
 
             BotonesRepresentacion(caso = case, onRepresented = { isRepresented ->
-                representacionSeleccionada = isRepresented  // Actualizar el valor seleccionado para representacion
+                representacionSeleccionada = isRepresented
+
             })
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -84,6 +85,8 @@ fun ActualizarCasos(
                         return@Button
                     }
 
+
+
                     caseViewModel.assignUserToCase(case.case_id, abogadoseleccionado.id, "lawyerAssigned")
                     caseViewModel.assignUserToCase(case.case_id, estudianteseleccionado.id, "studentAssigned")
 
@@ -97,10 +100,26 @@ fun ActualizarCasos(
             ) {
                 Text("Reasignar", color = Color.White)
             }
+
             Spacer(Modifier.height(16.dp))
+
             Button(
                 onClick = {
+                    // Validar que el caso tenga un abogado y un estudiante asignado
+                    val abogadoActual = if (abogadoactual != " ") abogadoactual else abogadoseleccionado.id
+                    val estudianteActual = if (estudianteactual != " ") estudianteactual else estudianteseleccionado.id
 
+                    if (abogadoActual.isEmpty() || abogadoActual == " ") {
+                        Toast.makeText(context, "Seleccione un abogado", Toast.LENGTH_SHORT).show()
+                        return@Button
+                    }
+
+                    if (estudianteActual.isEmpty() || estudianteActual == " ") {
+                        Toast.makeText(context, "Seleccione un estudiante", Toast.LENGTH_SHORT).show()
+                        return@Button
+                    }
+
+                    // Actualizar el estado y la asignación del caso
                     val caseUpdateData = mapOf(
                         "represented" to representacionSeleccionada,
                         "state" to estadoSeleccionado,
@@ -110,6 +129,10 @@ fun ActualizarCasos(
                     )
 
                     caseViewModel.updateCase(case.case_id, caseUpdateData)
+
+                    // Asignar abogado y estudiante si no se han asignado previamente
+                    caseViewModel.assignUserToCase(case.case_id, abogadoActual, "lawyerAssigned")
+                    caseViewModel.assignUserToCase(case.case_id, estudianteActual, "studentAssigned")
 
                     Toast.makeText(context, "Caso guardado exitosamente", Toast.LENGTH_SHORT).show()
                 },

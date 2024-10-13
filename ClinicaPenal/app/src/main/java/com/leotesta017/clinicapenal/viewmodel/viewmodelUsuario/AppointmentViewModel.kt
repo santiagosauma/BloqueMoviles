@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.leotesta017.clinicapenal.model.modelUsuario.Appointment
 import com.leotesta017.clinicapenal.repository.userRepository.AppointmentRepository
+import com.leotesta017.clinicapenal.repository.userRepository.UsuarioRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -11,6 +12,7 @@ import kotlinx.coroutines.launch
 class AppointmentViewModel : ViewModel() {
 
     val repository = AppointmentRepository()
+    val userRepository = UsuarioRepository()
 
     private val _appointment = MutableStateFlow<Appointment?>(null)
     val appointment: StateFlow<Appointment?> = _appointment
@@ -60,19 +62,37 @@ class AppointmentViewModel : ViewModel() {
     }
 
 
-    // Método para agregar una nueva cita y crear un nuevo caso
-    fun addAppointmentAndCreateNewCase(appointment: Appointment, userId: String, place: String) {
+    fun createAppointmentAndNewCase(
+        appointment: Appointment,
+        userId: String,
+        place: String,
+        lugarProcedencia: String,
+        victima: Boolean,
+        investigado: Boolean
+    ) {
         viewModelScope.launch {
             try {
-                // Llamamos al repositorio para ejecutar la función
-                val success = repository.addAppointmentAndCreateNewCase(appointment, userId, place)
-                if (success) {
-                    _appointmentResult.value = true
-                } else {
-                    _error.value = "Error al crear un nuevo caso y agregar la cita."
+                // Llamar a la función del repositorio para crear la cita y el nuevo caso
+                val result = repository.addAppointmentAndCreateNewCase(
+                    appointment,
+                    userId,
+                    place,
+                    lugarProcedencia,
+                    victima,
+                    investigado
+                )
+
+                // Actualizar el estado del resultado
+                _appointmentResult.value = result
+
+                // Si la operación no fue exitosa, mostrar mensaje de error
+                if (!result) {
+                    _error.value = "No se pudo crear el caso o agendar la cita."
                 }
+
             } catch (e: Exception) {
-                _error.value = "Error: ${e.message}"
+                // Si hay una excepción, manejar el error
+                _error.value = e.message
             }
         }
     }
@@ -99,10 +119,10 @@ class AppointmentViewModel : ViewModel() {
         _error.value = ""
     }
 
-    // Método para resetear el estado de error y resultado
-    fun resetState() {
+    // Función para reiniciar los estados
+    fun resetAppointmentResult() {
         _appointmentResult.value = false
-        _error.value = ""
+        _error.value = null
     }
 
     // Método para actualizar una cita existente
@@ -114,4 +134,14 @@ class AppointmentViewModel : ViewModel() {
             }
         }
     }
+
+    // Función para verificar si el usuario puede crear un nuevo caso
+    fun canCreateNewCase(userId: String, onResult: (Boolean) -> Unit) {
+        viewModelScope.launch {
+            val lastAvailableCase = userRepository.getLastAvailableCase(userId)
+            // Si no existe un último caso disponible, puede crear un nuevo caso
+            onResult(lastAvailableCase == null)
+        }
+    }
+
 }

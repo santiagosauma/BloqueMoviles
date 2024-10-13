@@ -5,6 +5,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.traceEventStart
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -68,14 +69,14 @@ fun MyApp() {
         composable(
             route = "ReviewComentarios/{case_id}",
             arguments = listOf(
-                navArgument("case_id") { type = NavType.StringType }
+                navArgument("case_id") { type = NavType.StringType },
             )
         ) { backStackEntry ->
 
             val case_id = backStackEntry.arguments?.getString("case_id") ?: ""
             ReviewComentarios(
                 navController = navController,
-                case_id = case_id
+                case_id = case_id,
             )
         }
         composable("crearsolicitud") { Solicitud(navController) }
@@ -127,7 +128,20 @@ fun MyApp() {
 
         composable("Juribot") { JuriBotScreen(navController) }
 
-        composable("SegundoFormulario") { SegundoFormulario(navController) }
+        composable(
+            route = "SegundoFormulario/{caseId}",
+            arguments = listOf(
+                navArgument("caseId") {type = NavType.StringType}
+            )
+        ) { backStackEntry ->
+
+            val caseId = backStackEntry.arguments?.getString("caseId") ?: ""
+
+            SegundoFormulario(
+                navController =  navController,
+                caseId = caseId
+            )
+        }
 
 
 

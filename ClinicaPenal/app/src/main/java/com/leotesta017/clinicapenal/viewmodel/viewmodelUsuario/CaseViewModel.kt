@@ -95,9 +95,30 @@ class CaseViewModel : ViewModel() {
     }
 
     // Función para eliminar un caso y sus elementos asociados
+    fun updateExtraInfoOfCase(caseId: String, data: Map<String,Any>) {
+        viewModelScope.launch {
+            val success = repository.updateLastExtraInfoInCase(caseId = caseId, extraInfoData = data)
+            if (!success) {
+                _error.value = "Error al eliminar el caso o elementos asociados."  // Indicar que el caso ha sido eliminado con éxito
+            }
+        }
+    }
+
+
+    // Función para eliminar un caso y sus elementos asociados
     fun discardCase(caseId: String) {
         viewModelScope.launch {
             val success = repository.updateCaseToDiscard(caseId)
+            if (!success) {
+                _error.value = "Error al eliminar el caso o elementos asociados."  // Indicar que el caso ha sido eliminado con éxito
+            }
+        }
+    }
+
+    // Función para eliminar un caso y sus elementos asociados
+    fun deleteCase(caseId: String) {
+        viewModelScope.launch {
+            val success = repository.deleteCase(caseId)
             if (!success) {
                 _error.value = "Error al eliminar el caso o elementos asociados."  // Indicar que el caso ha sido eliminado con éxito
             }
@@ -145,6 +166,26 @@ class CaseViewModel : ViewModel() {
     fun resetLastAppointment() {
         _lastAppointment.value = null
         _error.value = null
+    }
+
+    // Función para actualizar la valoración del appointment y agregar comentario si existe
+    fun updateAppointmentAndAddComment(
+        caseId: String,
+        rating: Int,
+        commentContent: String,
+        userId: String
+    ) {
+        viewModelScope.launch {
+            val success = repository.updateAppointmentAndAddCommentIfExists(
+                            caseId = caseId,
+                            rating = rating,
+                            commentContent = commentContent,
+                            userId = userId)
+            if (!success) {
+                _error.value = "Error al actualizar el caso o elementos asociados."
+            }
+        }
+
     }
 
 }

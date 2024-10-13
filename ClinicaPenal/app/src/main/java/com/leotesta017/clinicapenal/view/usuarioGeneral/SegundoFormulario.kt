@@ -1,29 +1,28 @@
 package com.leotesta017.clinicapenal.view.usuarioGeneral
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.BarraNav
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.TopBar
 import com.leotesta017.clinicapenal.view.theme.ClinicaPenalTheme
+import com.leotesta017.clinicapenal.viewmodel.viewmodelUsuario.CaseViewModel
 
 @Composable
-fun SegundoFormulario(navController: NavController?) {
+fun SegundoFormulario(navController: NavController?,caseId: String) {
     Scaffold(
         topBar = {
             Column {
@@ -34,7 +33,7 @@ fun SegundoFormulario(navController: NavController?) {
                         .padding(horizontal = 16.dp, vertical = 3.dp)
                         .fillMaxWidth()
                 ) {
-                    IconButton(onClick = { navController?.popBackStack() }) {
+                    IconButton(onClick = { navController?.navigate("solicitud") }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
                     }
                     Spacer(modifier = Modifier.width(8.dp))
@@ -59,13 +58,50 @@ fun SegundoFormulario(navController: NavController?) {
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                InputDelito()
+                var delitoIngresado by remember { mutableStateOf("") }
+                var fiscaliaSeleccionada by remember { mutableStateOf("") }
+                var ineIngresado by remember { mutableStateOf("") }
+
+                // Input para el delito
+                InputDelito(onDelitoChange = { nuevoDelito ->
+                    delitoIngresado = nuevoDelito
+                })
+
                 Spacer(modifier = Modifier.height(16.dp))
-                DropdownFiscalia()
+
+                // Dropdown para la fiscalía
+                InputFiscalia(onFiscaliaEntered = { nuevaFiscalia ->
+                    fiscaliaSeleccionada = nuevaFiscalia
+                })
+
                 Spacer(modifier = Modifier.height(16.dp))
-                InputCI()
+
+                // Input para el INE
+                InputCI(onIneChange = { nuevoINE ->
+                    ineIngresado = nuevoINE
+                })
+
                 Spacer(modifier = Modifier.height(32.dp))
-                EnviarInformacionButton()
+
+                val context = LocalContext.current
+                val caseViewModel: CaseViewModel = viewModel()
+                val caseData = mapOf(
+                    "segundoFormulario" to true
+                )
+                // Botón de enviar información
+                EnviarInformacionButton(
+                    delito = delitoIngresado,
+                    fiscalia = fiscaliaSeleccionada,
+                    ine = ineIngresado,
+                    onEnviar = { extraInfoData ->
+                            caseViewModel.updateExtraInfoOfCase(caseId,extraInfoData)
+
+                            caseViewModel.updateCase(caseId,caseData)
+                            Toast.makeText(context, "Informacion agregada a su caso", Toast.LENGTH_LONG).show()
+                            navController?.navigate("solicitud")
+
+                    }
+                )
             }
         }
     )
@@ -73,12 +109,15 @@ fun SegundoFormulario(navController: NavController?) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun InputDelito() {
+fun InputDelito(onDelitoChange: (String) -> Unit) {
     var delito by remember { mutableStateOf("") }
 
     TextField(
         value = delito,
-        onValueChange = { delito = it },
+        onValueChange = {
+            delito = it
+            onDelitoChange(it) // Devolver el valor ingresado en el campo
+        },
         label = { Text("Delito") },
         modifier = Modifier.fillMaxWidth(),
         colors = TextFieldDefaults.textFieldColors(
@@ -90,67 +129,44 @@ fun InputDelito() {
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun DropdownFiscalia() {
-    var selectedFiscalia by remember { mutableStateOf("") }
-    var expanded by remember { mutableStateOf(false) }
-    val fiscalias = listOf("Fiscalía 1", "Fiscalía 2", "Fiscalía 3")
-
-    Box(modifier = Modifier.fillMaxWidth()) {
-        TextField(
-            value = selectedFiscalia,
-            onValueChange = { selectedFiscalia = it },
-            label = { Text("Fiscalía") },
-            trailingIcon = {
-                Icon(
-                    imageVector = Icons.Default.ArrowDropDown,
-                    contentDescription = "Dropdown arrow",
-                    modifier = Modifier.clickable { expanded = !expanded }
-                )
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable { expanded = !expanded },
-            colors = TextFieldDefaults.textFieldColors(
-                containerColor = Color(0xFFF2F2F2),
-                focusedIndicatorColor = Color.Blue,
-                unfocusedIndicatorColor = Color.Gray,
-                cursorColor = Color.Blue
-            )
-        )
-
-        DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false },
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color.White)
-        ) {
-            fiscalias.forEach { fiscalia ->
-                DropdownMenuItem(
-                    onClick = {
-                        selectedFiscalia = fiscalia
-                        expanded = false
-                    },
-                    text = {
-                        Text(text = fiscalia, color = Color.Black)
-                    }
-                )
-            }
-        }
-    }
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun InputCI() {
-    var ci by remember { mutableStateOf("") }
+fun InputFiscalia(onFiscaliaEntered: (String) -> Unit) {
+    var fiscalia by remember { mutableStateOf("") }
 
     TextField(
-        value = ci,
-        onValueChange = { ci = it },
-        label = { Text("C.I.") },
+        value = fiscalia,
+        onValueChange = {
+            fiscalia = it
+            onFiscaliaEntered(it) // Devolver el valor ingresado
+        },
+        label = { Text("Fiscalía") },
+        modifier = Modifier
+            .fillMaxWidth(),
+        colors = TextFieldDefaults.textFieldColors(
+            containerColor = Color(0xFFF2F2F2),
+            focusedIndicatorColor = Color.Blue,
+            unfocusedIndicatorColor = Color.Gray,
+            cursorColor = Color.Blue
+        )
+    )
+}
+
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun InputCI(onIneChange: (String) -> Unit) {
+    var ine by remember { mutableStateOf("") }
+
+    TextField(
+        value = ine,
+        onValueChange = {
+            ine = it
+            onIneChange(it) // Devolver el valor ingresado
+        },
+        label = { Text("INE.") },
         modifier = Modifier.fillMaxWidth(),
         colors = TextFieldDefaults.textFieldColors(
             containerColor = Color(0xFFF2F2F2),
@@ -162,29 +178,47 @@ fun InputCI() {
 }
 
 @Composable
-fun EnviarInformacionButton() {
+fun EnviarInformacionButton(
+    delito: String,
+    fiscalia: String,
+    ine: String,
+    onEnviar: (Map<String, String>) -> Unit // Callback para manejar el envío
+) {
+    val context = LocalContext.current
     Button(
         onClick = {
+            // Validar que ninguno de los campos esté vacío
+            if (delito.isEmpty() || fiscalia.isEmpty() || ine.isEmpty() ||
+                delito.isBlank() || fiscalia.isBlank() || ine.isBlank()) {
+                Toast.makeText(context, "Por favor completa todos los campos", Toast.LENGTH_SHORT).show()
+            } else {
+                // Crear el mapa con los valores
+                val extraInfoData = mapOf(
+                    "crime" to delito,
+                    "fiscalia" to fiscalia,
+                    "ine" to ine
+                )
+                onEnviar(extraInfoData)
+            }
         },
         modifier = Modifier
             .fillMaxWidth()
-            .height(56.dp),
-        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0B1F8C)),
-        shape = RoundedCornerShape(24.dp)
+            .height(48.dp),
+        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF002366))
     ) {
         Text(
             text = "Enviar Información",
             color = Color.White,
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold
+            style = MaterialTheme.typography.labelLarge.copy(fontSize = 18.sp)
         )
     }
 }
+
 
 @Preview(showBackground = true)
 @Composable
 fun SegundoFormularioPreview() {
     ClinicaPenalTheme {
-        SegundoFormulario(navController = rememberNavController())
+        SegundoFormulario(navController = rememberNavController(), caseId = "1")
     }
 }

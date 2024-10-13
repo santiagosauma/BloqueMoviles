@@ -12,6 +12,7 @@ data class Case (
     val situation: String = "",
     val state: String = "",
     val studentAssigned: String = "",
+    val segundoFormulario: Boolean = false,
     val listAppointments: List<String> = emptyList(),
     val listExtraInfo: List<String> = emptyList(),
     val listComents: List<String> = emptyList()

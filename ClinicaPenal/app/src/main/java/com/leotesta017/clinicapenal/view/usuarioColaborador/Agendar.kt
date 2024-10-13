@@ -139,7 +139,7 @@ fun Agendar(navController: NavController?, caseId: String, appointmentViewModel:
 fun SeleccionarFechaYHora(
     context: Context,
     selectedTime: String,
-    availableHours: List<String>,  // Recibimos las horas filtradas como parámetro
+    availableHours: List<String>,
     onDateSelected: (String) -> Unit,
     onTimeSelected: (String) -> Unit
 ) {
