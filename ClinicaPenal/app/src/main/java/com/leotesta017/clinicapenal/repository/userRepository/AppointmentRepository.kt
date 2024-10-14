@@ -1,5 +1,6 @@
 package com.leotesta017.clinicapenal.repository.userRepository
 
+import android.content.Context
 import android.util.Log
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.ktx.firestore
@@ -7,6 +8,10 @@ import com.google.firebase.ktx.Firebase
 import com.leotesta017.clinicapenal.model.modelUsuario.Appointment
 import com.leotesta017.clinicapenal.model.modelUsuario.Case
 import com.leotesta017.clinicapenal.model.modelUsuario.ExtraInfo
+import com.leotesta017.clinicapenal.notificaciones.NotificationServiceSingleton
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -83,7 +88,8 @@ class AppointmentRepository {
         place: String,
         lugarProcedencia: String,
         victima: Boolean,
-        investigado: Boolean
+        investigado: Boolean,
+        context: Context
     ): Boolean {
         return try {
             // Generar un nuevo ID para el caso
@@ -150,6 +156,18 @@ class AppointmentRepository {
             // Actualizar la lista de casos del usuario
             firestore.collection("usuarios").document(userId)
                 .update("listCases", FieldValue.arrayUnion(newCaseId)).await()
+
+            val notificationService = NotificationServiceSingleton.getInstance(context = context)
+
+            Log.d("Notificacion", "Antes de enviarse ")
+            CoroutineScope(Dispatchers.IO).launch {
+                notificationService.sendNotificationToAllAbogadosYEstudiantes(
+                    title = "Nuevo caso creado",
+                    message = "Se ha registrado una nueva cita y creado un caso a partir de ella. Revisa los detalles en la aplicación."
+
+                )
+                Log.d("Notificacion", "Despues de enviarse ")
+            }
 
             true  // Operación exitosa
         } catch (e: Exception) {

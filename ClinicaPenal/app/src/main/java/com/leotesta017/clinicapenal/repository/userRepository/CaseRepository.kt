@@ -1,5 +1,6 @@
 package com.leotesta017.clinicapenal.repository.userRepository
 
+import android.content.Context
 import android.util.Log
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FieldValue
@@ -11,7 +12,7 @@ import com.leotesta017.clinicapenal.model.modelUsuario.Comentario
 import com.leotesta017.clinicapenal.model.modelUsuario.ExtraInfo
 import kotlinx.coroutines.tasks.await
 
-class CaseRepository {
+class CaseRepository() {
 
     private val firestore = Firebase.firestore
     private val ExtraInforepository = ExtraInfoRepository()
@@ -242,6 +243,7 @@ class CaseRepository {
                     val appointments = mutableListOf<Appointment>()
                     val comments = mutableListOf<Comentario>()
                     val extraInfoList = mutableListOf<ExtraInfo>()
+
 
                     val appointmentRepository = AppointmentRepository()
 

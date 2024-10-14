@@ -308,7 +308,8 @@ fun BotonAgendarCita(
                             place = lugar,
                             lugarProcedencia = lugar,
                             victima = victima,
-                            investigado = investigado
+                            investigado = investigado,
+                            context = context
                         )
                         Toast.makeText(context, "Cita creada con exito, favor de contestar el segundo formulario", Toast.LENGTH_LONG).show()
                     }

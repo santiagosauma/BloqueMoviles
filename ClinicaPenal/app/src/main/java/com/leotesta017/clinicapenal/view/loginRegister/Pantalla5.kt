@@ -1,7 +1,10 @@
+@file:Suppress("LABEL_NAME_CLASH")
+
 package com.leotesta017.clinicapenal.view.loginRegister
 
 import android.content.Intent
 import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -27,7 +30,9 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.messaging.FirebaseMessaging
 import com.leotesta017.clinicapenal.R
 import com.leotesta017.clinicapenal.model.modelUsuario.UserIdData
 import com.leotesta017.clinicapenal.view.theme.ClinicaPenalTheme
@@ -117,6 +122,25 @@ fun Pantalla5(navController: NavController) {
                                             if (document != null && document.exists())
                                             {
                                                 val tipoUsuario = document.getString("tipo")
+
+                                                // Obtener el token FCM y guardarlo en la base de datos
+                                                FirebaseMessaging.getInstance().token.addOnCompleteListener { tokenTask ->
+                                                    if (!tokenTask.isSuccessful) {
+                                                        Log.w("FCM", "Fetching FCM registration token failed", tokenTask.exception)
+                                                        return@addOnCompleteListener
+                                                    }
+                                                    // Obtener el token
+                                                    val token = tokenTask.result
+                                                    // Guardar el token FCM en Firestore en el documento del usuario
+                                                    db.collection("usuarios").document(uid)
+                                                        .update("fcmTokens", FieldValue.arrayUnion(token))
+                                                        .addOnSuccessListener {
+                                                            Log.d("FCM", "FCM token successfully saved in Firestore")
+                                                        }
+                                                        .addOnFailureListener {
+                                                            Log.e("FCM", "Error saving FCM token", it)
+                                                        }
+                                                }
 
                                                 when (tipoUsuario)
                                                 {

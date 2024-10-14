@@ -1,16 +1,26 @@
 package com.leotesta017.clinicapenal.view
 
+import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.traceEventStart
+import androidx.core.content.ContextCompat
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.firebase.messaging.Constants.MessageNotificationKeys.TAG
+import com.google.firebase.messaging.FirebaseMessaging
+import com.leotesta017.clinicapenal.R
 import com.leotesta017.clinicapenal.view.loginRegister.*
 import com.leotesta017.clinicapenal.solicitud.GeneralSolicitud
 import com.leotesta017.clinicapenal.view.usuarioColaborador.*
@@ -19,8 +29,59 @@ import com.leotesta017.clinicapenal.view.usuarioGeneral.*
 import com.leotesta017.clinicapenal.view.editvideo.EditVideoScreen
 
 class MainActivity : ComponentActivity() {
+    // Declare the launcher at the top of your Activity/Fragment:
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission(),
+    ) { isGranted: Boolean ->
+        if (isGranted) {
+            FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
+                if (!task.isSuccessful) {
+                    Log.w(TAG, "Fetching FCM registration token failed", task.exception)
+                    return@OnCompleteListener
+                }
+
+                // Get new FCM registration token
+                val token = task.result
+
+                // Log and toast
+                val msg = getString(R.string.msg_token_fmt, token)
+                Log.d(TAG, msg)
+                Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
+            })
+        } else {
+            // TODO: Inform user that that your app will not show notifications.
+        }
+    }
+
+    private fun askNotificationPermission() {
+        // This is only necessary for API level >= 33 (TIRAMISU)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) ==
+                PackageManager.PERMISSION_GRANTED
+            ) {
+
+            } else if (shouldShowRequestPermissionRationale(android.Manifest.permission.POST_NOTIFICATIONS)) {
+
+            } else {
+
+                requestPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+            }
+        } else {
+            FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
+                if (!task.isSuccessful) {
+                    Log.w(TAG, "Fetching FCM registration token")
+                    return@OnCompleteListener
+                }
+
+                // Get new FCM registration token
+                val token = task.result
+            })
+        }
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        askNotificationPermission()
         super.onCreate(savedInstanceState)
         setContent {
             MyApp()

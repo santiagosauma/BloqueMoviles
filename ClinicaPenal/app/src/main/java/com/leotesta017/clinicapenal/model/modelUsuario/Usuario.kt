@@ -8,5 +8,6 @@ data class Usuario(
     val tipo: String ="",
 
     //INFORMACION ASOCIADA A CADA USUARIO DE LOS CASOS
-    val listCases: List<String> = emptyList()
+    val listCases: List<String> = emptyList(),
+    val fcmTokens: List<String> = emptyList()
 )

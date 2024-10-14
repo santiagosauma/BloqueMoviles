@@ -1,5 +1,6 @@
 package com.leotesta017.clinicapenal.viewmodel.viewmodelUsuario
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.leotesta017.clinicapenal.model.modelUsuario.Appointment
@@ -68,7 +69,8 @@ class AppointmentViewModel : ViewModel() {
         place: String,
         lugarProcedencia: String,
         victima: Boolean,
-        investigado: Boolean
+        investigado: Boolean,
+        context: Context
     ) {
         viewModelScope.launch {
             try {
@@ -79,7 +81,8 @@ class AppointmentViewModel : ViewModel() {
                     place,
                     lugarProcedencia,
                     victima,
-                    investigado
+                    investigado,
+                    context
                 )
 
                 // Actualizar el estado del resultado
