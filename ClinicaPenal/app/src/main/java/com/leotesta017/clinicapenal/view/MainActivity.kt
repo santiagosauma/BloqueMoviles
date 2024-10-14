@@ -308,7 +308,24 @@ fun MyApp() {
         //PANTALLA DEL JURIBOT PARA ADMIN
         composable("JuriBotAdmin") { JuriBotAdmin(navController) }
 
+        composable(
+            route = "editarComentarioAdmin/{caseId}/{comentarioId}",
+            arguments = listOf(
+                navArgument("caseId") { type = NavType.StringType },
+                navArgument("comentarioId") { type = NavType.StringType }
+            )
+        )
+        { backStackEntry ->
 
+            val caseId = backStackEntry.arguments?.getString("caseId") ?: ""
+            val comentarioId = backStackEntry.arguments?.getString("comentarioId") ?: ""
+
+            EditarBorrarComentarioAdmin(
+                navController,
+                caseId = caseId,
+                comentarioId = comentarioId
+            )
+        }
 
 
         /*=======================================================================================*/
@@ -409,7 +426,24 @@ fun MyApp() {
             )
         }
 
+        composable(
+            route = "editarComentarioEstudiante/{caseId}/{comentarioId}",
+            arguments = listOf(
+                navArgument("caseId") { type = NavType.StringType },
+                navArgument("comentarioId") { type = NavType.StringType }
+            )
+        )
+        { backStackEntry ->
 
+            val caseId = backStackEntry.arguments?.getString("caseId") ?: ""
+            val comentarioId = backStackEntry.arguments?.getString("comentarioId") ?: ""
+
+            EditarBorrarComentario(
+                navController,
+                caseId = caseId,
+                comentarioId = comentarioId
+            )
+        }
 
     }
 }

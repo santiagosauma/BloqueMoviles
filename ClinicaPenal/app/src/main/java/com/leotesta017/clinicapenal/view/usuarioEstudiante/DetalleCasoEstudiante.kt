@@ -25,6 +25,7 @@ fun DetalleCasoEstudiante(
         routeEditarFormulario = "modificarsegundoformularioestudiante",
         route = "generasolicitudestudiante",
         routeEditCita = "editarcitaEstudiante",
+        routeEditComentario = "editarComentarioEstudiante",
         barraNav = {
             Box(modifier = Modifier.fillMaxSize()){
                 EstudiantesBarraNav(

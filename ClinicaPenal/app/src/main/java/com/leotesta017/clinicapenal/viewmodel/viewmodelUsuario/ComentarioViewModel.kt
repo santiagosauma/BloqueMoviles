@@ -64,4 +64,13 @@ class ComentarioViewModel : ViewModel() {
             _usuarioByComentario.value = usuarioByComentario
         }
     }
+
+    fun deleteComentario(caseId: String, comentarioId: String) {
+        viewModelScope.launch {
+            val success = repository.deleteComentarioFromCase(caseId, comentarioId)
+            if (!success) {
+                _error.value = "Error al actualizar el comentario"
+            }
+        }
+    }
 }

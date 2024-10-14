@@ -18,22 +18,22 @@ fun ComentarioScreen(navController: NavController?, caseId: String) {
         title = "Comentario",
         caseId = caseId,
         route =  "actualizarcasos",
-        onAddComment = { contenido, isUrgent, userId, case_Id ->
+        onAddOrEditComment = { contenido, isUrgent, userId, case_Id ->
             comentarioViewModel.addNewComentarioToCase(
                 contenido = contenido,
                 important = isUrgent,
                 userId = userId,
                 caseId = case_Id
             )
+            navController?.navigate("actualizarcasos/${caseId}")
         },
         bottomBarNav = {
             AdminBarraNav(
                 navController = navController,
                 modifier = Modifier.fillMaxWidth()
             )
-
-
-        }
+        },
+        onDeleteComment = {/*Aqui no se eliminan comentarios*/}
     )
 }
 

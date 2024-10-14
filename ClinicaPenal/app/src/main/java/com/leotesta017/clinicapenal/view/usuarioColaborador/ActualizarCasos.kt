@@ -40,6 +40,7 @@ fun ActualizarCasos(
         route = "generalsolicitudadmin",
         routeEditarFormulario = "modificarsegundoformulario",
         routeEditCita ="editarcitaAdmin",
+        routeEditComentario = "editarComentarioAdmin",
         barraNav = {
             Box(
                 modifier = Modifier

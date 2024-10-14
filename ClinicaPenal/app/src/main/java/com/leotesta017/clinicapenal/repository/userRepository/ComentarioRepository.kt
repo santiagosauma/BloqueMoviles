@@ -31,9 +31,6 @@ class ComentarioRepository {
     }
 
 
-
-
-
     // Método para generar y agregar un nuevo comentario
     suspend fun addNewComentarioToCase(contenido: String, important: Boolean, userId: String, caseId: String): Boolean {
         return try {
@@ -90,6 +87,29 @@ class ComentarioRepository {
             null
         }
     }
+
+    // Método para eliminar un comentario por su ID y eliminarlo de la lista de comentarios del caso
+    suspend fun deleteComentarioFromCase(comentarioId: String, caseId: String): Boolean {
+        return try {
+            // Obtener referencias a los documentos del comentario y del caso
+            val comentarioRef = firestore.collection("coments").document(comentarioId)
+            val caseRef = firestore.collection("cases").document(caseId)
+
+            firestore.runTransaction { transaction ->
+                // Eliminar el comentario de la colección "coments"
+                transaction.delete(comentarioRef)
+
+                // Eliminar la referencia del comentario en el campo listComents del documento del caso
+                transaction.update(caseRef, "listComents", FieldValue.arrayRemove(comentarioId))
+            }.await()  // Esperar a que la transacción se complete
+
+            true  // Operación exitosa
+        } catch (e: Exception) {
+            // En caso de error, se devuelve false
+            false
+        }
+    }
+
 
 }
 

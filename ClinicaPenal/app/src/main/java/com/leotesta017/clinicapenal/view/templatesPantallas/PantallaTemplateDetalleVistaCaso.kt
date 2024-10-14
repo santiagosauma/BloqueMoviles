@@ -74,6 +74,7 @@ fun PantallaTemplateDetalleVistaCaso(
     routeComentario: String,
     routeEditarFormulario: String,
     routeEditCita: String,
+    routeEditComentario: String,
     barraNav: @Composable () -> Unit,
     contenidoExtra: @Composable (Case,Usuario,Usuario,String,String) -> Unit,
     caseViewModel: CaseViewModel = viewModel(),
@@ -316,7 +317,9 @@ fun PantallaTemplateDetalleVistaCaso(
                             isImportant = comment.important,
                             author = comment.madeBy,
                             comentarioId = comment.comentario_id,
-                            navController = navController
+                            navController = navController,
+                            caseId = caseId,
+                            routeEditComentario = routeEditComentario
                         )
                     }
                 }
@@ -817,7 +820,9 @@ fun ClienteComentario(nombre: String,
                       isImportant: Boolean,
                       author: String,
                       comentarioId:String,
-                      navController:NavController?
+                      caseId:String,
+                      navController:NavController?,
+                      routeEditComentario: String
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -841,7 +846,7 @@ fun ClienteComentario(nombre: String,
         {
             IconButton(
                 onClick = {
-                    navController?.navigate("editComentario/$comentarioId")
+                    navController?.navigate("$routeEditComentario/$caseId/$comentarioId")
                 }
             ) {
                 Icon(

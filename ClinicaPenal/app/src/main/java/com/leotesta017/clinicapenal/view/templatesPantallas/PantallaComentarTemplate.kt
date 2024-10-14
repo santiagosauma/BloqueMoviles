@@ -1,5 +1,6 @@
 package com.leotesta017.clinicapenal.view.templatesPantallas
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -17,7 +18,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.FormatBold
 import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.AlertDialog
@@ -38,6 +38,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -52,20 +53,24 @@ import com.leotesta017.clinicapenal.viewmodel.viewmodelUsuario.ComentarioViewMod
 @Composable
 fun PantallaComentarTemplate(
     navController: NavController?,
+    comentarioIncial: String? = null, // Comentario inicial puede ser nulo
     title: String,
     caseId: String,
     route: String,
+    comentarioId: String? = null, // ID del comentario para eliminación, puede ser nulo
     bottomBarNav: @Composable () -> Unit,
-    comentarioViewModel: ComentarioViewModel = viewModel(),
-    onAddComment: (String, Boolean, String, String) -> Unit
+    isUrgentInitial: Boolean? = null, // Urgente puede ser nulo
+    isEditing: Boolean = false, // Para habilitar el botón de eliminar solo si está editando
+    onAddOrEditComment: (String, Boolean, String, String) -> Unit,
+    onDeleteComment: (String) -> Unit // Callback para manejar la acción de eliminar el comentario, usando el ID
 ) {
-
-    var comentario by remember { mutableStateOf("") }
+    var comentario by remember { mutableStateOf(comentarioIncial ?: "") } // Valor predeterminado vacío si es nulo
     var isBold by remember { mutableStateOf(false) }
     var showDialog by remember { mutableStateOf(false) }
     var showUnsavedChangesDialog by remember { mutableStateOf(false) }
+    var showDeleteDialog by remember { mutableStateOf(false) } // Controla la visibilidad del diálogo de eliminación
     var linkInput by remember { mutableStateOf("") }
-    var isUrgent by remember { mutableStateOf(false) }  // Controlar si el comentario es urgente
+    var isUrgent by remember { mutableStateOf(isUrgentInitial ?: false) } // Valor predeterminado 'false' si es nulo
     var hasChanges by remember { mutableStateOf(false) } // Variable booleana para detectar cambios
 
     Scaffold(
@@ -166,7 +171,12 @@ fun PantallaComentarTemplate(
                     .fillMaxWidth()
                 ){
                     OutlinedButton(
-                        onClick = { isUrgent = !isUrgent },
+                        onClick = { isUrgent = !isUrgent
+                                  if(isUrgentInitial != null && isUrgentInitial != isUrgent)
+                                  {
+                                      hasChanges = true
+                                  }
+                        },
                         colors = ButtonDefaults.outlinedButtonColors(
                             containerColor = if (isUrgent) Color.Red else Color(0xFF002366),
                             contentColor = if (isUrgent) Color.White else Color.White
@@ -184,39 +194,68 @@ fun PantallaComentarTemplate(
                         .fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-
-
                     val userId = UserIdData.userId
                     RoundedButton(
                         icon = Icons.Default.Save,
                         label = "Guardar",
                         onClick = {
                             if (comentario.isNotEmpty()) {
-                                if (userId != null) {
-                                    onAddComment(
-                                        comentario,
-                                        isUrgent,
-                                        userId,
-                                        caseId
-                                    )
+                                if(isEditing)
+                                {
+                                    if (userId != null && comentarioId != null) {
+                                        onAddOrEditComment(
+                                                comentario,
+                                                isUrgent,
+                                                userId,
+                                                comentarioId
+                                        )
+                                    }
                                 }
-                                comentario = ""  // Limpiar el campo después de guardar
-                                isUrgent = false  // Reiniciar el estado de urgencia
+                                else{
+                                    if (userId != null) {
+                                        onAddOrEditComment(
+                                            comentario,
+                                            isUrgent,
+                                            userId,
+                                            caseId
+                                        )
+                                    }
+                                    comentario = comentarioIncial ?: ""  // Limpiar el campo después de guardar
+                                    isUrgent = isUrgentInitial ?: false  // Reiniciar el estado de urgencia
+                                }
+
                             }
-
                             hasChanges = false // Reiniciar el estado de cambios después de guardar
-
                         }
                     )
+
                     RoundedButton(
                         icon = Icons.Default.Delete,
                         label = "Descartar",
                         onClick = {
-                            comentario = "" // Limpiar el comentario
-                            isUrgent = false
+                            comentario = comentarioIncial ?: "" // Restaurar el comentario inicial o vacío
+                            isUrgent = isUrgentInitial ?: false // Restaurar el estado de urgencia inicial
                             hasChanges = false // Reiniciar el estado de cambios
                         }
                     )
+                }
+
+                // Mostrar el botón de eliminar si está en modo edición y tiene un comentario ID
+                if (isEditing && comentarioId != null) {
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    OutlinedButton(
+                        onClick = {
+                            showDeleteDialog = true // Mostrar el diálogo de confirmación de eliminación
+                        },
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            containerColor = Color.Red,
+                            contentColor = Color.White
+                        ),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(text = "Eliminar Comentario")
+                    }
                 }
 
                 // Mostrar el diálogo para insertar enlace
@@ -237,7 +276,7 @@ fun PantallaComentarTemplate(
                         confirmButton = {
                             Button(
                                 onClick = {
-                                    comentario += " $linkInput" // Insertar el enlace en el comentario
+                                    comentario += "\nHipervinculo: $linkInput" // Insertar el enlace en el comentario
                                     hasChanges = true
                                     showDialog = false
                                 }
@@ -280,10 +319,39 @@ fun PantallaComentarTemplate(
                         }
                     )
                 }
+
+                // Mostrar el diálogo de confirmación de eliminación
+                if (showDeleteDialog) {
+                    AlertDialog(
+                        onDismissRequest = { showDeleteDialog = false },
+                        title = { Text("Confirmar eliminación") },
+                        text = { Text("¿Estás seguro de que deseas eliminar este comentario? Esta acción no se puede deshacer.") },
+                        confirmButton = {
+                            Button(onClick = {
+                                showDeleteDialog = false
+                                comentarioId?.let {
+                                    onDeleteComment(it) // Ejecutar la lógica de eliminación con el comentarioId
+                                }
+                            }) {
+                                Text("Eliminar")
+                            }
+                        },
+                        dismissButton = {
+                            Button(
+                                onClick = {
+                                    showDeleteDialog = false // Cerrar el diálogo sin eliminar
+                                }
+                            ) {
+                                Text("Cancelar")
+                            }
+                        }
+                    )
+                }
             }
         }
     )
 }
+
 
 
 

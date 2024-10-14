@@ -17,21 +17,21 @@ fun ComentarioScreenEstudiante(navController: NavController?, caseId: String) {
         title = "Comentario",
         caseId = caseId,
         route =  "detallecasoestudiante",
-        onAddComment = { contenido, isUrgent, userId, case_Id ->
+        onAddOrEditComment = { contenido, isUrgent, userId, case_Id ->
             comentarioViewModel.addNewComentarioToCase(
                 contenido = contenido,
                 important = isUrgent,
                 userId = userId,
                 caseId = case_Id
             )
+            navController?.navigate("detallecasoestudiante/${caseId}")
         },
         bottomBarNav = {
             EstudiantesBarraNav(
                 navController = navController,
                 modifier = Modifier.fillMaxWidth()
             )
-
-
-        }
+        },
+        onDeleteComment = {/*Aqui no habra eliminaciones*/}
     )
 }
