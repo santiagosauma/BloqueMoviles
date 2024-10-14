@@ -8,6 +8,7 @@ import com.leotesta017.clinicapenal.model.modelUsuario.Comentario
 import com.leotesta017.clinicapenal.model.modelUsuario.ExtraInfo
 import com.leotesta017.clinicapenal.repository.userRepository.AppointmentRepository
 import com.leotesta017.clinicapenal.repository.userRepository.CaseRepository
+import com.leotesta017.clinicapenal.repository.userRepository.ExtraInfoRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -16,6 +17,7 @@ class CaseViewModel : ViewModel() {
 
     val repository = CaseRepository()
     val appointmentRepository = AppointmentRepository()
+    val extrainfoRepository = ExtraInfoRepository()
 
     private val _case = MutableStateFlow<Case?>(null)
     val case: StateFlow<Case?> = _case
@@ -23,6 +25,10 @@ class CaseViewModel : ViewModel() {
     // Estado para almacenar la última cita obtenida
     private val _lastAppointment = MutableStateFlow<Appointment?>(null)
     val lastAppointment: StateFlow<Appointment?> = _lastAppointment
+
+    //Estado para almacenar el ultimo formulario del caso
+    private val _lastExtraInfo = MutableStateFlow<ExtraInfo?>(null)
+    val lastExtraInfo: StateFlow<ExtraInfo?> = _lastExtraInfo
 
     private val _unrepresentedCasesWithLastAppointment = MutableStateFlow<List<Triple<Case, String, Boolean>>>(emptyList())
     val unrepresentedCasesWithLastAppointment: StateFlow<List<Triple<Case, String, Boolean>>> = _unrepresentedCasesWithLastAppointment
@@ -165,6 +171,35 @@ class CaseViewModel : ViewModel() {
     // Método para resetear el estado de la última cita
     fun resetLastAppointment() {
         _lastAppointment.value = null
+        _error.value = null
+    }
+
+
+    fun fetchLastExtraInfo(caseId: String) {
+        viewModelScope.launch {
+            try {
+                // Resetear el estado antes de la nueva llamada
+                resetLastExtraInfo()
+
+                // Llamar al repositorio para obtener el último appointment
+                val lastExtraInfo = repository.getLastExtraInfoForCase(caseId, extrainfoRepository)
+
+                if (lastExtraInfo != null) {
+                    _lastExtraInfo.value = lastExtraInfo
+                    _error.value = null // Sin error
+                } else {
+                    _lastExtraInfo.value = null
+                    _error.value = "No se encontró ninguna cita para este caso."
+                }
+            } catch (e: Exception) {
+                _error.value = "Error al obtener la última cita: ${e.message}"
+            }
+        }
+    }
+
+    // Método para resetear el estado de la última cita
+    fun resetLastExtraInfo() {
+        _lastExtraInfo.value = null
         _error.value = null
     }
 

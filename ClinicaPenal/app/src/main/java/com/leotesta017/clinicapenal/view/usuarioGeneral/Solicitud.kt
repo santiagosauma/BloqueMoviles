@@ -153,7 +153,7 @@ fun Solicitud(navController: NavController?) {
 
 @Composable
 fun SeleccionCasoLegal(onSelectedOptionChange: (String) -> Unit) {
-    var selectedOption by remember { mutableStateOf("Víctima") }
+    var selectedOption by remember { mutableStateOf("") }
 
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
@@ -334,18 +334,6 @@ fun BotonAgendarCita(
         )
     }
 
-    // Manejo de resultados
-    when {
-        appointmentResult == true -> {
-            // Mostrar mensaje de éxito
-            Text(text = "Cita y caso creados exitosamente", color = Color.Green)
-            appointmentViewModel.resetAppointmentResult() // Resetear el estado
-        }
-        error != null -> {
-            // Mostrar mensaje de error
-            Text(text = "Error: $error", color = Color.Red)
-        }
-    }
 }
 
 // Función auxiliar para convertir la fecha y la hora a un Timestamp (de Firestore)

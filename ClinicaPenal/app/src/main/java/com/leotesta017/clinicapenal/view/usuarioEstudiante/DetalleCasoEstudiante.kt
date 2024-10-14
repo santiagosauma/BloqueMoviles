@@ -22,7 +22,9 @@ fun DetalleCasoEstudiante(
         caseId = case_id,
         routeComentario = "comentarestudiante",
         routeAgendar = "agendarestudiante",
+        routeEditarFormulario = "modificarsegundoformularioestudiante",
         route = "generasolicitudestudiante",
+        routeEditCita = "editarcitaEstudiante",
         barraNav = {
             Box(modifier = Modifier.fillMaxSize()){
                 EstudiantesBarraNav(

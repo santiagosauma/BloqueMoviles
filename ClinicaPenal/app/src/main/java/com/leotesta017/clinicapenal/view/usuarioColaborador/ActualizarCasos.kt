@@ -38,6 +38,8 @@ fun ActualizarCasos(
         routeComentario = "comentar",
         routeAgendar = "agendar",
         route = "generalsolicitudadmin",
+        routeEditarFormulario = "modificarsegundoformulario",
+        routeEditCita ="editarcitaAdmin",
         barraNav = {
             Box(
                 modifier = Modifier

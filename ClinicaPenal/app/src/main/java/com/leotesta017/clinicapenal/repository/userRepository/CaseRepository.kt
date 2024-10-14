@@ -283,6 +283,39 @@ class CaseRepository {
         }
     }
 
+    suspend fun getLastExtraInfoForCase(caseId: String, extraInfoRepository: ExtraInfoRepository): ExtraInfo? {
+        return try {
+            // Obtener el caso por su ID
+            val caseSnapshot = firestore.collection("cases").document(caseId).get().await()
+
+            if (caseSnapshot.exists()) {
+                val case = caseSnapshot.toObject(Case::class.java)
+
+                case?.let {
+                    // Verificar si tiene citas en la lista de citas
+                    if (it.listExtraInfo.isNotEmpty()) {
+                        // Obtener el ID del último Appointment de la lista
+                        val lastExtraInfoId = it.listExtraInfo.last()
+
+                        // Obtener la cita por su ID usando el repositorio de citas
+                        val lastExtraInfo = extraInfoRepository.getExtraInfoById(lastExtraInfoId)
+
+                        lastExtraInfo // Retornar el ultimo formulario
+                    } else {
+                        null // No hay citas asociadas al caso
+                    }
+                }
+            } else {
+                null // Caso no existe
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null // Error al obtener la cita
+        }
+    }
+
+
+
     suspend fun getLastAppointmentForCase(caseId: String, appointmentRepository: AppointmentRepository): Appointment? {
         return try {
             // Obtener el caso por su ID

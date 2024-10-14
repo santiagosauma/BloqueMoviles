@@ -1336,6 +1336,14 @@ fun CaseUserAdminItem(
         username = generalUserName
     }
 
+    val caseViewModel: CaseViewModel = viewModel()
+
+    val ultimaCita by caseViewModel.lastAppointment.collectAsState()
+
+    LaunchedEffect(Unit) {
+        caseViewModel.fetchLastAppointment(case.first.case_id)
+    }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -1425,18 +1433,23 @@ fun CaseUserAdminItem(
                     )
 
                     if (case.second.isNotEmpty()) {
+
                         val lastAppointment = case.second
 
                         // Fecha de la última cita
                         Text(
                             text = "Fecha: $lastAppointment",
                             fontSize = 14.sp,
-                            color = if (case.first.suspended) Color.Red else Color.Blue
+                            color = if (case.first.suspended || (ultimaCita?.suspended == true)) Color.Red else Color.Blue
                         )
 
                         // Estado de confirmación
                         Text(
-                            text = "Confirmada: ${if (case.third) "Sí" else "No"}",
+                            text = "Cita Confirmada: ${if (case.third) "Sí" else "No"}",
+                            fontSize = 14.sp
+                        )
+                        Text(
+                            text = "Cita Suspendida: ${if (ultimaCita?.suspended == true) "Sí" else "No"}",
                             fontSize = 14.sp
                         )
                     } else {
@@ -1539,6 +1552,14 @@ fun CaseUserGenaralItem(
         caseCounter = index
     }
 
+    val caseViewModel: CaseViewModel = viewModel()
+
+    val ultimaCita by caseViewModel.lastAppointment.collectAsState()
+
+    LaunchedEffect(Unit) {
+        caseViewModel.fetchLastAppointment(case.first.case_id)
+    }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -1595,14 +1616,7 @@ fun CaseUserGenaralItem(
                             null
                         }
 
-                        val caseViewModel: CaseViewModel = viewModel()
 
-                        val ultimaCita by caseViewModel.lastAppointment.collectAsState()
-
-                        LaunchedEffect(Unit) {
-                            Log.d("ReviewComentarios", "Fetching last appointment for caseId: ${case.first.case_id}")
-                            caseViewModel.fetchLastAppointment(case.first.case_id)
-                        }
 
                         val rating = ultimaCita?.valoration
                         
@@ -1623,7 +1637,7 @@ fun CaseUserGenaralItem(
                             DropdownMenuItem(
                                 onClick = {
                                     expanded = false
-                                    navController?.navigate("CambiarCitaOConfirmar/${case.first.case_id}")
+                                    navController?.navigate("editarcitaUsuario/${ultimaCita?.appointment_id}")
                                 },
                                 text = { Text("Confirmar o Cancelar Cita") }
                             )
@@ -1656,20 +1670,27 @@ fun CaseUserGenaralItem(
                     )
 
                     if (case.second.isNotEmpty()) {
+
                         val lastAppointment = case.second
 
                         // Fecha de la última cita
                         Text(
                             text = "Fecha: $lastAppointment",
                             fontSize = 14.sp,
-                            color = if (case.first.suspended) Color.Red else Color.Blue
+                            color = if (case.first.suspended || (ultimaCita?.suspended == true)) Color.Red else Color.Blue
                         )
 
-                        // Estado de confirmación
+                            // Estado de confirmación
                         Text(
-                            text = "Confirmada: ${if (case.third) "Sí" else "No"}",
+                            text = "Cita Confirmada: ${if (case.third) "Sí" else "No"}",
                             fontSize = 14.sp
                         )
+                        Text(
+                            text = "Cita Suspendida: ${if (ultimaCita?.suspended == true) "Sí" else "No"}",
+                            fontSize = 14.sp
+                        )
+
+
                     } else {
                         Text(text = "Sin citas disponibles", fontSize = 14.sp)
                     }

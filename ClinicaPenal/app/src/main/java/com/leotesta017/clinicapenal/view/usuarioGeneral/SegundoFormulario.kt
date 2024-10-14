@@ -1,7 +1,10 @@
 package com.leotesta017.clinicapenal.view.usuarioGeneral
 
 import android.widget.Toast
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
@@ -58,50 +61,21 @@ fun SegundoFormulario(navController: NavController?,caseId: String) {
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                var delitoIngresado by remember { mutableStateOf("") }
-                var fiscaliaSeleccionada by remember { mutableStateOf("") }
-                var ineIngresado by remember { mutableStateOf("") }
-
-                // Input para el delito
-                InputDelito(onDelitoChange = { nuevoDelito ->
-                    delitoIngresado = nuevoDelito
-                })
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // Dropdown para la fiscalía
-                InputFiscalia(onFiscaliaEntered = { nuevaFiscalia ->
-                    fiscaliaSeleccionada = nuevaFiscalia
-                })
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // Input para el INE
-                InputCI(onIneChange = { nuevoINE ->
-                    ineIngresado = nuevoINE
-                })
-
-                Spacer(modifier = Modifier.height(32.dp))
-
                 val context = LocalContext.current
                 val caseViewModel: CaseViewModel = viewModel()
-                val caseData = mapOf(
-                    "segundoFormulario" to true
-                )
-                // Botón de enviar información
-                EnviarInformacionButton(
-                    delito = delitoIngresado,
-                    fiscalia = fiscaliaSeleccionada,
-                    ine = ineIngresado,
-                    onEnviar = { extraInfoData ->
-                            caseViewModel.updateExtraInfoOfCase(caseId,extraInfoData)
+                FormularioCompleto(onEnviar = { extraInfoData ->
+                    val caseData = mapOf("segundoFormulario" to true)
 
-                            caseViewModel.updateCase(caseId,caseData)
-                            Toast.makeText(context, "Informacion agregada a su caso", Toast.LENGTH_LONG).show()
-                            navController?.navigate("solicitud")
+                    // Actualizar extraInfo y el caso
+                    caseViewModel.updateExtraInfoOfCase(caseId, extraInfoData)
+                    caseViewModel.updateCase(caseId, caseData)
 
-                    }
-                )
+                    // Mostrar el mensaje de éxito
+                    Toast.makeText(context, "Información agregada. Gracias por responder :)", Toast.LENGTH_LONG).show()
+
+                    // Navegar de vuelta a la pantalla de solicitud
+                    navController?.navigate("solicitud")
+                })
             }
         }
     )
@@ -109,111 +83,177 @@ fun SegundoFormulario(navController: NavController?,caseId: String) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun InputDelito(onDelitoChange: (String) -> Unit) {
-    var delito by remember { mutableStateOf("") }
-
+fun InputField(
+    label: String,
+    value: String,
+    onValueChange: (String) -> Unit,
+    isError: Boolean = false
+) {
     TextField(
-        value = delito,
-        onValueChange = {
-            delito = it
-            onDelitoChange(it) // Devolver el valor ingresado en el campo
+        value = value,
+        onValueChange = onValueChange,
+        label = {
+            Row {
+                Text(label)
+                if (isError) {
+                    Text(" *", color = Color.Red) // Indicador de campo obligatorio
+                }
+            }
         },
-        label = { Text("Delito") },
-        modifier = Modifier.fillMaxWidth(),
-        colors = TextFieldDefaults.textFieldColors(
-            containerColor = Color(0xFFF2F2F2),
-            focusedIndicatorColor = Color.Blue,
-            unfocusedIndicatorColor = Color.Gray,
-            cursorColor = Color.Blue
-        )
-    )
-}
-
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun InputFiscalia(onFiscaliaEntered: (String) -> Unit) {
-    var fiscalia by remember { mutableStateOf("") }
-
-    TextField(
-        value = fiscalia,
-        onValueChange = {
-            fiscalia = it
-            onFiscaliaEntered(it) // Devolver el valor ingresado
-        },
-        label = { Text("Fiscalía") },
         modifier = Modifier
             .fillMaxWidth(),
         colors = TextFieldDefaults.textFieldColors(
             containerColor = Color(0xFFF2F2F2),
-            focusedIndicatorColor = Color.Blue,
-            unfocusedIndicatorColor = Color.Gray,
+            focusedIndicatorColor = if (isError) Color.Red else Color.Blue,
+            unfocusedIndicatorColor = if (isError) Color.Red else Color.Gray,
             cursorColor = Color.Blue
-        )
+        ),
+        isError = isError
     )
 }
 
-
-
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun InputCI(onIneChange: (String) -> Unit) {
+fun FormularioCompleto(onEnviar: (Map<String, String>) -> Unit) {
+    var fiscalia by remember { mutableStateOf("") }
+    var crime by remember { mutableStateOf("") } // Delito
     var ine by remember { mutableStateOf("") }
+    var nuc by remember { mutableStateOf("") } // Número Único de Causa (NUC)
+    var carpetaJudicial by remember { mutableStateOf("") }
+    var carpetaInvestigacion by remember { mutableStateOf("") }
+    var afv by remember { mutableStateOf("") } // Acceso a Fiscalía Virtual
+    var passwordFV by remember { mutableStateOf("") } // Contraseña de Fiscalía Virtual
+    var fiscalTitular by remember { mutableStateOf("") }
+    var unidadInvestigacion by remember { mutableStateOf("") }
+    var direccionUI by remember { mutableStateOf("") } // Dirección de la Unidad de Investigación
 
-    TextField(
-        value = ine,
-        onValueChange = {
-            ine = it
-            onIneChange(it) // Devolver el valor ingresado
-        },
-        label = { Text("INE.") },
-        modifier = Modifier.fillMaxWidth(),
-        colors = TextFieldDefaults.textFieldColors(
-            containerColor = Color(0xFFF2F2F2),
-            focusedIndicatorColor = Color.Blue,
-            unfocusedIndicatorColor = Color.Gray,
-            cursorColor = Color.Blue
-        )
-    )
-}
+    // Variables de control para mostrar el error en los campos obligatorios
+    var showErrorFiscalia by remember { mutableStateOf(false) }
+    var showErrorCrime by remember { mutableStateOf(false) }
+    var showErrorIne by remember { mutableStateOf(false) }
 
-@Composable
-fun EnviarInformacionButton(
-    delito: String,
-    fiscalia: String,
-    ine: String,
-    onEnviar: (Map<String, String>) -> Unit // Callback para manejar el envío
-) {
     val context = LocalContext.current
-    Button(
-        onClick = {
-            // Validar que ninguno de los campos esté vacío
-            if (delito.isEmpty() || fiscalia.isEmpty() || ine.isEmpty() ||
-                delito.isBlank() || fiscalia.isBlank() || ine.isBlank()) {
-                Toast.makeText(context, "Por favor completa todos los campos", Toast.LENGTH_SHORT).show()
-            } else {
-                // Crear el mapa con los valores
-                val extraInfoData = mapOf(
-                    "crime" to delito,
-                    "fiscalia" to fiscalia,
-                    "ine" to ine
-                )
-                onEnviar(extraInfoData)
-            }
-        },
+
+    Column(
         modifier = Modifier
-            .fillMaxWidth()
-            .height(48.dp),
-        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF002366))
+            .padding(16.dp)
+            .verticalScroll(rememberScrollState())
+
     ) {
-        Text(
-            text = "Enviar Información",
-            color = Color.White,
-            style = MaterialTheme.typography.labelLarge.copy(fontSize = 18.sp)
+        // Campo para Fiscalía (obligatorio)
+        InputField(
+            label = "Fiscalía",
+            value = fiscalia,
+            onValueChange = { fiscalia = it },
+            isError = showErrorFiscalia
         )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Campo para Delito (obligatorio)
+        InputField(
+            label = "Delito (Crime)",
+            value = crime,
+            onValueChange = { crime = it },
+            isError = showErrorCrime
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Campo para INE (obligatorio)
+        InputField(
+            label = "INE",
+            value = ine,
+            onValueChange = { ine = it },
+            isError = showErrorIne
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Text(
+            text = "Información Detallada",
+            style = MaterialTheme.typography.headlineSmall.copy(color = Color.Black),
+            modifier = Modifier.weight(1f)
+        )
+
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+            text = "Si cuenta con esta información, favor de proporcionarla",
+            style = MaterialTheme.typography.labelSmall.copy(color = Color.Black),
+            modifier = Modifier.weight(1f)
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Campos adicionales opcionales
+        InputField(label = "Número Único de Causa (NUC)",
+            value = nuc, onValueChange = { nuc = it })
+        Spacer(modifier = Modifier.height(16.dp))
+
+        InputField(label = "Carpeta Judicial",
+            value = carpetaJudicial, onValueChange = { carpetaJudicial = it })
+        Spacer(modifier = Modifier.height(16.dp))
+
+        InputField(label = "Carpeta de Investigación",
+            value = carpetaInvestigacion, onValueChange = { carpetaInvestigacion = it })
+        Spacer(modifier = Modifier.height(16.dp))
+
+        InputField(label = "Acceso a Fiscalía Virtual (AFV)",
+            value = afv, onValueChange = { afv = it })
+        Spacer(modifier = Modifier.height(16.dp))
+
+        InputField(label = "Contraseña de Fiscalía Virtual",
+            value = passwordFV, onValueChange = { passwordFV = it })
+        Spacer(modifier = Modifier.height(16.dp))
+
+        InputField(label = "Fiscal Titular",
+            value = fiscalTitular, onValueChange = { fiscalTitular = it })
+        Spacer(modifier = Modifier.height(16.dp))
+
+        InputField(label = "Unidad de Investigación",
+            value = unidadInvestigacion, onValueChange = { unidadInvestigacion = it })
+        Spacer(modifier = Modifier.height(16.dp))
+
+        InputField(label = "Dirección de la Unidad de Investigación",
+            value = direccionUI, onValueChange = { direccionUI = it })
+        Spacer(modifier = Modifier.height(32.dp))
+
+        // Botón de enviar la información
+        Button(
+            onClick = {
+                // Resetear los indicadores de error
+                showErrorFiscalia = fiscalia.isBlank() || fiscalia.isEmpty()
+                showErrorCrime = crime.isBlank() || fiscalia.isEmpty()
+                showErrorIne = ine.isBlank() || fiscalia.isEmpty()
+
+                if (crime.isBlank() || fiscalia.isBlank() || ine.isBlank() ||
+                    crime.isEmpty() || fiscalia.isEmpty() || ine.isEmpty() ) {
+
+                    Toast.makeText(context, "Por favor, completa los campos obligatorios.", Toast.LENGTH_SHORT).show()
+
+                } else {
+                    val formData = mapOf(
+                        "fiscalia" to fiscalia,
+                        "crime" to crime,
+                        "ine" to ine,
+                        "nuc" to nuc,
+                        "carpetaJudicial" to carpetaJudicial,
+                        "carpetaInvestigacion" to carpetaInvestigacion,
+                        "afv" to afv,
+                        "passwordFV" to passwordFV,
+                        "fiscalTitular" to fiscalTitular,
+                        "unidadInvestigacion" to unidadInvestigacion,
+                        "direccionUI" to direccionUI
+                    )
+                    onEnviar(formData) // Enviar el formulario
+                }
+            },
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF002366)),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(text = "Enviar Información", color = Color.White)
+        }
     }
 }
-
 
 @Preview(showBackground = true)
 @Composable

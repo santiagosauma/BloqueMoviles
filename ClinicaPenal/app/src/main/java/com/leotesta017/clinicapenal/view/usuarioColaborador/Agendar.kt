@@ -52,7 +52,7 @@ fun Agendar(navController: NavController?, caseId: String, appointmentViewModel:
                         .padding(horizontal = 16.dp, vertical = 3.dp)
                         .fillMaxWidth()
                 ) {
-                    IconButton(onClick = { navController?.popBackStack() }) {
+                    IconButton(onClick = { navController?.navigate("actualizarcasos/$caseId") }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
                     }
                     Spacer(modifier = Modifier.width(8.dp))

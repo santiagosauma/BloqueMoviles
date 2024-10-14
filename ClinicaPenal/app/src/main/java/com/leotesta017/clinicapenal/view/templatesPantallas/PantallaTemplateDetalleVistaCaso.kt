@@ -39,6 +39,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
@@ -71,6 +72,8 @@ fun PantallaTemplateDetalleVistaCaso(
     route: String,
     routeAgendar: String,
     routeComentario: String,
+    routeEditarFormulario: String,
+    routeEditCita: String,
     barraNav: @Composable () -> Unit,
     contenidoExtra: @Composable (Case,Usuario,Usuario,String,String) -> Unit,
     caseViewModel: CaseViewModel = viewModel(),
@@ -132,19 +135,16 @@ fun PantallaTemplateDetalleVistaCaso(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Información del Cliente (común)
+
                 SectionTitle("Información del Cliente")
+
                 Spacer(modifier = Modifier.height(8.dp))
 
                 val extraInfoList = caseWithDetails?.second?.third
 
-                println("extraInfoList: $extraInfoList")
 
                 extraInfoList?.lastOrNull()?.let { extraInfo ->
-                    // Log extra details
-                    println("ExtraInfo ID Usuario: ${extraInfo.id_Usuario}, Lugar Procedencia: ${extraInfo.lugarProcedencia}")
 
-                    // Obtener el ID del usuario
                     val userExtraInfoId = extraInfo.id_Usuario
 
                     LaunchedEffect(userExtraInfoId) {
@@ -154,13 +154,27 @@ fun PantallaTemplateDetalleVistaCaso(
                     // Recolectar la información del usuario
                     val usuarioExtraInfo by userViewModel.usuario.collectAsState()
 
-                    // Mostrar la información de cliente
                     ClienteInfoComponent(
                         userInfo = usuarioExtraInfo,
                         extraInfo = extraInfo,
-                        isRepresented = caseWithDetails?.first?.represented ?: false
                     )
                 }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Button(
+                    onClick = {
+                        navController?.navigate("$routeEditarFormulario/$caseId")
+                    },
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp)
+                        .fillMaxWidth()
+                        .height(48.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF002366))
+                ) {
+                    Text("Editar Informacion del Caso", color = Color.White)
+                }
+
                 Spacer(modifier = Modifier.height(16.dp))
                 SectionTitle("Histórico de Citas")
                 Spacer(modifier = Modifier.height(8.dp))
@@ -173,6 +187,8 @@ fun PantallaTemplateDetalleVistaCaso(
                     val isLastItem = index == appointmentList.lastIndex
 
                     CitaInfo(
+                        routeEditCita = routeEditCita,
+                        caseId = caseId,
                         campo = formatDate(cita.fecha.toDate()),
                         valor = formatTime(cita.fecha.toDate()),
                         suspended = cita.suspended,
@@ -346,7 +362,6 @@ fun PantallaTemplateDetalleVistaCaso(
 fun ClienteInfoComponent(
     userInfo: Usuario,
     extraInfo: ExtraInfo,
-    isRepresented: Boolean
 ) {
     // Mostrar información básica del cliente
     ClienteInfo(
@@ -386,17 +401,15 @@ fun ClienteInfoComponent(
         Color.Black,
     )
 
-    // Mostrar información adicional si el caso está representado
-    if (isRepresented) {
-        Spacer(modifier = Modifier.height(16.dp))
-        SectionTitle(title = "Información del Caso")
-        Spacer(modifier = Modifier.height(16.dp))
+    Spacer(modifier = Modifier.height(16.dp))
+    SectionTitle(title = "Información del Caso")
+    Spacer(modifier = Modifier.height(16.dp))
 
         // Mostrar datos específicos del caso
         ClienteInfo(
-            campo = "Número Único de Causa",
-            valor = extraInfo.nuc.ifEmpty { "No hay información aún" },
-            Color.Black,
+        campo = "Número Único de Causa",
+        valor = extraInfo.nuc.ifEmpty { "No hay información aún" },
+        Color.Black,
         )
 
         ClienteInfo(
@@ -440,7 +453,7 @@ fun ClienteInfoComponent(
             valor = extraInfo.direccionUI.ifEmpty { "No hay información aún" },
             Color.Black,
         )
-    }
+
 }
 
 @Composable
@@ -614,6 +627,8 @@ fun BotonesEstado(
 
 @Composable
 fun CitaInfo(
+    routeEditCita:String,
+    caseId: String,
     campo: String,
     valor: String,
     campoColor: Color,
@@ -695,11 +710,27 @@ fun CitaInfo(
                                 modifier = Modifier.fillMaxWidth()
                             )
                         }
+                        confirmado -> {
+                            Text(
+                                text = "Cita confirmada",
+                                fontWeight = fontWeightCampo,
+                                color = Color.Blue,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
                         !asistido ->{
                             Text(
                                 text = "No se presentó a la cita",
                                 fontWeight = fontWeightCampo,
                                 color = Color.Red,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
+                        asistido ->{
+                            Text(
+                                text = "Asistio a la cita",
+                                fontWeight = fontWeightCampo,
+                                color = Color.Blue,
                                 modifier = Modifier.fillMaxWidth()
                             )
                         }
@@ -715,10 +746,10 @@ fun CitaInfo(
             }
 
             // Icono de edición
-            if (!suspended) {
+
                 IconButton(
                     onClick = {
-                        navController?.navigate("editAppointment/$appointmentId")
+                        navController?.navigate("$routeEditCita/$caseId/$appointmentId")
                     }
                 ) {
                     Icon(
@@ -728,7 +759,7 @@ fun CitaInfo(
                         modifier = Modifier.size(20.dp)
                     )
                 }
-            }
+
         }
 
         // Mostrar barra de estrellas debajo de la cita completada

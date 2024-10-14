@@ -143,6 +143,21 @@ fun MyApp() {
             )
         }
 
+        composable(
+            route = "editarcitaUsuario/{appointmentId}",
+            arguments = listOf(
+                navArgument("appointmentId") { type = NavType.StringType }
+            )
+        )
+        { backStackEntry ->
+
+            val appointmentId = backStackEntry.arguments?.getString("appointmentId") ?: ""
+
+            CancelarOConfirmarCita(
+                navController,
+                appointmentId = appointmentId
+            )
+        }
 
 
         /*=======================================================================================*/
@@ -226,7 +241,41 @@ fun MyApp() {
                 case_id = case_id
             )
         }
+        composable(
+            route = "modificarsegundoformulario/{case_id}",
+            arguments = listOf(
+                navArgument("case_id") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+
+            val case_id = backStackEntry.arguments?.getString("case_id") ?: ""
+
+            ModificarSegundoFormulario(
+                navController = navController,
+                caseId = case_id
+            )
+        }
+
         composable("infoclinicaadmin") { PantallaInfoClinicaAdmin(navController) }
+        composable(
+            route = "editarcitaAdmin/{caseId}/{appointmentId}",
+            arguments = listOf(
+                navArgument("caseId") { type = NavType.StringType },
+                navArgument("appointmentId") { type = NavType.StringType }
+            )
+        )
+        { backStackEntry ->
+
+            val caseId = backStackEntry.arguments?.getString("caseId") ?: ""
+            val appointmentId = backStackEntry.arguments?.getString("appointmentId") ?: ""
+
+            EditarCitaAdmin(
+            navController,
+            caseId = caseId,
+            appointmentId = appointmentId
+            )
+        }
+
         composable(
             route = "agendar/{caseId}",
             arguments = listOf(
@@ -290,6 +339,25 @@ fun MyApp() {
             )
         }
 
+        composable(
+            route = "editarcitaEstudiante/{caseId}/{appointmentId}",
+            arguments = listOf(
+                navArgument("caseId") { type = NavType.StringType },
+                navArgument("appointmentId") { type = NavType.StringType }
+            )
+        )
+        { backStackEntry ->
+
+            val caseId = backStackEntry.arguments?.getString("caseId") ?: ""
+            val appointmentId = backStackEntry.arguments?.getString("appointmentId") ?: ""
+
+            EditarCitaEstudiante(
+                navController,
+                caseId = caseId,
+                appointmentId = appointmentId
+            )
+        }
+
         //AGREGAR CATEGORIA Y SERVICIOS ESTUDIANTES
         composable("agregar-info-estudiante") { AgregarInfoEstudiante(navController) }
         composable("agregar-servicio-estudiante") { AgregarServiciosInfoEstudiante(navController) }
@@ -323,6 +391,21 @@ fun MyApp() {
             AgendarEstudiante(
                 navController = navController,
                 caseId = caseId
+            )
+        }
+
+        composable(
+            route = "modificarsegundoformularioestudiante/{case_id}",
+            arguments = listOf(
+                navArgument("case_id") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+
+            val case_id = backStackEntry.arguments?.getString("case_id") ?: ""
+
+            ModificarSegundoFormularioEstudiante(
+                navController = navController,
+                caseId = case_id
             )
         }
 
