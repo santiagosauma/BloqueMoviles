@@ -90,8 +90,8 @@ fun PantallaInfoClinicaAdmin(navController: NavController?) {
                     else -> {
                         Column(
                             modifier = Modifier
-                                .padding(horizontal = 16.dp)
                                 .verticalScroll(rememberScrollState())
+                                .padding(top = 20.dp)
                         ) {
                             Calendarios(
                                 title = "Calendario Eventos",

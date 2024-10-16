@@ -302,8 +302,7 @@ fun SearchBarPantallaInfo(
             Icon(imageVector = Icons.Default.Search, contentDescription = "Search Icon")
         },
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp),
+            .fillMaxWidth(),
         textStyle = TextStyle(fontSize = 18.sp, color = Color.Black),
         singleLine = true
     )
@@ -545,7 +544,6 @@ fun LabelCategoriaConBoton(label: String,
         horizontalArrangement = Arrangement.SpaceBetween,
         modifier = modifier
             .fillMaxWidth()
-            .padding(end = 16.dp, start = 16.dp)
     ) {
         Text(
             text = label,
@@ -585,7 +583,7 @@ fun MyTextNoticias(text: String)
         fontWeight = FontWeight.Bold,
         color = Color.Black,
         modifier = Modifier
-            .padding(start = 15.dp, bottom = 8.dp)
+            .padding(bottom = 8.dp)
     )
 }
 
@@ -818,7 +816,6 @@ fun VideoCard(
 
 
 // FUNCIONES PARA ITEMS DE CATEGORIAS
-// FUNCIONES PARA ITEMS DE CATEGORIAS
 @Composable
 fun CategoriesSection(
     navController: NavController?,
@@ -828,7 +825,7 @@ fun CategoriesSection(
 ) {
     val loading = categories.isEmpty() && error == null
 
-    Column(modifier = Modifier) {
+    Column(modifier = Modifier.padding(bottom = 16.dp)) {
         if (categories.isNotEmpty()) {
             categories.forEach { category ->
                 CategoryItem(
@@ -866,7 +863,7 @@ fun CategoryItem(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 11.dp, horizontal = 16.dp)
+            .padding(vertical = 11.dp)
             .clickable {
                 val encodedUrlImagen = Uri.encode(imageUrl)
                 navController?.navigate("$route/$title/$description/$categoriaId/$encodedUrlImagen")
@@ -945,7 +942,7 @@ fun ServicesSection(
                 )
             }
         } else if (error != null) {
-            Text(text = error, color = Color.Red, modifier = Modifier.padding(horizontal = 16.dp))
+            Text(text = error, color = Color.Red, modifier = Modifier)
         }
 
         if (loading) {
@@ -970,7 +967,7 @@ fun ServiceItem(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp, horizontal = 16.dp)
+            .padding(vertical = 8.dp)
             .clickable {
                 val encodedUrlImagen = Uri.encode(imageUrl)
                 navController?.navigate("$route/$title/$description/$servicioId/$encodedUrlImagen")
@@ -1070,7 +1067,6 @@ fun SectionTitle(title: String) {
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
             color = Color.Black,
-            modifier = Modifier.padding(horizontal = 16.dp)
         )
     }
 }
@@ -1080,8 +1076,7 @@ fun SectionContent(content: String) {
     Text(
         text = content,
         fontSize = 16.sp,
-        color = Color.Black,
-        modifier = Modifier.padding(horizontal = 16.dp)
+        color = Color.Black
     )
 }
 

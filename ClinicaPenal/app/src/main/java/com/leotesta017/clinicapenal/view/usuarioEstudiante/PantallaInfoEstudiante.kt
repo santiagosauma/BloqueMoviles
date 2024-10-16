@@ -66,8 +66,7 @@ fun PantallaInfoEstudiante(navController: NavController) {
         // SECCION DE INFORMACION LEGAL
         informacionLegal = { categorias, error ->
             LabelCategoria(
-                label = "Información Legal",
-                modifier = Modifier.padding(0.dp)
+                label = "Información Legal"
             )
 
             CategoriesSection(
@@ -81,8 +80,7 @@ fun PantallaInfoEstudiante(navController: NavController) {
         // SECCION DE SERVICIOS
         servicios = { servicios, error ->
             LabelCategoria(
-                label = "Servicios",
-                modifier = Modifier.padding(0.dp)
+                label = "Servicios"
             )
 
             ServicesSection(
