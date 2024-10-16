@@ -71,7 +71,7 @@ fun PantallaInfoEstudiante(navController: NavController) {
 
             CategoriesSection(
                 navController = navController,
-                route = "detalle_info",
+                route = "detalle_info_estudiante",
                 categories = categorias,
                 error = error
             )
@@ -85,7 +85,7 @@ fun PantallaInfoEstudiante(navController: NavController) {
 
             ServicesSection(
                 navController = navController,
-                route = "servicios_info",
+                route = "servicios_info_estudiante",
                 servicios = servicios,
                 error = error
             )

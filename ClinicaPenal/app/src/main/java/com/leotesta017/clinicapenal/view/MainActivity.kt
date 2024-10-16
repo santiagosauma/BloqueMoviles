@@ -213,6 +213,51 @@ fun MyApp() {
             )
         }
 
+        composable(
+            route = "detalle_info_estudiante/{titulo}/{descripcion}/{categoriaId}/{url_image}",
+            arguments = listOf(
+                navArgument("titulo") { type = NavType.StringType },
+                navArgument("descripcion") { type = NavType.StringType },
+                navArgument("categoriaId") { type = NavType.StringType },
+                navArgument("url_image") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val titulo = backStackEntry.arguments?.getString("titulo") ?: ""
+            val descripcion = backStackEntry.arguments?.getString("descripcion") ?: ""
+            val categoriaId = backStackEntry.arguments?.getString("categoriaId") ?: ""
+            val url_image = Uri.decode(backStackEntry.arguments?.getString("url_image") ?: "")
+            DetalleInfoEstudiante(
+                navController = navController,
+                titulo = titulo,
+                descripcion = descripcion,
+                categoriaId = categoriaId,
+                url_image = url_image
+            )
+        }
+
+        composable(
+            route = "servicios_info_estudiante/{titulo}/{descripcion}/{servicioId}/{url_imagen}",
+            arguments = listOf(
+                navArgument("titulo") { type = NavType.StringType },
+                navArgument("descripcion") { type = NavType.StringType },
+                navArgument("servicioId") { type = NavType.StringType },
+                navArgument("url_imagen") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val titulo = backStackEntry.arguments?.getString("titulo") ?: ""
+            val descripcion = backStackEntry.arguments?.getString("descripcion") ?: ""
+            val servicioId = backStackEntry.arguments?.getString("servicioId") ?: ""
+            val url_imagen = Uri.decode(backStackEntry.arguments?.getString("url_imagen") ?: "")
+            ServiciosInfoEstudiante(
+                navController = navController,
+                titulo = titulo,
+                descripcion = descripcion,
+                servicioId = servicioId,
+                url_imagen = url_imagen
+            )
+        }
+
+
         composable("Juribot") { JuriBotScreen(navController) }
 
         composable(
