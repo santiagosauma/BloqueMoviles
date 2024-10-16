@@ -1,11 +1,15 @@
 package com.leotesta017.clinicapenal.viewmodel.viewmodelUsuario
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.leotesta017.clinicapenal.model.modelUsuario.Appointment
+import com.leotesta017.clinicapenal.notificaciones.NotificationServiceSingleton
 import com.leotesta017.clinicapenal.repository.userRepository.AppointmentRepository
 import com.leotesta017.clinicapenal.repository.userRepository.UsuarioRepository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -82,11 +86,19 @@ class AppointmentViewModel : ViewModel() {
                     lugarProcedencia,
                     victima,
                     investigado,
-                    context
+
                 )
 
                 // Actualizar el estado del resultado
                 _appointmentResult.value = result
+                val notificationService = NotificationServiceSingleton.getInstance(context = context)
+
+                notificationService.sendNotificationToAllAbogadosYEstudiantes(
+                        title = "Nuevo caso creado",
+                        message = "Se ha registrado una nueva cita y creado un caso a partir de ella.\nRevisa los detalles en la aplicación."
+                )
+
+
 
                 // Si la operación no fue exitosa, mostrar mensaje de error
                 if (!result) {

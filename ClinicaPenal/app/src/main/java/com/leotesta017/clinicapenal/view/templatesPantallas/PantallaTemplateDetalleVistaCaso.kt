@@ -1,5 +1,6 @@
 package com.leotesta017.clinicapenal.view.templatesPantallas
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -76,7 +77,7 @@ fun PantallaTemplateDetalleVistaCaso(
     routeEditCita: String,
     routeEditComentario: String,
     barraNav: @Composable () -> Unit,
-    contenidoExtra: @Composable (Case,Usuario,Usuario,String,String) -> Unit,
+    contenidoExtra: @Composable (Case,Usuario,Usuario,String,String,String) -> Unit,
     caseViewModel: CaseViewModel = viewModel(),
     userViewModel: UsuarioViewModel = viewModel(),
     caseCounterViewModel: Case_CounterViewModel = viewModel(),
@@ -142,7 +143,9 @@ fun PantallaTemplateDetalleVistaCaso(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 val extraInfoList = caseWithDetails?.second?.third
-
+                var usuariocaso by remember {
+                    mutableStateOf("")
+                }
 
                 extraInfoList?.lastOrNull()?.let { extraInfo ->
 
@@ -155,6 +158,7 @@ fun PantallaTemplateDetalleVistaCaso(
                     // Recolectar la información del usuario
                     val usuarioExtraInfo by userViewModel.usuario.collectAsState()
 
+                    usuariocaso = usuarioExtraInfo.id
                     ClienteInfoComponent(
                         userInfo = usuarioExtraInfo,
                         extraInfo = extraInfo,
@@ -243,6 +247,8 @@ fun PantallaTemplateDetalleVistaCaso(
                     }
                 }
 
+
+
                 ClienteInfo(
                     campo = "Agente a cargo",
                     valor = abogado.ifEmpty { "No hay un abogado asignado aun" },
@@ -299,20 +305,23 @@ fun PantallaTemplateDetalleVistaCaso(
 
                 Column(modifier = Modifier.padding(horizontal = 16.dp)) {
                     commentList?.forEach { comment ->
-                        // Crear un estado independiente para almacenar el usuario de este comentario
-                        val userName by comentViewModel.usuarioByComentario.collectAsState()
+                        val userName = comentViewModel.usuarioByComentario.collectAsState().value[comment.comentario_id]
 
-                        // Lanzar un efecto para obtener el usuario asociado a este comentario
+                        // Lanzar un efecto para obtener el nombre de usuario si no está en el mapa
                         LaunchedEffect(comment.comentario_id) {
-                            comentViewModel.getUserNameByComentarioId(comment.comentario_id)
+                            if (userName == null) {
+                                comentViewModel.getUserNameByComentarioId(comment.comentario_id)
+                            }
                         }
 
                         Text(
-                            text = formatDate(comment.fecha.toDate()) + " " +
-                                    formatTime(comment.fecha.toDate()),
-                            color = Color.Blue)
+                            text = formatDate(comment.fecha.toDate()) + " " + formatTime(comment.fecha.toDate()),
+                            color = Color.Blue
+                        )
+
+
                         ClienteComentario(
-                            nombre = userName ?: "Usuario desconocido",
+                            nombre = userName ?: "Cargando...",  // Muestra "Cargando..." mientras se espera el nombre
                             comentario = comment.contenido,
                             isImportant = comment.important,
                             author = comment.madeBy,
@@ -326,9 +335,20 @@ fun PantallaTemplateDetalleVistaCaso(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
+                val currentUserName = if(caseWithDetails?.first?.lawyerAssigned == UserIdData.userId) {
+                    abogado
+                } else {
+                    estudiante
+                }
+                val destinatario = if(caseWithDetails?.first?.lawyerAssigned == UserIdData.userId) {
+                    caseWithDetails?.first?.studentAssigned
+                } else {
+                    caseWithDetails?.first?.lawyerAssigned
+                }
+
                 Button(
                     onClick = {
-                        navController?.navigate("$routeComentario/$caseId")
+                        navController?.navigate("$routeComentario/$caseId/$destinatario/$currentUserName")
                     },
                     modifier = Modifier
                         .padding(horizontal = 16.dp)
@@ -347,7 +367,8 @@ fun PantallaTemplateDetalleVistaCaso(
                         colaboradorSeleccionado ?: Usuario(id = "", nombre = "Sin abogado", apellidos = ""),
                         estudianteSeleccionado ?: Usuario(id = "", nombre = "Sin estudiante", apellidos = ""),
                         abogado,
-                        estudiante
+                        estudiante,
+                        usuariocaso
                     )
                 }
 

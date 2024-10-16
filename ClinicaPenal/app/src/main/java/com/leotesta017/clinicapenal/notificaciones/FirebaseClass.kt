@@ -51,16 +51,56 @@ class FirebaseClass : FirebaseMessagingService() {
         // Verifica si el mensaje contiene una carga de datos
         if (remoteMessage.data.isNotEmpty()) {
             Log.d(TAG, "Message data payload: ${remoteMessage.data}")
-            handleNow() // Si deseas manejar la carga de datos aquí
+            handleNow() // Manejar la carga de datos aquí si es necesario
         }
 
         // Verifica si el mensaje contiene una notificación
         remoteMessage.notification?.let {
             Log.d(TAG, "Message Notification Body: ${it.body}")
             it.body?.let { body ->
-                sendNotification(body)
+                val title = remoteMessage.notification?.title ?: "Nuevo Mensaje"
+                val groupKey = "com.leotesta017.clinicapenal.MESSAGE_GROUP" // Clave del grupo de notificaciones
+                val groupId = 1 // ID único del grupo para la notificación resumen
+
+                // Crea la notificación individual para este mensaje
+                createNotification(title, body, groupKey, groupId)
+
+                // Actualiza la notificación resumen (para agrupar los mensajes)
+                createSummaryNotification(groupKey, groupId, title, body)
             }
         }
+    }
+
+    private fun createNotification(title: String, message: String, groupKey: String, groupId: Int) {
+        val notificationId = System.currentTimeMillis().toInt() // Un ID único para cada notificación
+        val notification = NotificationCompat.Builder(this, CHANNEL_ID)
+            .setSmallIcon(R.drawable.logoapp) // Cambia el ícono si lo necesitas
+            .setContentTitle(title)
+            .setContentText(message)
+            .setGroup(groupKey) // Añadir a un grupo
+            .setAutoCancel(true)
+            .build()
+
+        val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.notify(notificationId, notification) // Muestra la notificación individual
+    }
+
+    private fun createSummaryNotification(groupKey: String, groupId: Int, title: String, message: String) {
+        val summaryNotification = NotificationCompat.Builder(this, CHANNEL_ID)
+            .setSmallIcon(R.drawable.logoapp) // Cambia el ícono si lo necesitas
+            .setContentTitle("Tienes nuevos mensajes")
+            .setContentText("Tienes varios mensajes nuevos.")
+            .setStyle(
+                NotificationCompat.InboxStyle() // Estilo de bandeja de entrada
+                    .addLine("$title: $message") // Añadir el título y mensaje al resumen
+            )
+            .setGroup(groupKey) // El mismo groupKey para agrupar
+            .setGroupSummary(true) // Este es el resumen del grupo
+            .setAutoCancel(true)
+            .build()
+
+        val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.notify(groupId, summaryNotification) // Muestra la notificación resumen
     }
 
     private fun handleNow() {
@@ -84,10 +124,11 @@ class FirebaseClass : FirebaseMessagingService() {
         val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(CHANNEL_ID, "Channel human readable title", NotificationManager.IMPORTANCE_DEFAULT)
+            val channel = NotificationChannel(CHANNEL_ID, "Notificaciones generales", NotificationManager.IMPORTANCE_DEFAULT)
             notificationManager.createNotificationChannel(channel)
         }
 
         notificationManager.notify(0, notificationBuilder.build())
     }
 }
+

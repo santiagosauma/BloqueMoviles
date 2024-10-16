@@ -19,10 +19,16 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.leotesta017.clinicapenal.notificaciones.NotificationService
+import com.leotesta017.clinicapenal.notificaciones.NotificationServiceSingleton
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.BarraNav
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.TopBar
 import com.leotesta017.clinicapenal.view.theme.ClinicaPenalTheme
 import com.leotesta017.clinicapenal.viewmodel.viewmodelUsuario.CaseViewModel
+import com.leotesta017.clinicapenal.viewmodel.viewmodelUsuario.Case_CounterViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @Composable
 fun SegundoFormulario(navController: NavController?,caseId: String) {
@@ -63,12 +69,57 @@ fun SegundoFormulario(navController: NavController?,caseId: String) {
             ) {
                 val context = LocalContext.current
                 val caseViewModel: CaseViewModel = viewModel()
+                val case_counterViewModel: Case_CounterViewModel = viewModel()
+                var caseCounter by remember { mutableStateOf<Int?>(null) }
+                val case by caseViewModel.case.collectAsState()
+
+                LaunchedEffect(caseId) {
+                    caseViewModel.fetchCase(caseId)
+                }
+
+                LaunchedEffect(caseId) {
+                    val index = case_counterViewModel.findOrAddCase(caseId)
+                    caseCounter = index
+                }
+
+                val notificationService = NotificationServiceSingleton.getInstance(context)
+
                 FormularioCompleto(onEnviar = { extraInfoData ->
                     val caseData = mapOf("segundoFormulario" to true)
 
                     // Actualizar extraInfo y el caso
                     caseViewModel.updateExtraInfoOfCase(caseId, extraInfoData)
                     caseViewModel.updateCase(caseId, caseData)
+
+                    if(!case?.lawyerAssigned.isNullOrBlank() && !case?.studentAssigned.isNullOrBlank())
+                    {
+                        case?.let { case ->
+                            CoroutineScope(Dispatchers.IO).launch {
+                                notificationService.sendNotificationToAssignedSpecificUser(
+                                    title = "Segundo Formulario Respondido",
+                                    message = "El Segundo Formulario para el caso: $caseCounter ha sido respondido." +
+                                              "\nRevisa los detalles en la aplicación.",
+                                    user_id = case.lawyerAssigned
+                                )
+
+                                notificationService.sendNotificationToAssignedSpecificUser(
+                                    title = "Segundo Formulario Respondido",
+                                    message = "El Segundo Formulario para el caso: $caseCounter ha sido respondido." +
+                                              "\nRevisa los detalles en la aplicación.",
+                                    user_id = case.studentAssigned
+                                )
+                            }
+                        }
+                    }
+                    else{
+                        CoroutineScope(Dispatchers.IO).launch {
+                            notificationService.sendNotificationToAllAbogadosYEstudiantes(
+                                title = "Segundo Formulario Respondido",
+                                message = "El Segundo Formulario para el caso: $caseCounter ha sido respondido." +
+                                        "\nRevisa los detalles en la aplicación."
+                            )
+                        }
+                    }
 
                     // Mostrar el mensaje de éxito
                     Toast.makeText(context, "Información agregada. Gracias por responder :)", Toast.LENGTH_LONG).show()

@@ -7,6 +7,7 @@ import androidx.navigation.NavController
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.EstudiantesBarraNav
 import com.leotesta017.clinicapenal.view.templatesPantallas.EditarCitaTemplate
 
+
 @Composable
 fun EditarCitaEstudiante(navController: NavController?, appointmentId: String, caseId: String)
 {
@@ -15,6 +16,7 @@ fun EditarCitaEstudiante(navController: NavController?, appointmentId: String, c
         appointmentId = appointmentId,
         popbackRoute = "detallecasoestudiante/$caseId" ,
         isUsuarioGeneral = false,
+        caseId = caseId,
         barraNav = {
             EstudiantesBarraNav(navController = navController, modifier = Modifier.fillMaxWidth())
         }

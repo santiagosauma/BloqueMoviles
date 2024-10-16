@@ -1,12 +1,16 @@
 package com.leotesta017.clinicapenal.notificaciones
 
+import android.app.NotificationManager
 import android.content.Context
 import android.util.Log
+import androidx.core.app.NotificationCompat
 import com.google.auth.oauth2.GoogleCredentials
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.gson.Gson
+import com.leotesta017.clinicapenal.R
+import com.leotesta017.clinicapenal.view.MainActivity
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -19,7 +23,7 @@ import java.util.concurrent.TimeUnit
 
 class NotificationService(private val context: Context) {
     private companion object {
-        const val FCM_API = "https://fcm.googleapis.com/v1/projects/YOUR_PROJECT_ID/messages:send"
+        const val FCM_API = "https://fcm.googleapis.com/v1/projects/bufetecapp/messages:send"
         const val SCOPE = "https://www.googleapis.com/auth/firebase.messaging"
         const val TAG = "NotificationService"
     }
@@ -116,9 +120,9 @@ class NotificationService(private val context: Context) {
 
         try {
             val abogadosSnapshot = db.collection("usuarios")
-                .whereIn("tipo", listOf("abogado", "estudiante"))
+                .whereIn("tipo", listOf("colaborador", "estudiante"))
                 .get()
-                .await() // Await if you're using Kotlin coroutines
+                .await()
 
             for (document in abogadosSnapshot.documents) {
                 val fcmTokens = document.get("fcmTokens") as? List<String> // Asegúrate de que "fcmTokens" es una lista
@@ -134,6 +138,29 @@ class NotificationService(private val context: Context) {
         return tokenList
     }
 
+    suspend fun getTokenByUserId(userId: String): List<String>? {
+        return try {
+            // Obtiene el documento del usuario usando su ID
+            val userSnapshot = db.collection("usuarios")
+                .document(userId)
+                .get()
+                .await()
+
+            // Verifica si el documento existe y obtiene los tokens
+            if (userSnapshot.exists()) {
+                val fcmTokens = userSnapshot.get("fcmTokens") as? List<String>
+                fcmTokens
+            } else {
+                Log.e("NotificationService", "No se encontró al usuario con ID: $userId")
+                null
+            }
+        } catch (e: Exception) {
+            Log.e("NotificationService", "Error buscando tokens para el usuario con ID: $userId", e)
+            null
+        }
+    }
+
+
     suspend fun sendNotificationToAllAbogadosYEstudiantes(
         title: String,
         message: String
@@ -148,4 +175,112 @@ class NotificationService(private val context: Context) {
         }
     }
 
+    suspend fun sendNotificationToAssignedSpecificUser(
+        title: String,
+        message: String,
+        user_id: String
+    ) {
+        val tokens = getTokenByUserId(user_id)
+
+        val notificationService = NotificationService(context)
+        tokens?.forEach { token ->
+            notificationService.sendNotification(token, title, message, user_id)
+        }
+    }
+
+    suspend fun sendMessageNotificationToAssignedSpecificUser(
+        title: String,
+        message: String,
+        user_id: String
+    ) {
+        // Obtener el ID del usuario que está enviando el mensaje
+        val currentUserId = FirebaseAuth.getInstance().currentUser?.uid
+
+        // Si el usuario que envía el mensaje es el mismo que el destinatario, no enviar notificación
+
+
+        // Obtener tokens del usuario receptor
+        val tokens = getTokenByUserId(user_id)
+        val groupKey = "com.leotesta017.clinicapenal.MESSAGE_GROUP"
+        val groupId = 1
+
+        val notificationService = NotificationService(context)
+
+        // Enviar notificaciones solo al receptor
+        tokens?.forEach { token ->
+            notificationService.sendNotificationGrouped(token, title, message, user_id, groupKey, groupId)
+        }
+    }
+
+
+    suspend fun NotificationService.sendNotificationGrouped(
+        token: String,
+        title: String,
+        message: String,
+        userId: String, // Este userId es el del receptor
+        groupKey: String,
+        groupId: Int
+    ) {
+
+        withContext(Dispatchers.IO) {
+            try {
+                // Crear la notificación para el receptor
+                val fcmMessage = Message(
+                    FCMMessage(
+                        token = token,
+                        notification = NotificationData(title = title, body = message)
+                    )
+                )
+
+                val jsonBody = Gson().toJson(fcmMessage)
+                val accessToken = getAccessToken()
+
+                val request = Request.Builder()
+                    .url(FCM_API)
+                    .addHeader("Authorization", "Bearer $accessToken")
+                    .addHeader("Content-Type", "application/json")
+                    .post(jsonBody.toRequestBody("application/json".toMediaType()))
+                    .build()
+
+                client.newCall(request).execute().use { response ->
+                    if (!response.isSuccessful) {
+                        val errorBody = response.body?.string()
+                        Log.e(TAG, "FCM API error: $errorBody")
+
+                        if (errorBody?.contains("NotRegistered") == true || errorBody?.contains("InvalidRegistration") == true) {
+                            removeInvalidToken(userId, token)
+                        }
+
+                        throw Exception("Failed to send notification: $errorBody")
+                    }
+                    Log.d(TAG, "Notification sent successfully to token: $token")
+
+                    // Generar notificación resumen para el receptor (no para el que envía)
+                }
+                //createSummaryNotification(groupKey, groupId, title, message)
+
+            } catch (e: Exception) {
+                Log.e(TAG, "Error sending notification", e)
+            }
+        }
+    }
+
+
+    fun createSummaryNotification(groupKey: String, groupId: Int, title: String, message: String) {
+        val summaryNotification = NotificationCompat.Builder(context.applicationContext, MainActivity.CHANNEL_ID)
+            .setSmallIcon(R.drawable.logoapp)
+            .setContentTitle("Tienes nuevos mensajes")
+            .setContentText("Tienes varios mensajes nuevos.")
+            .setStyle(
+                NotificationCompat.InboxStyle()
+                    .addLine("$title: $message") // Añade el título y mensaje al resumen
+            )
+            .setGroup(groupKey)
+            .setGroupSummary(true) // Establecer como resumen del grupo
+            .setAutoCancel(true)
+            .build()
+
+        val notificationManager = context.applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.notify(groupId, summaryNotification)
+    }
 }

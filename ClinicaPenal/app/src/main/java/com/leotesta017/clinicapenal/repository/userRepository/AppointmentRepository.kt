@@ -89,7 +89,6 @@ class AppointmentRepository {
         lugarProcedencia: String,
         victima: Boolean,
         investigado: Boolean,
-        context: Context
     ): Boolean {
         return try {
             // Generar un nuevo ID para el caso
@@ -156,18 +155,6 @@ class AppointmentRepository {
             // Actualizar la lista de casos del usuario
             firestore.collection("usuarios").document(userId)
                 .update("listCases", FieldValue.arrayUnion(newCaseId)).await()
-
-            val notificationService = NotificationServiceSingleton.getInstance(context = context)
-
-            Log.d("Notificacion", "Antes de enviarse ")
-            CoroutineScope(Dispatchers.IO).launch {
-                notificationService.sendNotificationToAllAbogadosYEstudiantes(
-                    title = "Nuevo caso creado",
-                    message = "Se ha registrado una nueva cita y creado un caso a partir de ella. Revisa los detalles en la aplicación."
-
-                )
-                Log.d("Notificacion", "Despues de enviarse ")
-            }
 
             true  // Operación exitosa
         } catch (e: Exception) {

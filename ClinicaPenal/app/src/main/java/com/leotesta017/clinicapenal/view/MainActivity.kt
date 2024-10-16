@@ -1,5 +1,7 @@
 package com.leotesta017.clinicapenal.view
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
@@ -11,6 +13,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.traceEventStart
+import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -36,7 +39,6 @@ class MainActivity : ComponentActivity() {
         if (isGranted) {
             FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
                 if (!task.isSuccessful) {
-                    Log.w(TAG, "Fetching FCM registration token failed", task.exception)
                     return@OnCompleteListener
                 }
 
@@ -46,10 +48,27 @@ class MainActivity : ComponentActivity() {
                 // Log and toast
                 val msg = getString(R.string.msg_token_fmt, token)
                 Log.d(TAG, msg)
-                Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
+                //Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
             })
         } else {
             // TODO: Inform user that that your app will not show notifications.
+        }
+    }
+
+    private fun createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channelId = MainActivity.CHANNEL_ID
+            val channelName = "Mensajes"
+            val channelDescription = "Canal para notificaciones de mensajes"
+            val importance = NotificationManager.IMPORTANCE_DEFAULT
+
+            val channel = NotificationChannel(channelId, channelName, importance).apply {
+                description = channelDescription
+            }
+
+            // Registrar el canal de notificación con el sistema
+            val notificationManager = this.getSystemService(NotificationManager::class.java)
+            notificationManager.createNotificationChannel(channel)
         }
     }
 
@@ -69,7 +88,7 @@ class MainActivity : ComponentActivity() {
         } else {
             FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
                 if (!task.isSuccessful) {
-                    Log.w(TAG, "Fetching FCM registration token")
+                    //Log.w(TAG, "Fetching FCM registration token")
                     return@OnCompleteListener
                 }
 
@@ -82,12 +101,19 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         askNotificationPermission()
+        createNotificationChannel()
         super.onCreate(savedInstanceState)
         setContent {
             MyApp()
         }
     }
+
+    companion object {
+         const val CHANNEL_ID = "MY_CHANNEL_ID"
+    }
 }
+
+
 
 @Composable
 fun MyApp() {
@@ -205,18 +231,20 @@ fun MyApp() {
         }
 
         composable(
-            route = "editarcitaUsuario/{appointmentId}",
+            route = "editarcitaUsuario/{appointmentId}/{caseId}",
             arguments = listOf(
-                navArgument("appointmentId") { type = NavType.StringType }
+                navArgument("appointmentId") { type = NavType.StringType },
+                navArgument("caseId") { type = NavType.StringType }
             )
         )
         { backStackEntry ->
 
             val appointmentId = backStackEntry.arguments?.getString("appointmentId") ?: ""
-
+            val caseId = backStackEntry.arguments?.getString("caseId") ?: ""
             CancelarOConfirmarCita(
                 navController,
-                appointmentId = appointmentId
+                appointmentId = appointmentId,
+                caseId = caseId
             )
         }
 
@@ -352,17 +380,23 @@ fun MyApp() {
             )
         }
         composable(
-            route = "comentar/{caseId}",
+            route = "comentar/{caseId}/{destinatario}/{currentUserName}",
             arguments = listOf(
-                navArgument("caseId") { type = NavType.StringType }
+                navArgument("caseId") { type = NavType.StringType },
+                navArgument("destinatario") { type = NavType.StringType },
+                navArgument("currentUserName") { type = NavType.StringType }
             )
         ) { backStackEntry ->
 
             val caseId = backStackEntry.arguments?.getString("caseId") ?: ""
+            val destinatario = backStackEntry.arguments?.getString("destinatario") ?: ""
+            val currentUserName = backStackEntry.arguments?.getString("currentUserName") ?: ""
 
             ComentarioScreen(
                 navController = navController,
-                caseId = caseId
+                caseId = caseId,
+                destinatario = destinatario,
+                currentUserName = currentUserName
             )
         }
 
@@ -443,17 +477,23 @@ fun MyApp() {
         composable("AccionVideo") { AccionVideo(navController) }
 
         composable(
-            route = "comentarestudiante/{caseId}",
+            route = "comentarestudiante/{caseId}/{destinatario}/{currentUserName}",
             arguments = listOf(
-                navArgument("caseId") { type = NavType.StringType }
+                navArgument("caseId") { type = NavType.StringType },
+                navArgument("destinatario") { type = NavType.StringType },
+                navArgument("currentUserName") { type = NavType.StringType }
             )
         ) { backStackEntry ->
 
             val caseId = backStackEntry.arguments?.getString("caseId") ?: ""
+            val destinatario = backStackEntry.arguments?.getString("destinatario") ?: ""
+            val currentUserName = backStackEntry.arguments?.getString("currentUserName") ?: ""
 
             ComentarioScreenEstudiante(
                 navController = navController,
-                caseId = caseId
+                caseId = caseId,
+                destinatario = destinatario,
+                currentUserName = currentUserName
             )
         }
 

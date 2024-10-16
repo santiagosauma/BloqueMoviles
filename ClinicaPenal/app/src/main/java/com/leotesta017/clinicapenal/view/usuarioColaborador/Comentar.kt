@@ -11,13 +11,20 @@ import com.leotesta017.clinicapenal.view.templatesPantallas.PantallaComentarTemp
 import com.leotesta017.clinicapenal.viewmodel.viewmodelUsuario.ComentarioViewModel
 
 @Composable
-fun ComentarioScreen(navController: NavController?, caseId: String) {
+fun ComentarioScreen(
+    navController: NavController?,
+    caseId: String,
+    destinatario: String,
+    currentUserName: String
+) {
     val comentarioViewModel: ComentarioViewModel = viewModel()
     PantallaComentarTemplate(
         navController = navController,
         title = "Comentario",
         caseId = caseId,
         route =  "actualizarcasos",
+        destinatario = destinatario,
+        currentUsername = currentUserName,
         onAddOrEditComment = { contenido, isUrgent, userId, case_Id ->
             comentarioViewModel.addNewComentarioToCase(
                 contenido = contenido,
@@ -37,8 +44,3 @@ fun ComentarioScreen(navController: NavController?, caseId: String) {
     )
 }
 
-@Preview(showBackground = true)
-@Composable
-fun PreviewComentarioScreen() {
-    ComentarioScreen(navController = null, "1")
-}

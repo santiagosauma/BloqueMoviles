@@ -96,7 +96,7 @@ fun GeneralSolicitud(
                 item {
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
-                        text = "Notificaciones",
+                        text = "",
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.padding(start = 20.dp)

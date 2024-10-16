@@ -12,12 +12,17 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.leotesta017.clinicapenal.notificaciones.NotificationService
+import com.leotesta017.clinicapenal.notificaciones.NotificationServiceSingleton
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.AdminBarraNav
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.SectionTitle
 import com.leotesta017.clinicapenal.view.templatesPantallas.BotonesEstado
 import com.leotesta017.clinicapenal.view.templatesPantallas.BotonesRepresentacion
 import com.leotesta017.clinicapenal.view.templatesPantallas.PantallaTemplateDetalleVistaCaso
 import com.leotesta017.clinicapenal.viewmodel.viewmodelUsuario.CaseViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @Composable
 fun ActualizarCasos(
@@ -57,7 +62,7 @@ fun ActualizarCasos(
             }
 
         },
-        contenidoExtra = { case, abogadoseleccionado, estudianteseleccionado,abogadoactual,estudianteactual ->
+        contenidoExtra = { case, abogadoseleccionado, estudianteseleccionado,abogadoactual,estudianteactual, usuariocasoid ->
             Spacer(modifier = Modifier.height(16.dp))
             SectionTitle("Representación")
 
@@ -137,6 +142,13 @@ fun ActualizarCasos(
                     caseViewModel.assignUserToCase(case.case_id, abogadoActual, "lawyerAssigned")
                     caseViewModel.assignUserToCase(case.case_id, estudianteActual, "studentAssigned")
 
+                    val notificationService = NotificationServiceSingleton.getInstance(context)
+
+                    if(representacionSeleccionada && !case.segundoFormulario)
+                    {
+                        NotificacionSegundoFormulario(idUsertoSend =  usuariocasoid, notificationService =  notificationService)
+                    }
+
                     Toast.makeText(context, "Caso guardado exitosamente", Toast.LENGTH_SHORT).show()
                 },
                 modifier = Modifier
@@ -161,4 +173,20 @@ fun ActualizarCasos(
 @Composable
 fun PreviewActualizarCasos() {
     ActualizarCasos(navController = null, case_id = "1")
+}
+
+fun NotificacionSegundoFormulario(
+    idUsertoSend: String,
+    notificationService: NotificationService,
+)
+{
+    CoroutineScope(Dispatchers.IO).launch {
+        notificationService.sendMessageNotificationToAssignedSpecificUser(
+            title = "Segundo formulario",
+            message = "El segundo formulario se encuentra listo para ser llenado" +
+                    " ve a la seccion de solicitudes y en el detalle del caso podras " +
+                    " encontralo para reponderlo ",
+            user_id = idUsertoSend
+        )
+    }
 }

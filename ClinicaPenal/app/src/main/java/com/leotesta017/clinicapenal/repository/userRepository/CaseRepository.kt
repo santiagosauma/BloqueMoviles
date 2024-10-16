@@ -504,5 +504,28 @@ class CaseRepository() {
         }
     }
 
+    suspend fun findUserByCaseId(caseId: String): String? {
+        return try {
+            // Consulta en la colección "usuarios" para encontrar aquellos de tipo "general"
+            val querySnapshot = firestore.collection("usuarios")
+                .whereEqualTo("tipo", "general") // Filtra por tipo de usuario "general"
+                .whereArrayContains("listCases", caseId) // Busca el caseId en el campo listCases
+                .get()
+                .await()
+
+            // Si se encuentra un documento, se obtiene el ID del usuario
+            if (!querySnapshot.isEmpty) {
+                val document = querySnapshot.documents.firstOrNull() // Obtiene el primer documento
+                document?.id // Devuelve el ID del usuario
+            } else {
+                null // Si no hay coincidencias, devuelve null
+            }
+        } catch (e: Exception) {
+            Log.e("CaseRepository", "Error buscando usuario por caseId: $caseId", e)
+            null // Devuelve null en caso de error
+        }
+    }
+
+
 
 }

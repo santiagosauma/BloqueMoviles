@@ -15,6 +15,7 @@ fun EditarCitaAdmin(navController: NavController?,appointmentId: String,caseId: 
         appointmentId = appointmentId,
         popbackRoute = "actualizarcasos/$caseId" ,
         isUsuarioGeneral = false,
+        caseId = caseId,
         barraNav = {
             AdminBarraNav(navController = navController, modifier = Modifier.fillMaxWidth())
         }

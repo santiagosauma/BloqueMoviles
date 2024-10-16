@@ -8,13 +8,14 @@ import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.BarraNav
 import com.leotesta017.clinicapenal.view.templatesPantallas.EditarCitaTemplate
 
 @Composable
-fun CancelarOConfirmarCita(navController: NavController?, appointmentId: String)
+fun CancelarOConfirmarCita(navController: NavController?, appointmentId: String, caseId: String)
 {
     EditarCitaTemplate(
         navController = navController,
         appointmentId = appointmentId,
         popbackRoute = "solicitud" ,
         isUsuarioGeneral = true,
+        caseId = caseId,
         barraNav = {
             BarraNav(navController = navController, modifier = Modifier.fillMaxWidth())
         }

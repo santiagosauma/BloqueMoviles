@@ -1589,7 +1589,7 @@ fun CaseUserGenaralItem(
                     ) {
                         var hasOptions = false
 
-                        if(!case.first.represented && !case.first.segundoFormulario)
+                        if(case.first.represented && !case.first.segundoFormulario)
                         {
                             DropdownMenuItem(
                                 onClick = {
@@ -1632,7 +1632,7 @@ fun CaseUserGenaralItem(
                             DropdownMenuItem(
                                 onClick = {
                                     expanded = false
-                                    navController?.navigate("editarcitaUsuario/${ultimaCita?.appointment_id}")
+                                    navController?.navigate("editarcitaUsuario/${ultimaCita?.appointment_id}/${case.first.case_id}")
                                 },
                                 text = { Text("Confirmar o Cancelar Cita") }
                             )

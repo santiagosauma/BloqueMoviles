@@ -36,6 +36,8 @@ class CaseViewModel : ViewModel() {
     private val _caseWithDetails = MutableStateFlow<Pair<Case, Triple<List<Appointment>, List<Comentario>, List<ExtraInfo>>>?>(null)
     val caseWithDetails: StateFlow<Pair<Case, Triple<List<Appointment>, List<Comentario>, List<ExtraInfo>>>?> = _caseWithDetails
 
+    private val _userGeneralId = MutableStateFlow<String?>(null)
+    val userGeneralId: StateFlow<String?> = _userGeneralId
 
     private val _caseDeleted = MutableStateFlow<Boolean>(false)
     val caseDeleted: StateFlow<Boolean> = _caseDeleted
@@ -223,5 +225,23 @@ class CaseViewModel : ViewModel() {
 
     }
 
+    fun getUserGenalIdFromCaseId(caseId: String)
+    {
+        viewModelScope.launch {
+            try {
+                val userId = repository.findUserByCaseId(caseId)
+
+                if (userId != null) {
+                    _userGeneralId.value = userId
+                    _error.value = null // Sin error
+                } else {
+                    _userGeneralId.value = null
+                    _error.value = "No se encontró ninguna cita para este caso."
+                }
+            } catch (e: Exception) {
+                _error.value = "Error al obtener la última cita: ${e.message}"
+            }
+        }
+    }
 }
 

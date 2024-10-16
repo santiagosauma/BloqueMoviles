@@ -37,7 +37,7 @@ fun DetalleCasoEstudiante(
             }
 
         },
-        contenidoExtra = { case,abogadoseleccionado ,estudianteseleccionado, userid, euserid ->
+        contenidoExtra = { case,abogadoseleccionado ,estudianteseleccionado, userid, euserid,usuariocasoid ->
 
             Spacer(modifier = Modifier.height(16.dp))
         }

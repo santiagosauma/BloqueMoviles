@@ -45,10 +45,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.google.firebase.Timestamp
 import com.leotesta017.clinicapenal.model.modelUsuario.UserIdData
+import com.leotesta017.clinicapenal.notificaciones.NotificationService
+import com.leotesta017.clinicapenal.notificaciones.NotificationServiceSingleton
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.RoundedButton
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.TopBar
 import com.leotesta017.clinicapenal.viewmodel.viewmodelUsuario.ComentarioViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @Composable
 fun PantallaComentarTemplate(
@@ -60,6 +66,8 @@ fun PantallaComentarTemplate(
     comentarioId: String? = null, // ID del comentario para eliminación, puede ser nulo
     bottomBarNav: @Composable () -> Unit,
     isUrgentInitial: Boolean? = null, // Urgente puede ser nulo
+    destinatario: String? = null,
+    currentUsername: String? = null,
     isEditing: Boolean = false, // Para habilitar el botón de eliminar solo si está editando
     onAddOrEditComment: (String, Boolean, String, String) -> Unit,
     onDeleteComment: (String) -> Unit // Callback para manejar la acción de eliminar el comentario, usando el ID
@@ -194,7 +202,10 @@ fun PantallaComentarTemplate(
                         .fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
+                    val context = LocalContext.current
                     val userId = UserIdData.userId
+
+                    val notificationService = NotificationServiceSingleton.getInstance(context)
                     RoundedButton(
                         icon = Icons.Default.Save,
                         label = "Guardar",
@@ -203,22 +214,23 @@ fun PantallaComentarTemplate(
                                 if(isEditing)
                                 {
                                     if (userId != null && comentarioId != null) {
-                                        onAddOrEditComment(
-                                                comentario,
-                                                isUrgent,
-                                                userId,
-                                                comentarioId
-                                        )
+                                        onAddOrEditComment(comentario, isUrgent, userId, comentarioId)
                                     }
                                 }
                                 else{
                                     if (userId != null) {
-                                        onAddOrEditComment(
-                                            comentario,
-                                            isUrgent,
-                                            userId,
-                                            caseId
-                                        )
+                                        onAddOrEditComment(comentario, isUrgent, userId, caseId)
+
+                                        if(destinatario != null && currentUsername != null) {
+                                            MensajeNuevoNotificaciones(
+                                                comentario = comentario,
+                                                idUsertoSend = destinatario,
+                                                isUrgent = isUrgent,
+                                                notificationService = notificationService,
+                                                UserWhoSendend = currentUsername
+                                            )
+                                        }
+
                                     }
                                     comentario = comentarioIncial ?: ""  // Limpiar el campo después de guardar
                                     isUrgent = isUrgentInitial ?: false  // Reiniciar el estado de urgencia
@@ -353,5 +365,21 @@ fun PantallaComentarTemplate(
 }
 
 
+fun MensajeNuevoNotificaciones(
+    comentario: String,
+    idUsertoSend: String,
+    UserWhoSendend: String,
+    notificationService: NotificationService,
+    isUrgent: Boolean
 
+)
+{
+    CoroutineScope(Dispatchers.IO).launch {
+        notificationService.sendMessageNotificationToAssignedSpecificUser(
+            title = if(isUrgent) "Mensaje urgente nuevo" else "Mensaje Nuevo",
+            message = "$UserWhoSendend \n$comentario",
+            user_id = idUsertoSend
+        )
+    }
+}
 

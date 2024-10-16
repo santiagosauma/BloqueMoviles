@@ -54,17 +54,28 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.google.firebase.Timestamp
+import com.leotesta017.clinicapenal.model.Notificacion
 import com.leotesta017.clinicapenal.model.modelUsuario.Appointment
+import com.leotesta017.clinicapenal.notificaciones.NotificationService
+import com.leotesta017.clinicapenal.notificaciones.NotificationServiceSingleton
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.TopBar
 import com.leotesta017.clinicapenal.viewmodel.viewmodelUsuario.AppointmentViewModel
+import com.leotesta017.clinicapenal.viewmodel.viewmodelUsuario.CaseViewModel
+import com.leotesta017.clinicapenal.viewmodel.viewmodelUsuario.Case_CounterViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import java.sql.Time
 import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Date
 import java.util.Locale
 
 @Composable
 fun EditarCitaTemplate(
     navController: NavController?,
     appointmentId: String,
+    caseId: String,
     popbackRoute: String,
     isUsuarioGeneral: Boolean,
     barraNav: @Composable () -> Unit,
@@ -156,15 +167,19 @@ fun EditarCitaTemplate(
                         Spacer(modifier = Modifier.height(20.dp))
 
 
-                        BotonGuardarCambios(
-                            appointmentId,
-                            selectedTime = selectedTime,
-                            selectedDate = selectedDate,
-                            isAsistido = isAsistido,
-                            isConfirmed = isConfirmed,
-                            isCancelled = isCancelled
-                        )
-
+                        appointment?.let { appointment ->
+                            BotonGuardarCambios(
+                                appointmentId,
+                                fechaOriginal =  appointment.fecha,
+                                selectedTime = selectedTime,
+                                selectedDate = selectedDate,
+                                isAsistido = isAsistido,
+                                isConfirmed = isConfirmed,
+                                isCancelled = isCancelled,
+                                caseId = caseId,
+                                isUsuarioGeneral = isUsuarioGeneral
+                            )
+                        }
                         Spacer(modifier = Modifier.height(50.dp))
                     }
                 }
@@ -547,10 +562,35 @@ fun BotonGuardarCambios(appointmentId: String,
                         isAsistido: Boolean,
                         isConfirmed: Boolean,
                         isCancelled: Boolean,
+                        caseId: String,
+                        isUsuarioGeneral: Boolean,
+                        fechaOriginal: Timestamp
 ) {
 
     val appointmentViewModel: AppointmentViewModel = viewModel()
     val context = LocalContext.current
+    val caseViewModel: CaseViewModel = viewModel()
+    val case_counterViewModel: Case_CounterViewModel = viewModel()
+    var caseCounter by remember { mutableStateOf<Int?>(null) }
+    val case by caseViewModel.case.collectAsState()
+
+    val userGeneralId by caseViewModel.userGeneralId.collectAsState()
+
+    LaunchedEffect (caseId) {
+        caseViewModel.getUserGenalIdFromCaseId(caseId)
+    }
+
+    LaunchedEffect(caseId) {
+        caseViewModel.fetchCase(caseId)
+    }
+
+    LaunchedEffect(caseId) {
+        val index = case_counterViewModel.findOrAddCase(caseId)
+        caseCounter = index
+    }
+
+    val notificationService = NotificationServiceSingleton.getInstance(context)
+
     Button(
         onClick = {
             if (selectedDate.isNotEmpty() && selectedTime.isNotEmpty()) {
@@ -571,15 +611,62 @@ fun BotonGuardarCambios(appointmentId: String,
                     updateAppointmentData["fecha"] = Timestamp(it)
                 }
                 appointmentViewModel.updateAppointment(appointmentId,updateAppointmentData)
-                Toast.makeText(context,"Cita Actualizada con excito", Toast.LENGTH_LONG).show()
 
+
+                if(isUsuarioGeneral)
+                {
+                    if(!case?.lawyerAssigned.isNullOrBlank() && !case?.studentAssigned.isNullOrBlank())
+                    {
+                        case?.let { case ->
+                            MensajeNotificacionReagendar(
+                                idUsertoSend = case.lawyerAssigned,
+                                notificationService = notificationService,
+                                fechaOriginal = fechaOriginal,
+                                caseCounter = caseCounter,
+                                appointmentTimestamp = appointmentTimestamp
+                            )
+                            MensajeNotificacionReagendar(
+                                idUsertoSend = case.studentAssigned,
+                                notificationService = notificationService,
+                                fechaOriginal = fechaOriginal,
+                                caseCounter = caseCounter,
+                                appointmentTimestamp = appointmentTimestamp
+                            )
+                        }
+                    }
+                    else{
+                        MensajeNotificacionReagendarSinDestinoEspecifico(
+                            notificationService = notificationService,
+                            fechaOriginal = fechaOriginal,
+                            caseCounter = caseCounter,
+                            appointmentTimestamp = appointmentTimestamp
+                        )
+                    }
+                }
+                else
+                {
+                    userGeneralId?.let{ userGeneralId ->
+                        MensajeNotificacionReagendar(
+                            idUsertoSend = userGeneralId,
+                            notificationService = notificationService,
+                            fechaOriginal = fechaOriginal,
+                            caseCounter = caseCounter,
+                            appointmentTimestamp = appointmentTimestamp
+                        )
+                    }
+                }
+
+                Toast.makeText(context,"Cita Actualizada con excito", Toast.LENGTH_LONG).show()
             }
+
+
             else if((selectedDate.isNotEmpty() && selectedTime.isEmpty())
                 || selectedDate.isEmpty() && selectedTime.isNotEmpty())
             {
                 Toast.makeText(context, "Selecciona una fecha y una hora validas", Toast.LENGTH_SHORT).show()
                 return@Button
             }
+
             else{
                 val updateAppointmentData = mutableMapOf<String, Any>(
                     "asisted" to isAsistido,
@@ -587,6 +674,58 @@ fun BotonGuardarCambios(appointmentId: String,
                     "suspended" to isCancelled
                 )
                 appointmentViewModel.updateAppointment(appointmentId,updateAppointmentData)
+
+                if(isUsuarioGeneral)
+                {
+                    if(!case?.lawyerAssigned.isNullOrBlank() && !case?.studentAssigned.isNullOrBlank())
+                    {
+                        case?.let { case ->
+                            MensajeNotificacionConfirmaciones(
+                                idUsertoSend = case.lawyerAssigned,
+                                notificationService = notificationService,
+                                fechaOriginal = fechaOriginal,
+                                caseCounter = caseCounter,
+                                isConfirmed = isConfirmed,
+                                isCancelled = isCancelled
+                            )
+                            MensajeNotificacionConfirmaciones(
+                                idUsertoSend = case.studentAssigned,
+                                notificationService = notificationService,
+                                fechaOriginal = fechaOriginal,
+                                caseCounter = caseCounter,
+                                isConfirmed = isConfirmed,
+                                isCancelled = isCancelled
+                            )
+                        }
+                    }
+                    else{
+                        MensajeNotificacionConfirmacionesSinDestinoEspecifico(
+                            notificationService = notificationService,
+                            fechaOriginal = fechaOriginal,
+                            caseCounter = caseCounter,
+                            isConfirmed = isConfirmed,
+                            isCancelled = isCancelled
+                        )
+                    }
+                }
+                else
+                {
+                    if(!isAsistido && (isCancelled || isConfirmed))
+                    {
+                        userGeneralId?.let{ userGeneralId ->
+                            MensajeNotificacionConfirmaciones(
+                                idUsertoSend = userGeneralId,
+                                notificationService = notificationService,
+                                fechaOriginal = fechaOriginal,
+                                caseCounter = caseCounter,
+                                isConfirmed = isConfirmed,
+                                isCancelled = isCancelled
+                            )
+                        }
+                    }
+
+                }
+
                 Toast.makeText(context,"Cita Actualizada con excito", Toast.LENGTH_LONG).show()
 
             }
@@ -596,5 +735,85 @@ fun BotonGuardarCambios(appointmentId: String,
         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF002366))
     ) {
         Text(text = "Guardar Cambios", color = Color.White)
+    }
+}
+
+fun MensajeNotificacionReagendar(
+    idUsertoSend: String,
+    notificationService: NotificationService,
+    fechaOriginal: Timestamp,
+    caseCounter: Int?,
+    appointmentTimestamp: Date?
+)
+{
+    CoroutineScope(Dispatchers.IO).launch {
+        notificationService.sendNotificationToAssignedSpecificUser(
+            title = "Cambios en cita y Reagendacion",
+            message = "La cita con fecha inicial para el dia ${fechaOriginal.toDate()} " +
+                    "para el caso $caseCounter. ha cambiado de fecha al dia $appointmentTimestamp"+
+                    "\nRevisa los detalles en la aplicación.",
+            user_id = idUsertoSend
+        )
+    }
+}
+
+fun MensajeNotificacionReagendarSinDestinoEspecifico(
+    notificationService: NotificationService,
+    fechaOriginal: Timestamp,
+    caseCounter: Int?,
+    appointmentTimestamp: Date?
+)
+{
+    CoroutineScope(Dispatchers.IO).launch {
+        notificationService.sendNotificationToAllAbogadosYEstudiantes(
+            title = "Cambios en cita y Reagendacion",
+            message = "La cita con fecha inicial para el dia ${fechaOriginal.toDate()} " +
+                    "para el caso $caseCounter. ha cambiado de fecha al dia: $appointmentTimestamp"+
+                    "\nRevisa los detalles en la aplicación.",
+        )
+    }
+}
+
+fun MensajeNotificacionConfirmaciones(
+    idUsertoSend: String,
+    notificationService: NotificationService,
+    fechaOriginal: Timestamp,
+    caseCounter: Int?,
+    isCancelled: Boolean,
+    isConfirmed: Boolean,
+)
+{
+    CoroutineScope(Dispatchers.IO).launch {
+        notificationService.sendNotificationToAssignedSpecificUser(
+            title = "Cambios en cita",
+            message = "La cita con fecha inicial para el dia ${fechaOriginal.toDate()} " +
+                      "para el caso $caseCounter "+
+                       if (isConfirmed)"ha sido confirmada"
+                       else if(isCancelled)"ha sido cancelada"
+                       else "ha sufrido cambios"+
+                      "\nRevisa los detalles en la aplicación.",
+            user_id = idUsertoSend
+        )
+    }
+}
+
+fun MensajeNotificacionConfirmacionesSinDestinoEspecifico(
+    notificationService: NotificationService,
+    fechaOriginal: Timestamp,
+    caseCounter: Int?,
+    isCancelled: Boolean,
+    isConfirmed: Boolean,
+)
+{
+    CoroutineScope(Dispatchers.IO).launch {
+        notificationService.sendNotificationToAllAbogadosYEstudiantes(
+            title = "Cambios en cita",
+            message = "La cita con fecha inicial para el dia ${fechaOriginal.toDate()} " +
+                    "para el caso $caseCounter "+
+                    if (isConfirmed)"ha sido confirmada"
+                    else if(isCancelled)"ha sido cancelada"
+                    else "ha sufrido cambios"+
+                    "\nRevisa los detalles en la aplicación.",
+        )
     }
 }

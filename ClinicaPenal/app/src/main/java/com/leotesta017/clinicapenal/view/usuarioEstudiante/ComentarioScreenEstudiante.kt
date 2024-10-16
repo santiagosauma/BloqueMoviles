@@ -10,13 +10,20 @@ import com.leotesta017.clinicapenal.view.templatesPantallas.PantallaComentarTemp
 import com.leotesta017.clinicapenal.viewmodel.viewmodelUsuario.ComentarioViewModel
 
 @Composable
-fun ComentarioScreenEstudiante(navController: NavController?, caseId: String) {
+fun ComentarioScreenEstudiante(
+    navController: NavController?,
+    caseId: String,
+    destinatario: String,
+    currentUserName: String
+) {
     val comentarioViewModel: ComentarioViewModel = viewModel()
     PantallaComentarTemplate(
         navController = navController,
         title = "Comentario",
         caseId = caseId,
         route =  "detallecasoestudiante",
+        destinatario = destinatario,
+        currentUsername = currentUserName,
         onAddOrEditComment = { contenido, isUrgent, userId, case_Id ->
             comentarioViewModel.addNewComentarioToCase(
                 contenido = contenido,

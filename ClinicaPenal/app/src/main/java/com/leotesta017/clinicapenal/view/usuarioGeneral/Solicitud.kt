@@ -22,6 +22,8 @@ import androidx.navigation.compose.rememberNavController
 import com.google.firebase.Timestamp
 import com.leotesta017.clinicapenal.model.modelUsuario.Appointment
 import com.leotesta017.clinicapenal.model.modelUsuario.UserIdData
+import com.leotesta017.clinicapenal.notificaciones.NotificationService
+import com.leotesta017.clinicapenal.notificaciones.NotificationServiceSingleton
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.BarraNav
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.TopBar
 import com.leotesta017.clinicapenal.view.theme.ClinicaPenalTheme
@@ -29,6 +31,9 @@ import com.leotesta017.clinicapenal.view.usuarioColaborador.SeleccionarFechaYHor
 import com.leotesta017.clinicapenal.viewmodel.viewmodelUsuario.AppointmentViewModel
 import com.leotesta017.clinicapenal.viewmodel.viewmodelUsuario.CaseViewModel
 import com.leotesta017.clinicapenal.viewmodel.viewmodelUsuario.ExtraInfoViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -355,3 +360,5 @@ fun SolicitudPreview() {
         Solicitud(navController = rememberNavController())
     }
 }
+
+
