@@ -346,17 +346,21 @@ fun PantallaTemplateDetalleVistaCaso(
                     caseWithDetails?.first?.lawyerAssigned
                 }
 
-                Button(
-                    onClick = {
-                        navController?.navigate("$routeComentario/$caseId/$destinatario/$currentUserName")
-                    },
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp)
-                        .fillMaxWidth()
-                        .height(48.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF002366))
-                ) {
-                    Text("Comentar", color = Color.White)
+
+                if(!caseWithDetails?.first?.lawyerAssigned.isNullOrBlank()  && !caseWithDetails?.first?.studentAssigned.isNullOrBlank())
+                {
+                    Button(
+                        onClick = {
+                            navController?.navigate("$routeComentario/$caseId/$destinatario/$currentUserName")
+                        },
+                        modifier = Modifier
+                            .padding(horizontal = 16.dp)
+                            .fillMaxWidth()
+                            .height(48.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF002366))
+                    ) {
+                        Text("Comentar", color = Color.White)
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -366,8 +370,8 @@ fun PantallaTemplateDetalleVistaCaso(
                         datos,
                         colaboradorSeleccionado ?: Usuario(id = "", nombre = "Sin abogado", apellidos = ""),
                         estudianteSeleccionado ?: Usuario(id = "", nombre = "Sin estudiante", apellidos = ""),
-                        abogado,
-                        estudiante,
+                        datos.lawyerAssigned,
+                        datos.studentAssigned,
                         usuariocaso
                     )
                 }

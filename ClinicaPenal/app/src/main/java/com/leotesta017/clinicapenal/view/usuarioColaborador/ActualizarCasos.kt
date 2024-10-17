@@ -16,6 +16,7 @@ import com.leotesta017.clinicapenal.notificaciones.NotificationService
 import com.leotesta017.clinicapenal.notificaciones.NotificationServiceSingleton
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.AdminBarraNav
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.SectionTitle
+import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.SectionTitle2
 import com.leotesta017.clinicapenal.view.templatesPantallas.BotonesEstado
 import com.leotesta017.clinicapenal.view.templatesPantallas.BotonesRepresentacion
 import com.leotesta017.clinicapenal.view.templatesPantallas.PantallaTemplateDetalleVistaCaso
@@ -64,7 +65,7 @@ fun ActualizarCasos(
         },
         contenidoExtra = { case, abogadoseleccionado, estudianteseleccionado,abogadoactual,estudianteactual, usuariocasoid ->
             Spacer(modifier = Modifier.height(16.dp))
-            SectionTitle("Representación")
+            SectionTitle2("Representación")
 
             BotonesRepresentacion(caso = case, onRepresented = { isRepresented ->
                 representacionSeleccionada = isRepresented
@@ -73,7 +74,7 @@ fun ActualizarCasos(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            SectionTitle("Estado")
+            SectionTitle2("Estado")
 
             BotonesEstado(caso = case, onEstadoChange = { estado ->
                 estadoSeleccionado = estado
@@ -114,8 +115,8 @@ fun ActualizarCasos(
             Button(
                 onClick = {
                     // Validar que el caso tenga un abogado y un estudiante asignado
-                    val abogadoActual = if (abogadoactual != " ") abogadoactual else abogadoseleccionado.id
-                    val estudianteActual = if (estudianteactual != " ") estudianteactual else estudianteseleccionado.id
+                    val abogadoActual = if (abogadoactual.isNotBlank()) abogadoactual else abogadoseleccionado.id
+                    val estudianteActual = if (estudianteactual.isNotBlank()) estudianteactual else estudianteseleccionado.id
 
                     if (abogadoActual.isEmpty() || abogadoActual == " ") {
                         Toast.makeText(context, "Seleccione un abogado", Toast.LENGTH_SHORT).show()
