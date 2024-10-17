@@ -41,9 +41,15 @@ class ServicioRepository {
     // Método para agregar un nuevo servicio
     suspend fun addServicio(servicio: Servicio): Boolean {
         return try {
-            firestore.collection("servicios")
-                .add(servicio)
+            val documentRef = firestore.collection("servicios")
+                .add(servicio) // Firestore genera un ID para el nuevo documento
                 .await()
+
+            // Ahora actualizamos la categoría con el ID generado por Firestore
+            val serviciosid = servicio.copy(id = documentRef.id)
+
+            // Actualizamos el documento para que tenga el ID también en su campo
+            documentRef.set(serviciosid).await()
             true  // Devuelve true si se agregó correctamente
         } catch (e: Exception) {
             false  // Devuelve false en caso de error
@@ -63,6 +69,20 @@ class ServicioRepository {
             false  // Devuelve false en caso de error
         }
     }
+
+    // Método para eliminar una categoría existente basado en su ID
+    suspend fun deleteServicios(servicioId: String): Boolean {
+        return try {
+            firestore.collection("servicios")
+                .document(servicioId)  // Se utiliza el ID de la categoría para ubicar el documento
+                .delete()
+                .await()
+            true  // Devuelve true si se eliminó correctamente
+        } catch (e: Exception) {
+            false  // Devuelve false en caso de error
+        }
+    }
+
 }
 
 

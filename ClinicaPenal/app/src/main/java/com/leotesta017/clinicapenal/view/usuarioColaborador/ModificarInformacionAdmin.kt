@@ -49,7 +49,7 @@ fun ModificarInfoCategoriaAdmin(
     val snackbarHostState = remember { SnackbarHostState() }
     var snackbarMessage by remember { mutableStateOf("") }
     var showDiscardDialog by remember { mutableStateOf(false) } // Estado para controlar el diálogo
-
+    var showDeleteDialog by remember { mutableStateOf(false) }
     LaunchedEffect(id) {
         viewModel.fetchContenidoById(id)
     }
@@ -110,6 +110,9 @@ fun ModificarInfoCategoriaAdmin(
                     },
                     onCancelClick = {
                         showDiscardDialog = true
+                    },
+                    onDeleteClick = {
+                         showDeleteDialog = true
                     }
                 )
             }
@@ -141,6 +144,28 @@ fun ModificarInfoCategoriaAdmin(
                 },
                 dismissButton = {
                     Button(onClick = { showDiscardDialog = false }) {
+                        Text("No")
+                    }
+                }
+            )
+        }
+        if (showDeleteDialog) {
+            AlertDialog(
+                onDismissRequest = { showDeleteDialog = false },
+                title = { Text("Eliminar Categoria") },
+                text = { Text("¿Estás seguro de que deseas eliminar la categoria?") },
+                confirmButton = {
+                    Button(onClick = {
+                        showDeleteDialog = false
+
+                        viewModel.deleteCategoria(id)
+                        navController?.navigate("pantallainfoadmin")
+                    }) {
+                        Text("Sí")
+                    }
+                },
+                dismissButton = {
+                    Button(onClick = { showDeleteDialog = false }) {
                         Text("No")
                     }
                 }

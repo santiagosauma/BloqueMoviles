@@ -17,7 +17,7 @@ fun AgregarServiciosInfoEstudiante(navController: NavController?) {
         bottomBarContent = {
             EstudiantesBarraNav(navController = navController, modifier = Modifier.fillMaxWidth())
         },
-        onAddClick = {
+        onAddClick = { n,c,d,u->
             // Aquí va tu lógica para añadir (POST a Firebase)
         },
         onCancelClick = {

@@ -50,6 +50,7 @@ fun ModificarServiciosInfoAdmin(
     val snackbarHostState = remember { SnackbarHostState() }
     var snackbarMessage by remember { mutableStateOf("") }
     var showDiscardDialog by remember { mutableStateOf(false) } // Estado para controlar el diálogo
+    var showDeleteDialog by remember { mutableStateOf(false) }
 
 
     LaunchedEffect(id) {
@@ -123,6 +124,9 @@ fun ModificarServiciosInfoAdmin(
                     },
                     onCancelClick = {
                         showDiscardDialog = true
+                    },
+                    onDeleteClick = {
+                        showDeleteDialog = true
                     }
                 )
             }
@@ -153,6 +157,28 @@ fun ModificarServiciosInfoAdmin(
                 },
                 dismissButton = {
                     Button(onClick = { showDiscardDialog = false }) {
+                        Text("No")
+                    }
+                }
+            )
+        }
+        if (showDeleteDialog) {
+            AlertDialog(
+                onDismissRequest = { showDeleteDialog = false },
+                title = { Text("Eliminar Servicio") },
+                text = { Text("¿Estás seguro de que deseas eliminar este servicio?") },
+                confirmButton = {
+                    Button(onClick = {
+                        showDeleteDialog = false
+
+                        viewModel.deleteServicios(id)
+                        navController?.navigate("pantallainfoadmin")
+                    }) {
+                        Text("Sí")
+                    }
+                },
+                dismissButton = {
+                    Button(onClick = { showDeleteDialog = false }) {
                         Text("No")
                     }
                 }

@@ -54,7 +54,7 @@ import com.leotesta017.clinicapenal.model.modelUsuario.Case
 import com.leotesta017.clinicapenal.model.modelUsuario.ExtraInfo
 import com.leotesta017.clinicapenal.model.modelUsuario.UserIdData
 import com.leotesta017.clinicapenal.model.modelUsuario.Usuario
-import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.SectionTitle
+import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.SectionTitle2
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.TopBar
 import com.leotesta017.clinicapenal.viewmodel.viewmodelUsuario.CaseViewModel
 import com.leotesta017.clinicapenal.viewmodel.viewmodelUsuario.Case_CounterViewModel
@@ -138,7 +138,7 @@ fun PantallaTemplateDetalleVistaCaso(
                 Spacer(modifier = Modifier.height(16.dp))
 
 
-                SectionTitle("Información del Cliente")
+                SectionTitle2("Información del Cliente")
 
                 Spacer(modifier = Modifier.height(8.dp))
 
@@ -181,7 +181,7 @@ fun PantallaTemplateDetalleVistaCaso(
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
-                SectionTitle("Histórico de Citas")
+                SectionTitle2("Histórico de Citas")
                 Spacer(modifier = Modifier.height(8.dp))
 
 
@@ -228,7 +228,7 @@ fun PantallaTemplateDetalleVistaCaso(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 // Encargados (común)
-                SectionTitle("Encargados")
+                SectionTitle2("Encargados")
                 Spacer(modifier = Modifier.height(8.dp))
 
 
@@ -296,7 +296,7 @@ fun PantallaTemplateDetalleVistaCaso(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                SectionTitle("Comentarios")
+                SectionTitle2("Comentarios")
                 Spacer(modifier = Modifier.height(8.dp))
 
 
@@ -426,7 +426,7 @@ fun ClienteInfoComponent(
     )
 
     Spacer(modifier = Modifier.height(16.dp))
-    SectionTitle(title = "Información del Caso")
+    SectionTitle2(title = "Información del Caso")
     Spacer(modifier = Modifier.height(16.dp))
 
         // Mostrar datos específicos del caso

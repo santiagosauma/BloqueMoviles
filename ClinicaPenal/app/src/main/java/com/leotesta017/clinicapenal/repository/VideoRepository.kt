@@ -78,4 +78,14 @@ class VideoRepository {
             null
         }
     }
+
+    // Método para eliminar un video específico por su ID
+    suspend fun deleteVideoById(videoId: String): Boolean {
+        return try {
+            firestore.collection("videos").document(videoId).delete().await()
+            true // Eliminación exitosa
+        } catch (e: Exception) {
+            false // En caso de fallo
+        }
+    }
 }

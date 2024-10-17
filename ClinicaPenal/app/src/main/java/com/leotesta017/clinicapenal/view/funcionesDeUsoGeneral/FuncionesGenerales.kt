@@ -478,6 +478,30 @@ fun RoundedButton(icon: ImageVector,
 }
 
 @Composable
+fun RoundedButton2(icon: ImageVector,
+                  label: String,
+                  onClick: () -> Unit)
+{
+    Row(
+        modifier = Modifier
+            .clickable(onClick = onClick)
+            .clip(RoundedCornerShape(50))
+            .background(Color(0xFF002366))
+            .padding(start = 18.dp,top = 10.dp, bottom = 10.dp, end = 14.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = "",
+            tint = Color.White,
+            modifier = Modifier.size(24.dp)
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(text = label, color = Color.White, fontWeight = FontWeight.Bold)
+    }
+}
+
+@Composable
 fun PantallasExtra(navController: NavController?,
                    routeJuribot: String,
                    routeCrearSolicitud: String)
@@ -671,10 +695,14 @@ fun CarruselDeNoticias(
                                     }
                                 },
                                 isVisible = isVisible,
-                                showEditButton = tipousuario == "administrador" || tipousuario == "colaborador",
+                                showExtraButtons = tipousuario == "administrador" || tipousuario == "colaborador",
                                 onEditClick = {
                                     // Navigate to the edit screen, passing necessary data
                                     navController.navigate("editar_video/${video.id}")
+                                },
+                                onDeleteClick = {
+                                    viewModel.deleteVideo(video.id)
+                                    navController.navigate("pantallainfoadmin")
                                 }
                             )
                         }
@@ -692,11 +720,13 @@ fun VideoCard(
     video: Video,
     onFullscreenClick: (String) -> Unit,
     isVisible: Boolean,
-    showEditButton: Boolean = false,
-    onEditClick: (() -> Unit)? = null
+    showExtraButtons: Boolean = false,
+    onEditClick: (() -> Unit)? = null,
+    onDeleteClick: (() -> Unit)? = null
 ) {
     var expanded by remember { mutableStateOf(false) }
     val maxHeight = if (expanded) Int.MAX_VALUE.dp else 428.dp
+    var showDialog by remember { mutableStateOf(false)}
 
     Card(
         modifier = Modifier
@@ -795,7 +825,7 @@ fun VideoCard(
                     .padding(top = 4.dp)
             )
 
-            if (showEditButton) {
+            if (showExtraButtons && expanded) {
                 Spacer(modifier = Modifier.height(8.dp))
                 Button(
                     onClick = { onEditClick?.invoke() },
@@ -807,6 +837,41 @@ fun VideoCard(
                 ) {
                     Text(text = "Editar Video")
                 }
+                Spacer(modifier = Modifier.height(8.dp))
+                Button(
+                    onClick = {
+                        showDialog = true
+                              },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF002366),
+                        contentColor = Color.White
+                    )
+                ) {
+                    Text(text = "Borrar Video")
+                }
+            }
+
+            if (showDialog)
+            {
+                AlertDialog(
+                    onDismissRequest = { showDialog = false },
+                    confirmButton = {
+                        TextButton(onClick = {
+                            onDeleteClick?.invoke()
+                            showDialog = false
+                        }) {
+                            Text("Eliminar")
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { showDialog = false }) {
+                            Text("Cancelar")
+                        }
+                    },
+                    title = { Text("Confirmar Eliminar Video") },
+                    text = { Text("¿Estas seguro de que quieres eliminar este video?") }
+                )
             }
         }
     }
@@ -1061,6 +1126,23 @@ fun SectionTitle(title: String) {
             .fillMaxWidth()
             .background(Color.White)
             .padding(vertical = 12.dp)
+    ) {
+        Text(
+            text = title,
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color.Black,
+        )
+    }
+}
+
+@Composable
+fun SectionTitle2(title: String) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Color.White)
+            .padding(vertical = 12.dp, horizontal = 16.dp)
     ) {
         Text(
             text = title,
@@ -1506,7 +1588,7 @@ fun CaseUserAdminItem(
                 }
             },
             title = { Text("Confirmar Descartar Caso") },
-            text = { Text(confirmDeleteText) }
+            text = { Text("¿Estas seguro que quieres descartar este caso?") }
         )
     }
     if (showDeleteDialog && isAdmin) {
@@ -1770,7 +1852,7 @@ fun TextEditor(
             textStyle = applyStyle(TextStyle.Default).copy(color = MaterialTheme.colorScheme.onBackground),
             modifier = Modifier
                 .fillMaxSize()
-                .padding(8.dp)
+                .padding(8.dp),
         )
     }
 }

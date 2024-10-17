@@ -1,5 +1,7 @@
 package com.leotesta017.clinicapenal.viewmodel
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.leotesta017.clinicapenal.model.Video
@@ -19,6 +21,9 @@ class VideoViewModel : ViewModel() {
     // Estado para manejar posibles errores
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error
+
+    private val _deleteVideoResult = MutableLiveData<Boolean>()
+    val deleteVideoResult: LiveData<Boolean> get() = _deleteVideoResult
 
     // Método para obtener los videos
     init {
@@ -74,4 +79,19 @@ class VideoViewModel : ViewModel() {
             }
         }
     }
+
+    // Función para eliminar un video por su ID
+    fun deleteVideo(videoId: String) {
+        viewModelScope.launch {
+            try {
+                // Llamada al repositorio para eliminar el video
+                val result = repository.deleteVideoById(videoId)
+                _deleteVideoResult.postValue(result) // Actualizamos el LiveData con el resultado
+            } catch (e: Exception) {
+                _deleteVideoResult.postValue(false) // Si ocurre algún error, se informa que no fue exitoso
+            }
+        }
+    }
+
 }
+

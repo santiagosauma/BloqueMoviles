@@ -35,11 +35,10 @@ import androidx.navigation.NavController
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.RoundedButton
 import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.TopBar
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
-import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.ApplyStyleButtons
+import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.RoundedButton2
 import kotlinx.coroutines.launch
 
 @Composable
@@ -161,7 +160,8 @@ fun ModificarInfoTemplate(
     route: String,
     bottomBarContent: @Composable () -> Unit,
     onSaveClick: (String, String, String, String) -> Unit,
-    onCancelClick: () -> Unit
+    onCancelClick: () -> Unit,
+    onDeleteClick: () -> Unit
 ) {
     var nombre by remember { mutableStateOf(initialName) }
     var descripcion by remember { mutableStateOf(initialDescription) }
@@ -169,6 +169,7 @@ fun ModificarInfoTemplate(
     var textContent by remember { mutableStateOf(contenido) }
     var isModified by remember { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
+    var isEliminar by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
 
 
@@ -197,7 +198,7 @@ fun ModificarInfoTemplate(
                         }
                     )
                     RoundedButton(
-                        icon = Icons.Default.Delete,
+                        icon = Icons.Default.Cancel  ,
                         label = "Cancelar",
                         onClick = {
                             if (isModified) {
@@ -207,6 +208,13 @@ fun ModificarInfoTemplate(
                                     snackbarHostState.showSnackbar("No hay cambios sin guardar")
                                 }
                             }
+                        }
+                    )
+                    RoundedButton2(
+                        icon = Icons.Default.Delete,
+                        label = "",
+                        onClick = {
+                            onDeleteClick()
                         }
                     )
                 }
@@ -233,7 +241,7 @@ fun ModificarInfoTemplate(
                         descripcion = it
                         isModified = true
                     },
-                    label = { Text("URL de la imagen") },
+                    label = { Text("descripcipcion") },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(bottom = 8.dp)

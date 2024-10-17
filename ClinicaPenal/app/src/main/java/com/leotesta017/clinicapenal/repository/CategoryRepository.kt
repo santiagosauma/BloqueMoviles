@@ -40,9 +40,17 @@ class CategoryRepository {
     // Método para agregar un nuevo categoria
     suspend fun addCategoria(categoria: Categoria): Boolean {
         return try {
-            firestore.collection("categorias")
-                .add(categoria)
+            // Primero agregamos el documento sin el ID
+            val documentRef = firestore.collection("categorias")
+                .add(categoria) // Firestore genera un ID para el nuevo documento
                 .await()
+
+            // Ahora actualizamos la categoría con el ID generado por Firestore
+            val categoriaConId = categoria.copy(id = documentRef.id)
+
+            // Actualizamos el documento para que tenga el ID también en su campo
+            documentRef.set(categoriaConId).await()
+
             true  // Devuelve true si se agregó correctamente
         } catch (e: Exception) {
             false  // Devuelve false en caso de error
@@ -62,4 +70,19 @@ class CategoryRepository {
             false  // Devuelve false en caso de error
         }
     }
+
+    // Método para eliminar una categoría existente basado en su ID
+    suspend fun deleteCategoria(categoriaId: String): Boolean {
+        return try {
+            firestore.collection("categorias")
+                .document(categoriaId)  // Se utiliza el ID de la categoría para ubicar el documento
+                .delete()
+                .await()
+            true  // Devuelve true si se eliminó correctamente
+        } catch (e: Exception) {
+            false  // Devuelve false en caso de error
+        }
+    }
+
+
 }

@@ -43,8 +43,8 @@ fun PantallaInfoEstudiante(navController: NavController) {
                 errorCategoria = errorCategoria,
                 errorServicio = errorServicio,
                 navController = navController,
-                routeCategoria = "detalle_info",
-                routeServicio = "servicios_info",
+                routeCategoria = "detalle_info_estudiante",
+                routeServicio = "servicios_info_estudiante",
                 onSearchStarted = onSearchStarted
             )
         },
@@ -95,7 +95,7 @@ fun PantallaInfoEstudiante(navController: NavController) {
         pantallasExtra = {
             PantallasExtra(
                 navController = navController,
-                routeJuribot = "JuriBotAdmin",
+                routeJuribot = "JuriBotEstudiante",
                 routeCrearSolicitud = "generasolicitudestudiante"
             )
         },

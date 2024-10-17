@@ -78,4 +78,15 @@ class CategoryViewModel : ViewModel() {
             }
         }
     }
+
+    fun deleteCategoria(categoriaId: String) {
+        viewModelScope.launch {
+            try {
+                val result = repository.deleteCategoria(categoriaId)
+                _isSuccess.value = result  // Actualizamos el estado de éxito o fallo
+            } catch (e: Exception) {
+                _error.value = "Error al eliminar la categoría"
+            }
+        }
+    }
 }

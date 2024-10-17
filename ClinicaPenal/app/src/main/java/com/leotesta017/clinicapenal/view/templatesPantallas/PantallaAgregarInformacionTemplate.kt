@@ -47,12 +47,12 @@ import com.leotesta017.clinicapenal.view.funcionesDeUsoGeneral.TopBar
 fun PantallaAgregarInformacionTemplate(
     navController: NavController?,
     titulo: String,
-    textDescripcion: String,
+    initialTextDescripcion: String, // Cambié el nombre para dejar claro que es solo un valor inicial
     bottomBar: @Composable () -> Unit,
     content: @Composable (PaddingValues, String, (String) -> Unit) -> Unit
 ) {
     var currentTextStyle by remember { mutableStateOf(TextStyle.Default) }
-    var textContent by remember { mutableStateOf(textDescripcion) }
+    var textContent by remember { mutableStateOf("") } // Ahora el valor editable comienza vacío
 
     Scaffold(
         topBar = {
@@ -92,6 +92,10 @@ fun PantallaAgregarInformacionTemplate(
                 item {
                     Spacer(modifier = Modifier.height(16.dp))
 
+                    if (textContent.isEmpty()) {
+                        textContent = initialTextDescripcion
+                    }
+
                     content(paddingValues, textContent) { newText ->
                         textContent = newText
                     }
@@ -111,7 +115,6 @@ fun PantallaAgregarInformacionTemplate(
                             )
                         },
                         onApplyUnderline = {
-                            // Aquí puedes manejar el subrayado de manera personalizada si es necesario
                         }
                     )
 
@@ -127,21 +130,24 @@ fun PantallaAgregarInformacionTemplate(
     )
 }
 
-
-
 @Composable
 fun AgregarInfoTemplate(
     navController: NavController?,
     titulo: String,
-    textDescripcion: String,
+    textDescripcion: String, // Este sigue siendo solo el valor inicial
     bottomBarContent: @Composable () -> Unit,
-    onAddClick: () -> Unit,
+    onAddClick: (String, String, String, String) -> Unit, // Ahora aceptamos cuatro strings (nombre, descripción, url, contenido)
     onCancelClick: () -> Unit
 ) {
+    var nombre by remember { mutableStateOf("") }
+    var descripcion by remember { mutableStateOf("") }
+    var urlImagen by remember { mutableStateOf("") }
+    var contenido by remember { mutableStateOf("") } // Aquí el contenido editable comienza vacío
+
     PantallaAgregarInformacionTemplate(
         navController = navController,
+        initialTextDescripcion = textDescripcion, // Pasamos el valor inicial
         titulo = titulo,
-        textDescripcion = textDescripcion,
         bottomBar = {
             Row(
                 modifier = Modifier
@@ -152,7 +158,10 @@ fun AgregarInfoTemplate(
                 RoundedButton(
                     icon = Icons.Default.Edit,
                     label = "Añadir",
-                    onClick = onAddClick
+                    onClick = {
+                        // Aquí llamas a onAddClick pasándole los valores actualizados
+                        onAddClick(nombre, descripcion, urlImagen, contenido)
+                    }
                 )
                 RoundedButton(
                     icon = Icons.Default.Delete,
@@ -163,8 +172,7 @@ fun AgregarInfoTemplate(
             bottomBarContent()
         },
         content = { paddingValues, textContent, onTextChange ->
-            var nombre by remember { mutableStateOf("") }
-            var descripcion by remember { mutableStateOf("") }
+            contenido = textContent
 
             OutlinedTextField(
                 value = nombre,
@@ -174,7 +182,6 @@ fun AgregarInfoTemplate(
                     .fillMaxWidth()
                     .padding(bottom = 8.dp)
             )
-
 
             OutlinedTextField(
                 value = descripcion,
@@ -187,19 +194,18 @@ fun AgregarInfoTemplate(
                     .verticalScroll(rememberScrollState())
             )
 
-            Spacer(modifier = Modifier.height(5.dp))
-
-            Text(
-                text = "Contenido",
-                style = MaterialTheme.typography.bodyMedium.copy(
-                    color = MaterialTheme.colorScheme.primary,
-                    fontWeight = FontWeight.Bold
-                ),
-                modifier = Modifier.padding(top = 8.dp, start = 10.dp)
+            OutlinedTextField(
+                value = urlImagen,
+                onValueChange = { urlImagen = it },
+                label = { Text("URL de la imagen") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp)
             )
 
             Spacer(modifier = Modifier.height(5.dp))
         }
     )
 }
+
 

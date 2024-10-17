@@ -80,6 +80,17 @@ class ServicioViewModel : ViewModel() {
         }
     }
 
+    fun deleteServicios(servicioId: String) {
+        viewModelScope.launch {
+            try {
+                val result = repository.deleteServicios(servicioId)
+                _isSuccess.value = result  // Actualizamos el estado de éxito o fallo
+            } catch (e: Exception) {
+                _error.value = "Error al eliminar la categoría"
+            }
+        }
+    }
+
 
 }
 

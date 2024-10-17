@@ -591,5 +591,7 @@ fun MyApp() {
             )
         }
 
+        composable("JuriBotEstudiante") { JuriBotEstudiante(navController) }
+
     }
 }
